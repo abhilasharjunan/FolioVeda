@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/sync-nav",
       "schedule": "0 23 * * *"
+    },
+    {
+      "path": "/api/cron/sync-risk",
+      "schedule": "0 2 * * 1"
+    },
+    {
+      "path": "/api/cron/sync-schemes",
+      "schedule": "0 3 * * 1"
     }
   ]
 }

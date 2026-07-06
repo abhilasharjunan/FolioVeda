@@ -114,6 +114,14 @@ export default function AuthPage() {
               >
                 {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
               </Button>
+
+              {isLogin && (
+                <div className="text-center">
+                  <a href="/auth/forgot-password" className="text-xs text-slate-500 hover:text-blue-600 font-medium">
+                    Forgot password?
+                  </a>
+                </div>
+              )}
             </form>
 
             <div className="mt-6 text-center">

@@ -2,6 +2,16 @@
 
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { TrendingUp, LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+
+const links = [
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/portfolio/risk', label: 'Risk' },
+  { href: '/funds/compare', label: 'Compare' },
+  { href: '/top-funds', label: 'Top Funds' },
+];
 
 export default function Navbar() {
   const router = useRouter();
@@ -9,56 +19,43 @@ export default function Navbar() {
 
   if (pathname === '/' || pathname.startsWith('/auth')) return null;
 
-  return (
-    <nav className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white">
-      <div 
-        className="text-xl font-bold text-slate-900 tracking-tight cursor-pointer"
-        onClick={() => router.push('/dashboard')}
-      >
-        Folio<span className="text-blue-600">Veda</span>
-      </div>
-      <div className="flex gap-4 text-sm">
-        <button
-          onClick={() => router.push('/dashboard')}
-          className={`px-3 py-1.5 rounded-md transition-colors ${
-            pathname === '/dashboard' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          Dashboard
-        </button>
-         <button
-           onClick={() => router.push('/portfolio')}
-           className={`px-3 py-1.5 rounded-md transition-colors ${
-             pathname.startsWith('/portfolio') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900'
-           }`}
-         >
-           Portfolio
-         </button>
-          <button
-            onClick={() => router.push('/portfolio/risk')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              pathname === '/portfolio/risk' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Portfolio Risk
-          </button>
-          <button
-            onClick={() => router.push('/funds/compare')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              pathname === '/funds/compare' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Compare Funds
-          </button>
-          <button
-            onClick={() => router.push('/top-funds')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              pathname === '/top-funds' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Top Funds
-          </button>
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    router.push('/auth/signin');
+  };
 
+  return (
+    <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between h-14">
+        <div
+          onClick={() => router.push('/dashboard')}
+          className="flex items-center gap-2 font-bold text-lg text-slate-900 cursor-pointer shrink-0"
+        >
+          <TrendingUp className="text-blue-600" size={20} />
+          <span className="hidden xs:inline">Folio<span className="text-blue-600">Veda</span></span>
+        </div>
+        <div className="flex items-center gap-0.5 sm:gap-1 overflow-x-auto no-scrollbar">
+          {links.map(link => (
+            <button
+              key={link.href}
+              onClick={() => router.push(link.href)}
+              className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
+                pathname === link.href || (link.href !== '/dashboard' && pathname.startsWith(link.href))
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors ml-1"
+          >
+            <LogOut size={14} />
+            <span className="hidden sm:inline">Logout</span>
+          </button>
+        </div>
       </div>
     </nav>
   );

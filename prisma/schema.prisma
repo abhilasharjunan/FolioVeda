@@ -58,6 +58,8 @@ model Portfolio {
   name        String   @default("My Mutual Fund Portfolio")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   holdings    Holding[]
+  snapshots   PortfolioSnapshot[]
+  goals       Goal[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -147,4 +149,46 @@ model SectorCache {
   fetchedAt   DateTime @default(now())
 
   @@index([schemeCode])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+}
+
+model PortfolioSnapshot {
+  id         String   @id @default(uuid())
+  portfolioId String
+  totalValue Decimal  @db.Decimal(20, 2)
+  totalInvested Decimal @db.Decimal(20, 2)
+  xirr       Decimal? @db.Decimal(10, 4)
+  snapshotDate DateTime @default(now())
+
+  portfolio  Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId, snapshotDate])
+  @@index([snapshotDate])
+}
+
+model Goal {
+  id          String   @id @default(uuid())
+  portfolioId String
+  name        String
+  targetAmount Decimal @db.Decimal(20, 2)
+  targetDate  DateTime
+  currentAmount Decimal @db.Decimal(20, 2) @default(0)
+  category    String?  // Retirement, Education, Home, Emergency, Other
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
 }
