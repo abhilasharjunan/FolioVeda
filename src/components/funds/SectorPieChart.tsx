@@ -12,8 +12,8 @@ export const SectorPieChart = ({ data }: SectorPieChartProps) => {
   const formattedData = Object.entries(data).map(([name, value]) => ({ name, value }));
 
   return (
-    <div className="h-[300px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="w-full">
+      <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
             data={formattedData}
