@@ -148,7 +148,7 @@ export default function TopFundsPage() {
             schemeCode: fund.schemeCode,
             schemeName: fund.schemeName,
             fundHouse: fund.fundHouse,
-            nav: fund.nav,
+            nav: fund.latestNav ?? fund.nav,
             returns: {
               '1M': null, // Placeholder - would need additional API calls
               '3M': null,
@@ -236,6 +236,10 @@ export default function TopFundsPage() {
           </div>
         ) : (
           <div className="space-y-8">
+            <div className="flex items-center gap-3 text-sm text-slate-500 mb-2">
+              <ProgressCircle progress={progress} size={16} />
+              <span>{status}</span>
+            </div>
             <div className="flex justify-between items-end">
               <div className="space-y-2">
                 <SkeletonText className="h-8 w-64" />
