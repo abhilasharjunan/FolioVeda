@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   TrendingUp, Search,
@@ -43,10 +43,14 @@ export default function TopFundsPage() {
   const [activeCategory, setActiveCategory] = useState<FundCategory | 'All'>('All');
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>('Loading...');
-  const [currentFunds, setCurrentFunds] = useState<Array<any>>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({
+    key: '3Y',
+    direction: 'desc',
+  });
   const isMounted = useRef(true);
 
-  const getProcessedData = useCallback(() => {
+  const currentFunds = useMemo(() => {
     if (!fundsData) return [];
     const list: any[] = [];
     Object.entries(fundsData).forEach(([cat, funds]) => {
@@ -63,16 +67,6 @@ export default function TopFundsPage() {
       return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
     });
   }, [fundsData, activeCategory, searchQuery, sortConfig]);
-
-  useEffect(() => {
-    setCurrentFunds(getProcessedData());
-  }, [getProcessedData]);
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({
-    key: '3Y',
-    direction: 'desc',
-  });
 
   const fetchFunds = async () => {
     if (!isMounted.current) return;
@@ -200,11 +194,8 @@ export default function TopFundsPage() {
 
   useEffect(() => {
     fetchFunds();
-    
-    // Cleanup on unmount
-    return () => {
-      isMounted.current = false;
-    };
+    return () => { isMounted.current = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSort = (key: string) => {

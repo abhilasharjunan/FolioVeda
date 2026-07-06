@@ -18,13 +18,9 @@ function ResetPasswordForm() {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!token) {
-      setError('Invalid or missing reset token.');
-    }
-  }, [token]);
+  const [error, setError] = useState<string | null>(
+    token ? null : 'Invalid or missing reset token.'
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
