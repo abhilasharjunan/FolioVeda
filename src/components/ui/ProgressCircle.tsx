@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ProgressCircleProps {
   progress: number; // 0-100
@@ -9,19 +9,25 @@ interface ProgressCircleProps {
 
 export function ProgressCircle({ progress, size = 80, className = '' }: ProgressCircleProps) {
   const [animatedProgress, setAnimatedProgress] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  const animate = useCallback(() => {
+    setAnimatedProgress(prev => {
+      const step = (progress - prev) * 0.1;
+      if (Math.abs(step) > 0.1) {
+        rafRef.current = requestAnimationFrame(animate);
+        return prev + step;
+      }
+      return progress;
+    });
+  }, [progress]);
 
   useEffect(() => {
-    const animate = () => {
-      const step = (progress - animatedProgress) * 0.1;
-      if (Math.abs(step) > 0.1) {
-        setAnimatedProgress(p => p + step);
-        requestAnimationFrame(animate);
-      } else {
-        setAnimatedProgress(progress);
-      }
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-    requestAnimationFrame(animate);
-  }, [progress, animatedProgress]);
+  }, [animate]);
 
   const radius = size / 2 - 10; // Leave room for stroke
   const circumference = 2 * Math.PI * radius;

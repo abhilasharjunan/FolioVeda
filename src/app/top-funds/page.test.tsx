@@ -23,10 +23,6 @@ vi.mock('@/components/ui/skeletons', () => ({
   ),
 }));
 
-vi.mock('@/components/ui/ProgressCircle', () => ({
-  ProgressCircle: () => <div data-testid="progress-circle" />,
-}));
-
 vi.mock('@/lib/export', () => ({
   downloadCSV: vi.fn(),
 }));
@@ -35,7 +31,11 @@ import TopFundsPage from './page';
 
 beforeEach(() => {
   vi.stubGlobal('fetch', vi.fn(() =>
-    Promise.resolve(new Response(JSON.stringify({ funds: [] }), { status: 200 }))
+    Promise.resolve(new Response(JSON.stringify({
+      "Large Cap": [],
+      "Mid Cap": [],
+      "Small Cap": [],
+    }), { status: 200 }))
   ));
 });
 

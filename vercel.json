@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/sync-schemes",
       "schedule": "0 3 * * 1"
+    },
+    {
+      "path": "/api/cron/sync-top-funds",
+      "schedule": "0 * * * *"
     }
   ]
 }

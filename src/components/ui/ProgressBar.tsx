@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface ProgressBarProps {
   progress: number; // 0-100
@@ -13,19 +13,25 @@ export function ProgressBar({
   showLabel = true 
 }: ProgressBarProps) {
   const [animatedProgress, setAnimatedProgress] = useState(0);
+  const rafRef = useRef<number | null>(null);
+
+  const animate = useCallback(() => {
+    setAnimatedProgress(prev => {
+      const step = (progress - prev) * 0.1;
+      if (Math.abs(step) > 0.1) {
+        rafRef.current = requestAnimationFrame(animate);
+        return prev + step;
+      }
+      return progress;
+    });
+  }, [progress]);
 
   useEffect(() => {
-    const animate = () => {
-      const step = (progress - animatedProgress) * 0.1;
-      if (Math.abs(step) > 0.1) {
-        setAnimatedProgress(p => p + step);
-        requestAnimationFrame(animate);
-      } else {
-        setAnimatedProgress(progress);
-      }
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-    requestAnimationFrame(animate);
-  }, [progress, animatedProgress]);
+  }, [animate]);
 
   return (
     <div className={`w-full h-2.5 bg-slate-200 rounded-full overflow-hidden ${className}`}>

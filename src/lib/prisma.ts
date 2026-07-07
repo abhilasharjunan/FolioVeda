@@ -37,6 +37,11 @@ function createPrismaClient() {
       findUnique: () => Promise.reject(new Error('DATABASE_URL not configured')),
       upsert: () => Promise.reject(new Error('DATABASE_URL not configured')),
     },
+    topFundsCache: {
+      findMany: () => Promise.reject(new Error('DATABASE_URL not configured')),
+      create: () => Promise.reject(new Error('DATABASE_URL not configured')),
+      deleteMany: () => Promise.reject(new Error('DATABASE_URL not configured')),
+    },
     $transaction: async (fn: any) => {
       throw new Error('DATABASE_URL not configured');
     },

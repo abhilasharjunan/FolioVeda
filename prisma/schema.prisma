@@ -177,6 +177,22 @@ model PortfolioSnapshot {
   @@index([snapshotDate])
 }
 
+model TopFundsCache {
+  id            String   @id @default(cuid())
+  category      String
+  schemeCode    String
+  schemeName    String
+  fundHouse     String?
+  nav           Decimal  @db.Decimal(20, 4)
+  returns       Json
+  sinceInception Decimal? @db.Decimal(10, 4)
+  rank          Int
+  updatedAt     DateTime @updatedAt
+
+  @@unique([category, schemeCode])
+  @@index([category, rank])
+}
+
 model Goal {
   id          String   @id @default(uuid())
   portfolioId String

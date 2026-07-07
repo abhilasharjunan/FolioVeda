@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, ShieldCheck, ArrowUpRight, Info, User, Building2, Wallet, PieChart, Activity, RefreshCw } from 'lucide-react';
@@ -16,8 +16,8 @@ function formatReturn(value: number | null | undefined): string {
   return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
 }
 
-export default async function FundDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function FundDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
