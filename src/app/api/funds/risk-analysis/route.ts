@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BENCHMARK_SCHEMES, FundCategory } from "@/lib/funds";
-import { calculateRiskMetrics, RiskMetrics } from "@/lib/risk-analysis";
+import { getFullRiskAnalysis } from "@/lib/risk-analysis";
 
 export const dynamic = 'force-dynamic';
 
@@ -20,14 +20,16 @@ export async function GET(request: NextRequest) {
         const batch = schemes.slice(i, i + 3);
         const batchResults = await Promise.all(batch.map(async (scheme) => {
           try {
-            const metrics = await calculateRiskMetrics(scheme.schemeCode);
-            if (!metrics) return null;
+            const analysis = await getFullRiskAnalysis(scheme.schemeCode);
+            if (!analysis) return null;
 
             return {
-              schemeCode: scheme.schemeCode,
-              schemeName: scheme.schemeName,
+              schemeCode: analysis.schemeCode,
+              schemeName: analysis.schemeName,
               category: scheme.category,
-              metrics,
+              metrics: analysis.metrics,
+              fundManagerName: analysis.fundManagerName,
+              fundManagerTenure: analysis.fundManagerTenure,
             };
           } catch (e) {
             console.error(`Risk API error for ${scheme.schemeCode}:`, e);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFundInsights } from "@/lib/finapi";
 import { getHistoricalNav, calculateCAGR } from "@/lib/funds";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
@@ -12,9 +13,12 @@ export async function GET(
       return NextResponse.json({ error: "Scheme ID is required" }, { status: 400 });
     }
 
-    const insights = await getFundInsights(id);
+    const [insights, scheme] = await Promise.all([
+      getFundInsights(id),
+      prisma.schemeMaster.findUnique({ where: { schemeCode: id } }),
+    ]);
 
-    if (!insights) {
+    if (!insights && !scheme) {
       return NextResponse.json({ error: "Fund insights not found" }, { status: 404 });
     }
 
@@ -35,7 +39,38 @@ export async function GET(
       console.warn(`CAGR calculation failed for ${id}:`, cagrError);
     }
 
-    return NextResponse.json({ ...insights, cagrReturns });
+    const riskLevelMappings: Record<string, string> = {
+      'Low': 'Low',
+      'Low to Moderate': 'Low to Moderate',
+      'Moderate': 'Moderate',
+      'Moderate to High': 'Moderate to High',
+      'High': 'High',
+      'Very High': 'Very High',
+    };
+
+    return NextResponse.json({
+      ...insights,
+      cagrReturns,
+      schemeCode: scheme?.schemeCode || id,
+      schemeName: scheme?.schemeName || insights?.schemeName || 'Unknown Fund',
+      category: scheme?.category || null,
+      fundHouse: scheme?.fundHouse || insights?.fundHouse || 'N/A',
+      latestNav: scheme?.latestNav || null,
+      lastUpdated: scheme?.lastUpdated || null,
+      riskLevel: riskLevelMappings[scheme?.riskLevel || ''] || null,
+      riskScore: scheme?.riskScore || null,
+      volatility: scheme?.volatility || null,
+      sharpeRatio: scheme?.sharpeRatio || null,
+      sortinoRatio: scheme?.sortinoRatio || null,
+      maxDrawdown: scheme?.maxDrawdown || null,
+      maxDrawdownDuration: scheme?.maxDrawdownDuration || null,
+      alpha: scheme?.alpha || null,
+      beta: scheme?.beta || null,
+      rSquared: scheme?.rSquared || null,
+      treynorRatio: scheme?.treynorRatio || null,
+      fundManagerName: scheme?.fundManagerName || insights?.fundManager?.name || null,
+      fundManagerTenure: scheme?.fundManagerTenure || insights?.fundManager?.tenure || null,
+    });
   } catch (error) {
     console.error("Fund Insights API Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

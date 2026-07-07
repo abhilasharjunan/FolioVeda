@@ -1,6 +1,15 @@
 import { fetchSchemeDetails } from "./mfapi";
 import { prisma } from "./prisma";
 
+function getFundManagerFromPeer(peer: any): { name: string; tenure: string; experience: string } | null {
+  if (!peer) return null;
+  const name = peer.fundManagerName || peer.fund_manager_name || peer.fundManager?.name || null;
+  const tenure = peer.fundManagerTenure || peer.fund_manager_tenure || peer.fundManager?.tenure || null;
+  const experience = peer.fundManagerExperience || peer.fund_manager_experience || peer.fundManager?.experience || null;
+  if (name) return { name, tenure: tenure || 'N/A', experience: experience || 'N/A' };
+  return null;
+}
+
 export interface FundHoldings {
   stockName: string;
   allocation: number;
@@ -37,6 +46,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
       const schemeDetails = await fetchSchemeDetails(schemeCode);
       const schemeName = schemeDetails.meta?.scheme_name || schemeDetails.schemeName || `Scheme ${schemeCode}`;
       const fundHouse = schemeDetails.meta?.fund_house || "N/A";
+      const dbScheme = await prisma.schemeMaster.findUnique({ where: { schemeCode }, select: { fundManagerName: true, fundManagerTenure: true } });
       return {
         schemeCode,
         schemeName,
@@ -44,7 +54,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
         aum: "N/A",
         expenseRatio: "N/A",
         portfolioTurnover: "N/A",
-        fundManager: { name: "Not Available", tenure: "N/A", experience: "N/A" },
+        fundManager: { name: dbScheme?.fundManagerName || "Not Available", tenure: dbScheme?.fundManagerTenure || "N/A", experience: "N/A" },
         holdings: [],
         sectorAllocation: sectorData,
         peers: [],
@@ -59,6 +69,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
 
     if (!isin) {
       console.warn(`No ISIN found for scheme ${schemeCode}, returning partial data`);
+      const dbScheme = await prisma.schemeMaster.findUnique({ where: { schemeCode }, select: { fundManagerName: true, fundManagerTenure: true } });
       return {
         schemeCode,
         schemeName,
@@ -66,7 +77,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
         aum: "N/A",
         expenseRatio: "N/A",
         portfolioTurnover: "N/A",
-        fundManager: { name: "Not Available", tenure: "N/A", experience: "N/A" },
+        fundManager: { name: dbScheme?.fundManagerName || "Not Available", tenure: dbScheme?.fundManagerTenure || "N/A", experience: "N/A" },
         holdings: [],
         sectorAllocation: {},
         peers: [],
@@ -79,6 +90,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
 
     if (!response.ok) {
       console.warn(`FinAPI error ${response.status} for ${schemeCode}, returning mfapi.in data`);
+      const dbScheme = await prisma.schemeMaster.findUnique({ where: { schemeCode }, select: { fundManagerName: true, fundManagerTenure: true } });
       return {
         schemeCode,
         schemeName,
@@ -86,7 +98,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
         aum: "N/A",
         expenseRatio: "N/A",
         portfolioTurnover: "N/A",
-        fundManager: { name: "Not Available", tenure: "N/A", experience: "N/A" },
+        fundManager: { name: dbScheme?.fundManagerName || "Not Available", tenure: dbScheme?.fundManagerTenure || "N/A", experience: "N/A" },
         holdings: [],
         sectorAllocation: {},
         peers: [],
@@ -98,6 +110,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
 
     if (!data) {
       console.warn(`FinAPI returned empty data for ${schemeCode}, returning mfapi.in data`);
+      const dbScheme = await prisma.schemeMaster.findUnique({ where: { schemeCode }, select: { fundManagerName: true, fundManagerTenure: true } });
       return {
         schemeCode,
         schemeName,
@@ -105,7 +118,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
         aum: "N/A",
         expenseRatio: "N/A",
         portfolioTurnover: "N/A",
-        fundManager: { name: "Not Available", tenure: "N/A", experience: "N/A" },
+        fundManager: { name: dbScheme?.fundManagerName || "Not Available", tenure: dbScheme?.fundManagerTenure || "N/A", experience: "N/A" },
         holdings: [],
         sectorAllocation: {},
         peers: [],
@@ -133,6 +146,17 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
     }).catch(() => {});
 
     const currentPeer = (data.peers || []).find((p: any) => p.schemeCode === schemeCode) || data.peers?.[0];
+    const peerManager = getFundManagerFromPeer(currentPeer);
+    const dataManager = getFundManagerFromPeer(data);
+    let fundManager: FundManager;
+    if (peerManager) {
+      fundManager = peerManager;
+    } else if (dataManager) {
+      fundManager = dataManager;
+    } else {
+      const dbScheme = await prisma.schemeMaster.findUnique({ where: { schemeCode }, select: { fundManagerName: true, fundManagerTenure: true } });
+      fundManager = { name: dbScheme?.fundManagerName || "Not Available", tenure: dbScheme?.fundManagerTenure || "N/A", experience: "N/A" };
+    }
 
     return {
       schemeCode,
@@ -141,7 +165,7 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
       aum: currentPeer?.aum || "N/A",
       expenseRatio: currentPeer?.expenseRatio || "N/A",
       portfolioTurnover: currentPeer?.portfolioTurnover || "N/A",
-      fundManager: { name: "Not Available", tenure: "N/A", experience: "N/A" },
+      fundManager,
       holdings,
       sectorAllocation,
       peers: data.peers || [],

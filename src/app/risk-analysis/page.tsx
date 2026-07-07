@@ -266,7 +266,7 @@ export default function RiskAnalysisPage() {
                 </thead>
                 <tbody>
                   {currentFunds.length === 0 ? (
-                    <tr><td colSpan={6} className="p-12 text-center text-slate-400 font-medium">No risk data available.</td></tr>
+                    <tr><td colSpan={8} className="p-12 text-center text-slate-400 font-medium">No risk data available.</td></tr>
                   ) : (
                     currentFunds.map((fund) => (
                       <tr 
@@ -285,7 +285,9 @@ export default function RiskAnalysisPage() {
                         </td>
                         <td className="p-4 text-sm font-mono text-slate-600">{(fund.metrics.volatility * 100).toFixed(2)}%</td>
                         <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.sharpeRatio.toFixed(2)}</td>
+                        <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.sortinoRatio.toFixed(2)}</td>
                         <td className="p-4 text-sm font-mono text-rose-600">{(fund.metrics.maxDrawdown * 100).toFixed(2)}%</td>
+                        <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.maxDrawdownDuration}mo</td>
                         <td className="p-4">
                           <RiskOMeterInline level={
                             fund.metrics.compositeScore < 20 ? 'Low' :

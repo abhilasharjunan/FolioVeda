@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
               volatility: true, sharpeRatio: true, sortinoRatio: true,
               maxDrawdown: true, maxDrawdownDuration: true,
               alpha: true, beta: true, rSquared: true, treynorRatio: true, riskScore: true,
+              fundManagerName: true, fundManagerTenure: true,
             }
           });
           
@@ -82,6 +83,7 @@ export async function GET(request: NextRequest) {
                   volatility: 0, sharpeRatio: 0, sortinoRatio: 0,
                   maxDrawdown: 0, maxDrawdownDuration: 0,
                   alpha: 0, beta: 0, rSquared: 0, treynorRatio: 0, riskScore: 0,
+                  fundManagerName: null, fundManagerTenure: null,
                   aum: 'N/A', expenseRatio: 'N/A', sectorAllocation: {}, holdings: [],
                   cagrReturns: { '1Y': cagr1Y, '3Y': cagr3Y, '5Y': cagr5Y },
                   available: true
@@ -139,6 +141,8 @@ export async function GET(request: NextRequest) {
             rSquared: Number(scheme.rSquared || 0),
             treynorRatio: Number(scheme.treynorRatio || 0),
             riskScore: Number(scheme.riskScore || 0),
+            fundManagerName: scheme.fundManagerName || null,
+            fundManagerTenure: scheme.fundManagerTenure || null,
             aum: insights?.aum || 'N/A',
             expenseRatio: insights?.expenseRatio || 'N/A',
             sectorAllocation: insights?.sectorAllocation || {},
