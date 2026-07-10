@@ -177,4 +177,31 @@ export default async function PortfolioRiskPage() {
                       <td className="p-4">
                         <div className="flex flex-col">
                           <span className="text-sm font-semibold text-slate-800">{h.schemeName}</span>
-          
+                          <span className="text-[10px] text-slate-400 uppercase">{h.category}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-sm font-mono text-slate-600">
+                        {((h.currentValue / analysis.totalValue) * 100).toFixed(2)}%
+                      </td>
+                      <td className="p-4 text-sm font-mono text-slate-800 font-medium">
+                        ₹{h.currentValue.toLocaleString('en-IN')}
+                      </td>
+                      <td className="p-4 text-sm font-mono text-slate-600">
+                        {(h.volatility * 100).toFixed(2)}%
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="outline" className="text-slate-700 font-bold">
+                          {h.riskScore.toFixed(1)}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
+    </div>
+  );
+}

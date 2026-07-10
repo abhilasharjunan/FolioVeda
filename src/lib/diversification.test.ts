@@ -98,4 +98,6 @@ describe('getPortfolioDiversification', () => {
 
     const result = await getPortfolioDiversification();
     expect(result!.score).toBe(80); // (1 - 0.2) * 100 = 80
-    expect(result!.riskLevel).toBe('Well Divers
+    expect(result!.riskLevel).toBe('Well Diversified');
+  });
+});

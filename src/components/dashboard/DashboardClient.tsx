@@ -204,4 +204,10 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
           <AlertCircle className="text-blue-600 mt-0.5" size={18} />
           <p className="text-xs text-blue-700 leading-relaxed">
             <strong className="font-semibold">Compliance Note:</strong> Returns calculated using XIRR methodology based on your transaction history and latest available NAV. 
-            Past performance is not a guarantee of future returns. 
+            Past performance is not a guarantee of future returns. Please refer to the scheme's SID for detailed risk factors.
+          </p>
+        </div>
+      </FadeIn>
+    </div>
+  );
+}

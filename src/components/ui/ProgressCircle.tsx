@@ -63,4 +63,9 @@ export function ProgressCircle({ progress, size = 80, className = '', color = '#
           transform="rotate(-90 50 50)"
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-slate-900"
+      <div className="absolute inset-0 flex items-center justify-center text-sm font-medium text-slate-900">
+        {showLabel ? `${Math.round(animatedProgress)}%` : null}
+      </div>
+    </div>
+  );
+}

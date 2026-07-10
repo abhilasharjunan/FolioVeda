@@ -32,4 +32,26 @@ export async function syncRiskMetrics() {
             category: scheme.category,
             latestNav: 0,
             volatility: metrics.volatility,
-            sharpeRatio: metr
+            sharpeRatio: metrics.sharpeRatio,
+            sortinoRatio: metrics.sortinoRatio,
+            maxDrawdown: metrics.maxDrawdown,
+            maxDrawdownDuration: metrics.maxDrawdownDuration,
+            alpha: metrics.alpha,
+            beta: metrics.beta,
+            rSquared: metrics.rSquared,
+            treynorRatio: metrics.treynorRatio,
+            concentrationRisk: metrics.concentrationRisk,
+            sectorConcentration: metrics.sectorConcentration,
+            riskScore: metrics.compositeScore,
+          },
+        });
+        updatedCount++;
+      }
+    } catch (error) {
+      console.error(`Failed to sync risk for ${scheme.schemeCode}:`, error);
+    }
+  }
+  console.log(`Risk synchronization complete. Updated ${updatedCount} schemes.`);
+  return updatedCount;
+}
+

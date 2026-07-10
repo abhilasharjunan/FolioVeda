@@ -320,3 +320,35 @@ export default function TopFundsClient() {
                   currentFunds.map((fund: any, idx: number) => (
                     <tr
                       key={fund.schemeCode}
+                      onClick={() => router.push(`/funds/${fund.schemeCode}`)}
+                      className="border-b border-slate-50 hover:bg-slate-50/80 transition-all duration-200 cursor-pointer group"
+                    >
+                      <td className="p-4 text-sm font-bold text-slate-400 sticky left-0 bg-white group-hover:bg-slate-50/80 z-10">
+                        #{activeCategory === 'All' ? idx + 1 : fund.rank}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-slate-800">{fund.schemeName}</span>
+                          <span className="text-[10px] text-slate-400 uppercase font-medium">{fund.category}</span>
+                        </div>
+                      </td>
+                      <td className="p-4 text-sm font-mono text-slate-600">₹{fund.nav?.toFixed(2) ?? 'N/A'}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['1M'])}`}>{formatReturn(fund.returns['1M'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['3M'])}`}>{formatReturn(fund.returns['3M'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['6M'])}`}>{formatReturn(fund.returns['6M'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['1Y'])}`}>{formatReturn(fund.returns['1Y'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['3Y'])}`}>{formatReturn(fund.returns['3Y'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['5Y'])}`}>{formatReturn(fund.returns['5Y'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.returns['10Y'])}`}>{formatReturn(fund.returns['10Y'])}</td>
+                      <td className={`p-4 text-sm font-mono ${getReturnColor(fund.sinceInception)}`}>{formatReturn(fund.sinceInception)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </FadeIn>
+    </div>
+  );
+}

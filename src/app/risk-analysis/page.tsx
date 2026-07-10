@@ -371,4 +371,22 @@ export default function RiskAnalysisPage() {
                         <p className="text-[10px] text-slate-500 uppercase font-bold">
                           <MetricLabel label="Sharpe Ratio" tooltip={METRIC_EXPLANATIONS.sharpeRatio} />
                         </p>
-                   
+                        <p className="text-lg font-bold text-slate-900">{selectedFund.metrics.sharpeRatio.toFixed(2)}</p>
+                      </div>
+                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <p className="text-[10px] text-slate-500 uppercase font-bold">
+                          <MetricLabel label="Max Drawdown" tooltip={METRIC_EXPLANATIONS.maxDrawdown} />
+                        </p>
+                        <p className="text-lg font-bold text-rose-600">{(selectedFund.metrics.maxDrawdown * 100).toFixed(2)}%</p>
+                      </div>
+                    </div>
+                  </div>
+                </FadeIn>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </FadeIn>
+    </div>
+  );
+}

@@ -37,4 +37,6 @@ describe('Financial Stress Tests', () => {
       { amount: 18000, date: new Date('2023-01-01') },  // Current Value
     ];
     const result = calculateXIRR(flows);
-    expect(r
+    expect(result).toBeDefined();
+  });
+});

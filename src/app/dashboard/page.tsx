@@ -25,3 +25,10 @@ export default async function DashboardPage() {
           >
             Add Your First Holding
           </a>
+        </div>
+      </div>
+    );
+  }
+
+  return <DashboardClient analysis={analysis} divScore={divScore} riskAnalysis={riskAnalysis} />;
+}

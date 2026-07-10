@@ -88,4 +88,9 @@ export async function GET() {
       results[cat].sort((a, b) => b.metrics.compositeScore - a.metrics.compositeScore);
     }
 
-    
+    return NextResponse.json(results);
+  } catch (error) {
+    console.error("Risk Analysis API Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
