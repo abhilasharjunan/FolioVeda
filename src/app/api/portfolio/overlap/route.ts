@@ -21,13 +21,26 @@ export async function GET() {
     });
 
     if (!portfolio || portfolio.holdings.length < 2) {
-      return NextResponse.json({ pairs: [] });
+      return NextResponse.json({ funds: [], pairs: [] });
     }
 
-    const schemeCodes = portfolio.holdings.map((h) => h.schemeCode);
+    const schemeCodes = [...new Set(portfolio.holdings.map((h) => h.schemeCode))];
+
+    // Return the full fund list too (not just pairs with overlap data), so the
+    // UI can render a complete grid even for funds whose holdings data isn't
+    // available (shown as "N/A" rather than silently omitted).
+    const schemes = await prisma.schemeMaster.findMany({
+      where: { schemeCode: { in: schemeCodes } },
+      select: { schemeCode: true, schemeName: true, category: true },
+    });
+    const funds = schemeCodes.map((code) => {
+      const s = schemes.find((x) => x.schemeCode === code);
+      return { schemeCode: code, schemeName: s?.schemeName || `Scheme ${code}`, category: s?.category || null };
+    });
+
     const pairs = await calculatePortfolioOverlapMatrix(schemeCodes);
 
-    return NextResponse.json({ pairs });
+    return NextResponse.json({ funds, pairs });
   } catch (error) {
     console.error("Portfolio overlap API error:", error);
     return NextResponse.json({ error: "Failed to calculate portfolio overlap" }, { status: 500 });

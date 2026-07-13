@@ -9,8 +9,11 @@ const links = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/portfolio', label: 'Portfolio' },
   { href: '/portfolio/risk', label: 'Risk' },
+  { href: '/portfolio/overlap', label: 'Overlap' },
   { href: '/funds/compare', label: 'Compare' },
   { href: '/top-funds', label: 'Top Funds' },
+  { href: '/risk-analysis', label: 'Fund Ratings' },
+  { href: '/tools/sip-calculator', label: 'SIP Calculator' },
 ];
 
 export default function Navbar() {
@@ -25,7 +28,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <nav className="print:hidden sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between h-14">
         <div
           onClick={() => router.push('/dashboard')}

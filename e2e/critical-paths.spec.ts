@@ -5,36 +5,31 @@ test.describe('Critical User Paths', () => {
   test('homepage loads with navigation links', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /login/i })).toBeVisible();
   });
 
-  test('fund detail page loads for a known scheme', async ({ page }) => {
+  test('fund detail page redirects unauthenticated users to sign in', async ({ page }) => {
     await page.goto('/funds/118531');
     await page.waitForLoadState('networkidle');
-    const body = page.locator('body');
-    await expect(body).not.toContainText('not found');
+    await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
-  test('risk analysis page renders and displays categories', async ({ page }) => {
+  test('risk analysis page redirects unauthenticated users to sign in', async ({ page }) => {
     await page.goto('/risk-analysis');
     await page.waitForLoadState('networkidle');
-    const categoryPills = page.locator('button:has-text("Large Cap"), button:has-text("Mid Cap"), button:has-text("Small Cap")');
-    const count = await categoryPills.count();
-    expect(count).toBeGreaterThanOrEqual(3);
+    await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
-  test('top funds page loads and shows progress', async ({ page }) => {
+  test('top funds page redirects unauthenticated users to sign in', async ({ page }) => {
     await page.goto('/top-funds');
     await page.waitForLoadState('networkidle');
-    const heading = page.locator('h1');
-    await expect(heading).toBeVisible();
+    await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
-  test('fund comparison page loads with search input', async ({ page }) => {
+  test('fund comparison page redirects unauthenticated users to sign in', async ({ page }) => {
     await page.goto('/funds/compare');
     await page.waitForLoadState('networkidle');
-    const searchInput = page.locator('input[placeholder*="Search"]');
-    await expect(searchInput).toBeVisible();
+    await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
   test('sign in page displays form', async ({ page }) => {

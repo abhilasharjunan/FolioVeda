@@ -75,6 +75,6 @@ export async function getPortfolioDiversification() {
   return {
     distribution,
     score,
-    riskLevel: score > 80 ? 'Well Diversified' : score > 60 ? 'Moderate Concentration' : 'High Concentration'
+    riskLevel: score >= 80 ? 'Well Diversified' : score > 60 ? 'Moderate Concentration' : 'High Concentration'
   };
 }

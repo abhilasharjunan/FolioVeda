@@ -143,7 +143,8 @@ export default function TopFundsClient() {
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Top Performing Funds</h1>
             <p className="text-slate-500 max-w-2xl">
               Ranked by CAGR across a curated shortlist of ~90 well-established funds spanning
-              9 categories — not the full AMFI universe. Updated hourly from live NAV data.
+              9 categories, plus other AMFI-listed funds once enough NAV history has
+              accumulated to rank them fairly. Updated hourly from live NAV data.
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">

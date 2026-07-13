@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 
 export const SEBIFooter = () => {
   return (
-    <footer className="border-t bg-slate-50 py-6 px-4 text-center text-xs text-slate-500">
+    <footer className="print:hidden border-t bg-slate-50 py-6 px-4 text-center text-xs text-slate-500">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-2 mb-2 text-slate-600 font-medium">
           <AlertCircle size={14} />

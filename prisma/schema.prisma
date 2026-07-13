@@ -201,6 +201,23 @@ model TopFundsCache {
   @@index([category, rank])
 }
 
+model NavSnapshot {
+  id         String   @id @default(cuid())
+  schemeCode String
+  nav        Decimal  @db.Decimal(20, 4)
+  date       DateTime @db.Date
+
+  // Accumulated daily(ish) NAV history for the FULL AMFI universe, written by
+  // syncAmfiUniverse() on every cron run. This is what lets Top Funds expand
+  // beyond the curated ~90-scheme BENCHMARK_SCHEMES list without per-scheme
+  // mfapi.in calls: once a scheme has enough accumulated snapshots, its
+  // returns can be computed locally from this table. See src/lib/nav-snapshots.ts.
+  // History builds up over time from whenever the cron starts running — there
+  // is no backfill, so full-universe coverage grows gradually, not instantly.
+  @@unique([schemeCode, date])
+  @@index([schemeCode, date])
+}
+
 model Goal {
   id          String   @id @default(uuid())
   portfolioId String

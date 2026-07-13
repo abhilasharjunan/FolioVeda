@@ -189,6 +189,15 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                 <a href="/funds/compare" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
                   Compare Funds <ArrowRight size={10} />
                 </a>
+                <a href="/portfolio/overlap" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                  Fund Overlap <ArrowRight size={10} />
+                </a>
+                <a href="/portfolio/report" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                  Download Report <ArrowRight size={10} />
+                </a>
+                <a href="/tools/sip-calculator" className="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+                  SIP Calculator <ArrowRight size={10} />
+                </a>
               </div>
             </div>
           </Card>

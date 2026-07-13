@@ -57,3 +57,9 @@ body {
   color: hsl(var(--foreground));
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+}

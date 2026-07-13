@@ -70,6 +70,11 @@ export async function GET(
       treynorRatio: scheme?.treynorRatio || null,
       fundManagerName: scheme?.fundManagerName || insights?.fundManager?.name || null,
       fundManagerTenure: scheme?.fundManagerTenure || insights?.fundManager?.tenure || null,
+      aum: insights?.aum || 'N/A',
+      expenseRatio: insights?.expenseRatio || 'N/A',
+      portfolioTurnover: insights?.portfolioTurnover || 'N/A',
+      holdings: insights?.holdings || [],
+      sectorAllocation: insights?.sectorAllocation || {},
     });
   } catch (error) {
     console.error("Fund Insights API Error:", error);
