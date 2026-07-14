@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncRiskMetrics } from "@/lib/risk-sync";
+import { isAuthorizedCronRequest } from "@/lib/cron-auth";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  if (searchParams.get("key") !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -1,7 +1,18 @@
 import { prisma } from "./prisma";
 import { fetchAmfiNavAll, AmfiSchemeRecord } from "./amfi";
+import { randomUUID } from "crypto";
 
-const DB_BATCH_SIZE = 100; // concurrent upserts per batch — DB-bound, not network-bound
+// Bulk set-based upserts (one round trip per chunk via unnest + ON CONFLICT)
+// instead of one query per row. The full AMFI universe is ~14,000 schemes;
+// row-at-a-time upserts took 200s+ against Neon and blew past Vercel's
+// function time limit, so every scheduled cron run was failing silently.
+const SQL_CHUNK_SIZE = 2000;
+
+function chunk<T>(items: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
+}
 
 function parseAmfiDate(dateStr: string): Date | null {
   // AMFI dates look like "09-Jul-2026"
@@ -9,14 +20,74 @@ function parseAmfiDate(dateStr: string): Date | null {
   return isFinite(d.getTime()) ? d : null;
 }
 
-async function runInBatches<T>(items: T[], batchSize: number, fn: (item: T) => Promise<void>) {
-  let done = 0;
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    await Promise.all(batch.map((item) => fn(item).catch(() => {})));
-    done += batch.length;
+async function bulkUpsertSchemeCatalog(records: AmfiSchemeRecord[]): Promise<number> {
+  for (const batch of chunk(records, SQL_CHUNK_SIZE)) {
+    const ids = batch.map(() => randomUUID());
+    const codes = batch.map((r) => r.schemeCode);
+    const names = batch.map((r) => r.schemeName);
+    const categories = batch.map((r) => r.category);
+    const fundHouses = batch.map((r) => r.amcName || null);
+
+    await prisma.$executeRaw`
+      INSERT INTO "SchemeCatalog" ("id", "schemeCode", "schemeName", "category", "fundHouse", "updatedAt")
+      SELECT id, code, name, cat, house, now()
+      FROM unnest(${ids}::text[], ${codes}::text[], ${names}::text[], ${categories}::text[], ${fundHouses}::text[])
+        AS t(id, code, name, cat, house)
+      ON CONFLICT ("schemeCode") DO UPDATE SET
+        "schemeName" = EXCLUDED."schemeName",
+        "category" = COALESCE(EXCLUDED."category", "SchemeCatalog"."category"),
+        "fundHouse" = COALESCE(EXCLUDED."fundHouse", "SchemeCatalog"."fundHouse"),
+        "updatedAt" = now()
+    `;
   }
-  return done;
+  return records.length;
+}
+
+/**
+ * Refreshes latestNav/lastUpdated for schemes already tracked in SchemeMaster
+ * (held by users, or part of the curated benchmark list). The join against
+ * unnest() naturally no-ops for schemeCodes with no matching SchemeMaster
+ * row, so there's no need to pre-filter to "existing" codes first.
+ */
+async function bulkUpdateSchemeMaster(records: AmfiSchemeRecord[]): Promise<number> {
+  let updated = 0;
+  for (const batch of chunk(records, SQL_CHUNK_SIZE)) {
+    const codes = batch.map((r) => r.schemeCode);
+    const navs = batch.map((r) => r.nav.toString());
+    const dates = batch.map((r) => (parseAmfiDate(r.date) ?? new Date()).toISOString());
+
+    const result = await prisma.$executeRaw`
+      UPDATE "SchemeMaster" AS sm
+      SET "latestNav" = t.nav::decimal, "lastUpdated" = t.d::timestamp
+      FROM unnest(${codes}::text[], ${navs}::text[], ${dates}::text[]) AS t(code, nav, d)
+      WHERE sm."schemeCode" = t.code
+    `;
+    updated += Number(result);
+  }
+  return updated;
+}
+
+async function bulkUpsertNavSnapshots(records: AmfiSchemeRecord[]): Promise<number> {
+  const withDates = records
+    .map((r) => ({ r, date: parseAmfiDate(r.date) }))
+    // skip records with an unparseable date rather than snapshotting under
+    // today's date, which would corrupt the time series
+    .filter((x): x is { r: AmfiSchemeRecord; date: Date } => x.date !== null);
+
+  for (const batch of chunk(withDates, SQL_CHUNK_SIZE)) {
+    const ids = batch.map(() => randomUUID());
+    const codes = batch.map((x) => x.r.schemeCode);
+    const navs = batch.map((x) => x.r.nav.toString());
+    const dates = batch.map((x) => x.date.toISOString().slice(0, 10));
+
+    await prisma.$executeRaw`
+      INSERT INTO "NavSnapshot" ("id", "schemeCode", "nav", "date")
+      SELECT id, code, nav::decimal, d::date
+      FROM unnest(${ids}::text[], ${codes}::text[], ${navs}::text[], ${dates}::text[]) AS t(id, code, nav, d)
+      ON CONFLICT ("schemeCode", "date") DO UPDATE SET "nav" = EXCLUDED."nav"
+    `;
+  }
+  return withDates.length;
 }
 
 export interface AmfiSyncResult {
@@ -52,55 +123,9 @@ export async function syncAmfiUniverse(): Promise<AmfiSyncResult> {
     throw new Error(`AMFI sync aborted: only parsed ${records.length} scheme records (expected 1000+)`);
   }
 
-  // 1. Full-universe catalog upsert (drives autocomplete/search).
-  const catalogUpserted = await runInBatches(records, DB_BATCH_SIZE, async (r: AmfiSchemeRecord) => {
-    await prisma.schemeCatalog.upsert({
-      where: { schemeCode: r.schemeCode },
-      update: {
-        schemeName: r.schemeName,
-        category: r.category ?? undefined,
-        fundHouse: r.amcName || undefined,
-      },
-      create: {
-        schemeCode: r.schemeCode,
-        schemeName: r.schemeName,
-        category: r.category,
-        fundHouse: r.amcName || null,
-      },
-    });
-  });
-
-  // 2. Refresh latestNav for schemes we already track in SchemeMaster (held by
-  // users, or part of the curated benchmark list) — skip creating new rows
-  // here, since SchemeMaster carries risk fields that should only be populated
-  // via the risk-sync cron, not implicitly by a NAV-only sync.
-  const existingCodes = new Set(
-    (await prisma.schemeMaster.findMany({ select: { schemeCode: true } })).map((s) => s.schemeCode)
-  );
-  const relevantRecords = records.filter((r) => existingCodes.has(r.schemeCode));
-
-  const schemeMasterUpdated = await runInBatches(relevantRecords, DB_BATCH_SIZE, async (r: AmfiSchemeRecord) => {
-    await prisma.schemeMaster.update({
-      where: { schemeCode: r.schemeCode },
-      data: {
-        latestNav: r.nav,
-        lastUpdated: parseAmfiDate(r.date) ?? new Date(),
-      },
-    });
-  });
-
-  // 3. Append one NavSnapshot row per scheme for this file's NAV date. Uses
-  // the (schemeCode, date) unique constraint so re-running the sync on the
-  // same day is a no-op update rather than a duplicate row.
-  const navSnapshotsUpserted = await runInBatches(records, DB_BATCH_SIZE, async (r: AmfiSchemeRecord) => {
-    const date = parseAmfiDate(r.date);
-    if (!date) return; // skip records with an unparseable date rather than snapshotting under today's date, which would corrupt the time series
-    await prisma.navSnapshot.upsert({
-      where: { schemeCode_date: { schemeCode: r.schemeCode, date } },
-      update: { nav: r.nav },
-      create: { schemeCode: r.schemeCode, date, nav: r.nav },
-    });
-  });
+  const catalogUpserted = await bulkUpsertSchemeCatalog(records);
+  const schemeMasterUpdated = await bulkUpdateSchemeMaster(records);
+  const navSnapshotsUpserted = await bulkUpsertNavSnapshots(records);
 
   return {
     totalSchemesInFile: records.length,

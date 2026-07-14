@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { syncAmfiUniverse } from "@/lib/sync-amfi";
+import { isAuthorizedCronRequest } from "@/lib/cron-auth";
 
 export const dynamic = 'force-dynamic';
 
@@ -11,10 +12,7 @@ export const dynamic = 'force-dynamic';
  * see src/lib/sync-amfi.ts and src/lib/amfi.ts.
  */
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const cronSecret = searchParams.get("key");
-
-  if (cronSecret !== process.env.CRON_SECRET) {
+  if (!isAuthorizedCronRequest(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

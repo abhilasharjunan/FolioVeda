@@ -7,6 +7,17 @@ const CATEGORIES: FundCategory[] = [
   "ELSS", "Debt", "Hybrid", "Index Funds", "International Funds"
 ];
 
+// A single run across all 9 categories does live mfapi.in calls per scheme
+// and can't reliably finish inside Vercel's per-invocation time limit (Hobby
+// caps at 60s). CATEGORY_BATCHES splits the work into smaller cron-triggered
+// chunks (see vercel.json + the `batch` query param on the sync-top-funds
+// route) that each comfortably fit within that budget.
+export const CATEGORY_BATCHES: FundCategory[][] = [
+  ["Large Cap", "Mid Cap", "Small Cap"],
+  ["Flexi Cap", "ELSS", "Debt"],
+  ["Hybrid", "Index Funds", "International Funds"],
+];
+
 // Cap on how many full-universe SchemeCatalog candidates we evaluate per
 // category per run. Bounds DB work while NavSnapshot history is still thin;
 // most candidates will fail the minimum-history gate early on anyway. Can be
@@ -28,8 +39,9 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
   const schemes = BENCHMARK_SCHEMES.filter((s) => s.category === cat);
   const results: RankedFund[] = [];
 
-  for (let i = 0; i < schemes.length; i += 3) {
-    const batch = schemes.slice(i, i + 3);
+  const CONCURRENCY = 6;
+  for (let i = 0; i < schemes.length; i += CONCURRENCY) {
+    const batch = schemes.slice(i, i + CONCURRENCY);
     const batchResults = await Promise.all(batch.map(async (scheme): Promise<RankedFund | null> => {
       try {
         const currentNav = await getHistoricalNav(scheme.schemeCode, 0);
@@ -118,10 +130,15 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
   return results;
 }
 
-export async function syncTopFundsCache() {
+export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES) {
   const results: Record<string, RankedFund[]> = {};
 
-  for (const cat of CATEGORIES) {
+  // Persist each category's ranking as soon as it's computed, rather than
+  // collecting all requested categories and writing at the very end — a live
+  // mfapi.in call can stall/timeout mid-run, and this way whatever
+  // categories finished before that still land in the cache instead of the
+  // whole sync losing all progress.
+  for (const cat of categories) {
     const [curated, fullUniverse] = await Promise.all([
       getCuratedCandidates(cat),
       getFullUniverseCandidates(cat),
@@ -140,12 +157,10 @@ export async function syncTopFundsCache() {
       .slice(0, 10);
 
     results[cat] = sorted;
-  }
 
-  for (const [category, funds] of Object.entries(results)) {
-    for (const [idx, fund] of funds.entries()) {
+    for (const [idx, fund] of sorted.entries()) {
       await prisma.topFundsCache.upsert({
-        where: { category_schemeCode: { category, schemeCode: fund.schemeCode } },
+        where: { category_schemeCode: { category: cat, schemeCode: fund.schemeCode } },
         update: {
           schemeName: fund.schemeName,
           fundHouse: fund.fundHouse,
@@ -155,7 +170,7 @@ export async function syncTopFundsCache() {
           rank: idx + 1,
         },
         create: {
-          category,
+          category: cat,
           schemeCode: fund.schemeCode,
           schemeName: fund.schemeName,
           fundHouse: fund.fundHouse,
@@ -163,6 +178,21 @@ export async function syncTopFundsCache() {
           returns: fund.returns,
           sinceInception: fund.sinceInception,
           rank: idx + 1,
+        },
+      });
+    }
+
+    // Drop rows that fell out of this category's top 10 — upsert alone never
+    // removes anything, so a scheme that used to rank #8 but no longer
+    // qualifies would otherwise linger in the cache forever. Skip when sorted
+    // is empty: an empty result usually means every candidate fetch failed
+    // for this run, and `notIn: []` would otherwise wipe the whole category
+    // instead of just leaving last run's (still-good) data in place.
+    if (sorted.length > 0) {
+      await prisma.topFundsCache.deleteMany({
+        where: {
+          category: cat,
+          schemeCode: { notIn: sorted.map((f) => f.schemeCode) },
         },
       });
     }

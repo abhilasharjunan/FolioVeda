@@ -1,6 +1,6 @@
-const MFAPI_TIMEOUT = 8000;
+const MFAPI_TIMEOUT = 6000;
 const navCache = new Map<string, any>();
-const MAX_RETRIES = 2;
+const MAX_RETRIES = 1;
 
 export async function fetchSchemeDetails(schemeCode: string, retryCount = 0) {
   const cached = navCache.get(schemeCode);

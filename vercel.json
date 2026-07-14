@@ -13,8 +13,16 @@
       "schedule": "0 3 * * 1"
     },
     {
-      "path": "/api/cron/sync-top-funds",
+      "path": "/api/cron/sync-top-funds?batch=0",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/sync-top-funds?batch=1",
+      "schedule": "15 0 * * *"
+    },
+    {
+      "path": "/api/cron/sync-top-funds?batch=2",
+      "schedule": "30 0 * * *"
     }
   ]
 }
