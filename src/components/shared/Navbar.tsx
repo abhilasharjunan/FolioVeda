@@ -14,6 +14,7 @@ const links = [
   { href: '/top-funds', label: 'Top Funds' },
   { href: '/risk-analysis', label: 'Fund Ratings' },
   { href: '/tools/sip-calculator', label: 'SIP Calculator' },
+  { href: '/about', label: 'About' },
 ];
 
 export default function Navbar() {
