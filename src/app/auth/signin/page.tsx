@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, User } from 'lucide-react';
+import { Lock, Mail, User, Loader2 } from 'lucide-react';
 import { FadeIn } from '@/components/animations';
 
 export default function AuthPage() {
@@ -21,18 +21,25 @@ export default function AuthPage() {
     setError('');
     setIsLoading(true);
 
-    if (isLogin) {
-      const res = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
-      if (res?.error) {
-        setError('Invalid email or password');
-      } else {
+    try {
+      if (isLogin) {
+        const res = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        });
+        if (res?.error) {
+          setError('Invalid email or password');
+          setIsLoading(false);
+          return;
+        }
+        // Keep loading true through the dashboard navigation so the UI does not
+        // flash a non-loading state during the redirect gap.
         router.push('/dashboard');
+        router.refresh();
+        return;
       }
-    } else {
+
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -45,12 +52,21 @@ export default function AuthPage() {
         setIsLogin(true);
         setError('Account created! Please sign in.');
       }
+      setIsLoading(false);
+    } catch {
+      setError('Something went wrong. Please try again.');
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+    <div className="relative min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      {isLoading && isLogin && (
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-[1px]">
+          <Loader2 className="animate-spin text-blue-600 mb-3" size={32} />
+          <p className="text-sm font-medium text-slate-600">Signing you in…</p>
+        </div>
+      )}
       <FadeIn>
         <Card className="w-full max-w-md border-none shadow-xl bg-white">
           <CardHeader className="text-center space-y-2">
@@ -73,6 +89,7 @@ export default function AuthPage() {
                     value={formData.name} 
                     onChange={e => setFormData({...formData, name: e.target.value})} 
                     required 
+                    disabled={isLoading}
                   />
                 </div>
               )}
@@ -86,6 +103,7 @@ export default function AuthPage() {
                   value={formData.email} 
                   onChange={e => setFormData({...formData, email: e.target.value})} 
                   required 
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -98,6 +116,7 @@ export default function AuthPage() {
                   value={formData.password} 
                   onChange={e => setFormData({...formData, password: e.target.value})} 
                   required 
+                  disabled={isLoading}
                 />
               </div>
 
@@ -112,7 +131,14 @@ export default function AuthPage() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
                 disabled={isLoading}
               >
-                {isLoading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
+                {isLoading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 size={16} className="animate-spin" />
+                    {isLogin ? 'Signing in…' : 'Creating account…'}
+                  </span>
+                ) : (
+                  isLogin ? 'Sign In' : 'Create Account'
+                )}
               </Button>
 
               {isLogin && (
@@ -128,6 +154,7 @@ export default function AuthPage() {
               <button 
                 onClick={() => setIsLogin(!isLogin)} 
                 className="text-sm text-blue-600 hover:underline font-medium"
+                disabled={isLoading}
               >
                 {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
               </button>

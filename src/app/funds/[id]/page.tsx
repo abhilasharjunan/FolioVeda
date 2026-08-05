@@ -7,7 +7,7 @@ import { TrendingUp, ShieldCheck, ArrowUpRight, Info, User, Building2, Wallet, P
 import { RiskOMeter } from '@/components/funds/RiskOMeter';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
 import { ReturnsBarChart } from '@/components/funds/ReturnsBarChart';
-import { ProgressCircle } from '@/components/ui/ProgressCircle';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export const dynamic = 'force-dynamic';
 
@@ -162,14 +162,7 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
             </button>
           </>
         ) : (
-          <>
-            <div className="flex items-center space-x-4">
-              <div className="w-16">
-                <ProgressCircle progress={progress} size={32} className="mr-2" />
-              </div>
-              <span className="text-sm text-muted-foreground">{status}</span>
-            </div>
-          </>
+          <PageLoader />
         )}
       </div>
     );

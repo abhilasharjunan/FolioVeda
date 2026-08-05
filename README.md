@@ -60,7 +60,13 @@ A SEBI-aware mutual fund portfolio tracker with XIRR returns, risk analytics, di
 Configured in `vercel.json`:
 - NAV / scheme sync
 - Risk metrics sync
-- Top-funds sync
+- Top-funds sync (3 daily batches: `?batch=0|1|2`)
 
 Manual trigger example:
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" \
+  "https://folioveda.vercel.app/api/cron/sync-top-funds?batch=0"
+```
+Repeat for `batch=1` and `batch=2` after deploy so Top Funds cache is rebuilt (Direct Growth only).
+
 `GET /api/cron/sync-nav` with `Authorization: Bearer $CRON_SECRET`

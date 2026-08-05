@@ -59,7 +59,6 @@ export default function TopFundsClient() {
   }, [fundsData, activeCategory, searchQuery, sortConfig]);
 
   const fetchFunds = async () => {
-    const startTime = Date.now();
     setLoading(true);
     setError(null);
     try {
@@ -73,11 +72,6 @@ export default function TopFundsClient() {
       console.error("Failed to fetch funds", e);
       setError(e.message || "We're having trouble loading fund data. Please try again later.");
     } finally {
-      const elapsed = Date.now() - startTime;
-      const minLoad = 800;
-      if (elapsed < minLoad) {
-        await new Promise(r => setTimeout(r, minLoad - elapsed));
-      }
       setLoading(false);
     }
   };
@@ -144,9 +138,9 @@ export default function TopFundsClient() {
             </div>
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Top Performing Funds</h1>
             <p className="text-slate-500 max-w-2xl">
-              Ranked by CAGR across a curated shortlist of ~90 well-established funds spanning
-              9 categories, plus other AMFI-listed funds once enough NAV history has
-              accumulated to rank them fairly. Updated hourly from live NAV data.
+              Direct Growth plans only · updated daily. Ranked by 3Y CAGR across a curated
+              shortlist of well-established funds spanning 9 categories, plus other
+              AMFI-listed Direct Growth funds once enough NAV history has accumulated.
             </p>
           </div>
           <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">

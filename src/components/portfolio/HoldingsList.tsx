@@ -106,7 +106,16 @@ export default function HoldingsList() {
   const totalInvested = holdings.reduce((sum, h) =>
     sum + h.transactions.reduce((s, t) => s + (t.type === 'BUY' ? t.amount : -t.amount), 0), 0);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <Card className="border-none shadow-sm bg-white max-w-2xl mx-auto">
+        <CardContent className="flex items-center justify-center gap-3 py-16 text-slate-500">
+          <Loader2 className="animate-spin" size={22} />
+          <span className="text-sm font-medium">Loading holdings…</span>
+        </CardContent>
+      </Card>
+    );
+  }
   if (holdings.length === 0) return null;
 
   return (

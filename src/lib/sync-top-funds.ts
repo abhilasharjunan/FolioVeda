@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { BENCHMARK_SCHEMES, FundCategory, calculateCAGR, getHistoricalNav } from "@/lib/funds";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
+import { isDirectGrowthScheme } from "@/lib/scheme-filters";
+import redis from "@/lib/redis";
 
 const CATEGORIES: FundCategory[] = [
   "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap",
@@ -18,12 +20,9 @@ export const CATEGORY_BATCHES: FundCategory[][] = [
   ["Hybrid", "Index Funds", "International Funds"],
 ];
 
-// Cap on how many full-universe SchemeCatalog candidates we evaluate per
-// category per run. Bounds DB work while NavSnapshot history is still thin;
-// most candidates will fail the minimum-history gate early on anyway. Can be
-// raised once NavSnapshot coverage/perf is proven out in production.
 const FULL_UNIVERSE_CANDIDATES_PER_CATEGORY = 200;
 const RECENT_SNAPSHOT_LOOKBACK_DAYS = 14;
+const REDIS_TOP_FUNDS_KEY = "funds:top-performing:v2";
 
 interface RankedFund {
   schemeCode: string;
@@ -34,7 +33,11 @@ interface RankedFund {
   sinceInception: number | null;
 }
 
-/** Original data source: the curated ~90-scheme benchmark list, refreshed live from mfapi.in on every run. */
+/**
+ * Curated ~90-scheme list. Prefer locally stored NavSnapshot history (no
+ * network) when enough history exists; fall back to live mfapi.in only when
+ * snapshots are missing — keeps the daily cron inside Vercel's time budget.
+ */
 async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
   const schemes = BENCHMARK_SCHEMES.filter((s) => s.category === cat);
   const results: RankedFund[] = [];
@@ -44,6 +47,29 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
     const batch = schemes.slice(i, i + CONCURRENCY);
     const batchResults = await Promise.all(batch.map(async (scheme): Promise<RankedFund | null> => {
       try {
+        // Try local snapshots first (same path as full-universe ranking).
+        const lookbackDate = new Date(Date.now() - RECENT_SNAPSHOT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
+        const recent = await prisma.navSnapshot.findFirst({
+          where: { schemeCode: scheme.schemeCode, date: { gte: lookbackDate } },
+          orderBy: { date: "desc" },
+          select: { nav: true, date: true },
+        });
+
+        if (recent) {
+          const local = await computeReturnsFromSnapshots(scheme.schemeCode, Number(recent.nav));
+          if (hasMinimumHistory(local.earliestSnapshotDate)) {
+            return {
+              schemeCode: scheme.schemeCode,
+              schemeName: scheme.schemeName,
+              fundHouse: "Mutual Fund",
+              nav: Number(recent.nav),
+              returns: local.returns,
+              sinceInception: local.sinceInception,
+            };
+          }
+        }
+
+        // Fallback: live mfapi.in (slower; only when snapshots are thin).
         const currentNav = await getHistoricalNav(scheme.schemeCode, 0);
         if (!currentNav) return null;
 
@@ -80,20 +106,23 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
 }
 
 /**
- * New data source (item 5): schemes from the full AMFI universe (SchemeCatalog),
- * ranked using locally-accumulated NavSnapshot history — no external calls.
- * Schemes without enough accumulated history are silently skipped rather than
- * ranked on incomplete data; coverage grows as NavSnapshot rows accumulate.
+ * Full AMFI universe candidates from SchemeCatalog, ranked from NavSnapshot
+ * history only. Direct Growth plans only — Regular / IDCW / Dividend excluded.
  */
 async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[]> {
   const schemes = await prisma.schemeCatalog.findMany({
     where: { category: cat },
     select: { schemeCode: true, schemeName: true, fundHouse: true },
-    take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY,
+    take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3, // oversample then filter Direct Growth
   });
   if (schemes.length === 0) return [];
 
-  const schemeCodes = schemes.map((s) => s.schemeCode);
+  const directGrowth = schemes
+    .filter((s) => isDirectGrowthScheme(s.schemeName))
+    .slice(0, FULL_UNIVERSE_CANDIDATES_PER_CATEGORY);
+  if (directGrowth.length === 0) return [];
+
+  const schemeCodes = directGrowth.map((s) => s.schemeCode);
   const lookbackDate = new Date(Date.now() - RECENT_SNAPSHOT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
 
   const recentSnapshots = await prisma.navSnapshot.findMany({
@@ -110,12 +139,12 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
   }
 
   const results: RankedFund[] = [];
-  for (const scheme of schemes) {
+  for (const scheme of directGrowth) {
     const latest = latestByScheme.get(scheme.schemeCode);
-    if (!latest) continue; // no recent snapshot yet — sync hasn't covered it or it's stale
+    if (!latest) continue;
 
     const local = await computeReturnsFromSnapshots(scheme.schemeCode, latest.nav);
-    if (!hasMinimumHistory(local.earliestSnapshotDate)) continue; // not enough accumulated history to trust yet
+    if (!hasMinimumHistory(local.earliestSnapshotDate)) continue;
 
     results.push({
       schemeCode: scheme.schemeCode,
@@ -133,26 +162,25 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
 export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES) {
   const results: Record<string, RankedFund[]> = {};
 
-  // Persist each category's ranking as soon as it's computed, rather than
-  // collecting all requested categories and writing at the very end — a live
-  // mfapi.in call can stall/timeout mid-run, and this way whatever
-  // categories finished before that still land in the cache instead of the
-  // whole sync losing all progress.
   for (const cat of categories) {
     const [curated, fullUniverse] = await Promise.all([
       getCuratedCandidates(cat),
       getFullUniverseCandidates(cat),
     ]);
 
-    // Curated (live mfapi.in) data wins on overlap — it's refreshed every run
-    // and has full return-window coverage, whereas full-universe candidates
-    // depend on however much NavSnapshot history has accumulated so far.
     const merged = new Map<string, RankedFund>();
     for (const f of curated) merged.set(f.schemeCode, f);
     for (const f of fullUniverse) if (!merged.has(f.schemeCode)) merged.set(f.schemeCode, f);
 
-    const sorted = Array.from(merged.values())
-      // nulls (missing 3Y data) sort last instead of being treated as a 0% return
+    // Safety net: drop Regular / IDCW even if a curated display name slipped through.
+    // Curated BENCHMARK names sometimes omit "Direct/Growth" in the short label while
+    // the scheme code itself is Direct Growth — keep those (they come from curated).
+    const curatedCodes = new Set(curated.map((f) => f.schemeCode));
+    const eligible = Array.from(merged.values()).filter(
+      (f) => curatedCodes.has(f.schemeCode) || isDirectGrowthScheme(f.schemeName)
+    );
+
+    const sorted = eligible
       .sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity))
       .slice(0, 10);
 
@@ -182,12 +210,6 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
       });
     }
 
-    // Drop rows that fell out of this category's top 10 — upsert alone never
-    // removes anything, so a scheme that used to rank #8 but no longer
-    // qualifies would otherwise linger in the cache forever. Skip when sorted
-    // is empty: an empty result usually means every candidate fetch failed
-    // for this run, and `notIn: []` would otherwise wipe the whole category
-    // instead of just leaving last run's (still-good) data in place.
     if (sorted.length > 0) {
       await prisma.topFundsCache.deleteMany({
         where: {
@@ -196,6 +218,11 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
         },
       });
     }
+  }
+
+  // Invalidate the page-facing Redis payload so the next read rebuilds from DB.
+  if (redis) {
+    redis.del(REDIS_TOP_FUNDS_KEY).catch(() => {});
   }
 
   return results;
