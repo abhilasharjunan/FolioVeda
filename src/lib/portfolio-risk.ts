@@ -1,6 +1,7 @@
 import React from 'react';
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
+import { computeHHI } from "@/lib/risk-calculations";
 
 export async function getPortfolioRiskAnalysis() {
   const session = await auth();
@@ -71,8 +72,11 @@ export async function getPortfolioRiskAnalysis() {
     weightedScore += h.riskScore * weight;
   });
 
-  // Diversification check (HHI based on value distribution)
-  const hhi = holdingRisks.reduce((sum, h) => sum + Math.pow(h.currentValue / totalValue, 2), 0);
+  // Diversification check (HHI based on value distribution) — same helper as
+  // diversification.ts / risk-calculations so scores stay consistent.
+  const hhi = computeHHI(
+    holdingRisks.map((h) => ({ allocation: h.currentValue / totalValue }))
+  );
 
   // Normalize category allocation to percentages
   const categories = Object.entries(categoryAllocation).map(([name, value]) => ({

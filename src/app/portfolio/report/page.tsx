@@ -73,8 +73,14 @@ export default async function PortfolioReportPage() {
             </div>
             <div className="p-3 border border-slate-200 rounded-lg">
               <p className="text-[10px] text-slate-500 uppercase font-bold">Overall XIRR</p>
-              <p className={`text-lg font-bold ${(analysis.overallXirr ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
-                {analysis.overallXirr?.toFixed(2) ?? '0.00'}%
+              <p className={`text-lg font-bold ${
+                analysis.overallXirr == null
+                  ? 'text-slate-400'
+                  : analysis.overallXirr >= 0
+                  ? 'text-emerald-700'
+                  : 'text-rose-700'
+              }`}>
+                {analysis.overallXirr != null ? `${analysis.overallXirr.toFixed(2)}%` : 'N/A'}
               </p>
             </div>
           </div>
@@ -134,7 +140,11 @@ export default async function PortfolioReportPage() {
                   <td className="py-2 text-right font-mono text-slate-700">{fmtCurrency(h.invested)}</td>
                   <td className="py-2 text-right font-mono text-slate-700">{fmtCurrency(h.currentVal)}</td>
                   <td className={`py-2 text-right font-mono ${h.gain >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmtCurrency(h.gain)}</td>
-                  <td className={`py-2 text-right font-mono font-bold ${h.xirr >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{h.xirr?.toFixed(2) ?? '0.00'}%</td>
+                  <td className={`py-2 text-right font-mono font-bold ${
+                    h.xirr == null ? 'text-slate-400' : h.xirr >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                  }`}>
+                    {h.xirr != null ? `${h.xirr.toFixed(2)}%` : 'N/A'}
+                  </td>
                 </tr>
               ))}
             </tbody>

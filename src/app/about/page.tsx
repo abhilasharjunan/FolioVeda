@@ -75,7 +75,7 @@ export default function AboutPage() {
 
             <div className="pt-4 border-t border-slate-200">
               <p className="text-xs text-slate-500">
-                © 2025 FolioVeda. All rights reserved.
+                © {new Date().getFullYear()} FolioVeda. All rights reserved.
               </p>
             </div>
           </div>

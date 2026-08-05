@@ -1,56 +1,66 @@
-<<<<<<< HEAD
-# FolioVeda
-Mutual Fund Portfolio Analyzer
-=======
-# FolioVeda - Modern Mutual Fund Portfolio Analyzer
+# FolioVeda — Mutual Fund Portfolio Analyzer
 
-A professional-grade, SEBI-compliant mutual fund portfolio tracker focusing on precision XIRR and high-end security.
+A SEBI-aware mutual fund portfolio tracker with XIRR returns, risk analytics, diversification scoring, and fund overlap analysis.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL Database (Neon, Supabase, or Local)
+- PostgreSQL (Neon, Supabase, or local)
+- Optional: Redis for response caching
 
 ### Installation
-1. Clone the repository
-2. Install dependencies:
+1. Clone the repository and enter the app directory:
    ```bash
+   cd folioveda
    npm install
    ```
-3. Setup environment variables:
+2. Configure environment variables:
    ```bash
    cp .env.example .env
    ```
-4. Initialize Database:
+3. Initialize the database:
    ```bash
    npx prisma db push
    ```
-5. Run the application:
+4. Start the app:
    ```bash
    npm run dev
    ```
 
-## 🛡️ Security Architecture
-- **IDOR Protection**: All data access is scoped to the authenticated user via UUIDs and Prisma filters.
-- **Input Validation**: Zod schemas enforce strict typing on all API inputs.
-- **CSV Sanitization**: Using papaparse + Zod to prevent CSV injection.
-- **Data Isolation**: Row-level security patterns implemented at the API layer.
+## Scripts
+- `npm run dev` — local development server
+- `npm run build` / `npm start` — production build & serve
+- `npm test` — Vitest unit tests
+- `npm run test:e2e` — Playwright e2e tests
+- `npm run seed` — seed scheme data
+- `npm run repair:holdings` — merge duplicate holdings before unique-constraint migrations
 
-## ⚖️ SEBI Compliance
-- Persistent regulatory disclaimers in footer and dashboard.
-- Standardized Risk-o-Meter for fund risk assessment.
-- Explicit user consent flow for financial data storage.
-- Transparent data attribution (AMFI/mfapi.in).
+## Security
+- **IDOR protection**: data access scoped to the authenticated user
+- **Input validation**: Zod schemas on API inputs
+- **CSV sanitization**: papaparse + Zod to block formula injection
+- **Cron auth**: Bearer `CRON_SECRET` (with `?key=` fallback for manual runs)
 
-## 🛠️ Technical Stack
-- **Frontend**: Next.js 15, Tailwind CSS, shadcn/ui, Recharts.
-- **Backend**: Next.js API Routes, Prisma ORM.
-- **Auth**: NextAuth.js (Google OAuth).
-- **Calculations**: Newton-Raphson XIRR implementation.
-- **Data**: mfapi.in for daily NAV updates.
+## SEBI / Compliance Notes
+- Persistent regulatory disclaimers in the footer and dashboard
+- Standardized Risk-o-Meter for fund risk presentation
+- Explicit consent flow for financial data storage
+- Data attribution to AMFI / mfapi.in — informational only, not investment advice
 
-## 📅 Daily NAV Sync
-The system updates NAVs daily via a secure cron job:
-`GET /api/cron/sync-nav?key=${CRON_SECRET}`
->>>>>>> dfc8173 (Initial commit: FolioVeda mutual fund analysis platform)
+## Tech Stack
+- **Frontend**: Next.js (App Router), React 19, Tailwind CSS, shadcn/ui, Recharts, Framer Motion
+- **Backend**: Next.js API routes, Prisma 7 + PostgreSQL
+- **Auth**: NextAuth.js (credentials + Prisma adapter)
+- **Cache**: Redis (`ioredis`) where configured
+- **Calculations**: Newton-Raphson XIRR with bisection fallback; tested risk metrics
+- **Data**: AMFI NAVAll for daily sync; mfapi.in for historical NAV; finapi for holdings/sectors
+
+## Cron Jobs (Vercel)
+Configured in `vercel.json`:
+- NAV / scheme sync
+- Risk metrics sync
+- Top-funds sync
+
+Manual trigger example:
+`GET /api/cron/sync-nav` with `Authorization: Bearer $CRON_SECRET`

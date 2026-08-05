@@ -104,7 +104,9 @@ export const getPortfolioAnalysis = cache(async () => {
       }));
       
       fundCashFlows.push({ amount: currentVal, date: new Date() });
-      const fundXirr = calculateXIRR(fundCashFlows) || 0;
+      // null = could not converge / insufficient data — do NOT coerce to 0,
+      // which is a legitimate return and would mislead the UI.
+      const fundXirr = calculateXIRR(fundCashFlows);
 
       totalInvested += invested;
       currentMarketValue += currentVal;
@@ -118,20 +120,20 @@ export const getPortfolioAnalysis = cache(async () => {
         schemeName: scheme?.schemeName || "Unknown Fund",
         currentVal,
         invested,
-        xirr: fundXirr * 100,
+        xirr: fundXirr != null ? fundXirr * 100 : null,
         gain: currentVal - invested,
       };
     })
   );
 
   overallCashFlows.push({ amount: currentMarketValue, date: new Date() });
-  const overallXirr = calculateXIRR(overallCashFlows) || 0;
+  const overallXirr = calculateXIRR(overallCashFlows);
 
   return {
     totalInvested,
     currentMarketValue,
     absoluteGain: currentMarketValue - totalInvested,
-    overallXirr: overallXirr * 100,
+    overallXirr: overallXirr != null ? overallXirr * 100 : null,
     holdings: holdingAnalysis,
   };
 });

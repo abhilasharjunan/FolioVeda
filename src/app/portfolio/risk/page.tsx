@@ -47,7 +47,7 @@ export default async function PortfolioRiskPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
               <ShieldCheck size={16} />
-              <span>Portfolio Intelligence</span>
+              <span>Portfolio Insights</span>
             </div>
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Risk Aggregation</h1>
             <p className="text-slate-500 max-w-2xl">

@@ -46,8 +46,15 @@ export function computeSortinoRatio(monthlyReturns: number[]): number {
   return (annualizedReturn - RISK_FREE_RATE) / downsideDev;
 }
 
-export function computeMaxDrawdown(navs: number[]): { drawdown: number; duration: number } {
-  if (navs.length < 2) return { drawdown: 0, duration: 0 };
+/**
+ * Max drawdown for a NAV series ordered newest-to-oldest (same convention as
+ * computeMonthlyReturns / fetchMonthlyNavSeries). Peak-to-trough must be walked
+ * chronologically (oldest → newest); iterating newest-first misreads older
+ * troughs as drawdowns from a future peak.
+ */
+export function computeMaxDrawdown(navsNewestFirst: number[]): { drawdown: number; duration: number } {
+  if (navsNewestFirst.length < 2) return { drawdown: 0, duration: 0 };
+  const navs = [...navsNewestFirst].reverse();
   let peak = -Infinity;
   let peakIndex = 0;
   let maxDD = 0;
@@ -130,6 +137,11 @@ export function computeSectorConcentration(sectorAllocation: Record<string, numb
     .reduce((sum, val) => sum + val, 0);
 }
 
+/**
+ * 0–100 risk score where higher = riskier (matches Risk Analysis UI colors and
+ * PortfolioHealthGauge, which treats riskScore as exposure to invert).
+ * Volatility/drawdown push the score up; stronger Sharpe/Sortino/alpha push it down.
+ */
 export function computeCompositeScore(params: {
   volatility: number;
   maxDrawdown: number;
@@ -144,16 +156,18 @@ export function computeCompositeScore(params: {
   const normSharpe = Math.max(0, Math.min(params.sharpeRatio * 25, 100));
   const normSortino = Math.max(0, Math.min(params.sortinoRatio * 25, 100));
   const normAlpha = Math.max(0, Math.min((params.alpha + 0.1) * 250, 100));
-  const normBeta = Math.max(0, Math.min((2 - Math.abs(params.beta - 1)) * 50, 100));
+  // |β − 1| as market-deviation risk (β≈1 → low contribution)
+  const normBetaDev = Math.max(0, Math.min(Math.abs(params.beta - 1) * 100, 100));
   const normRSquared = Math.max(0, Math.min(params.rSquared * 100, 100));
 
-  return (
+  const score =
     normVol * 0.25 +
     normDD * 0.2 +
-    normSharpe * 0.2 +
-    normSortino * 0.15 +
-    normAlpha * 0.1 +
-    normBeta * 0.05 +
-    normRSquared * 0.05
-  );
+    (100 - normSharpe) * 0.2 +
+    (100 - normSortino) * 0.15 +
+    (100 - normAlpha) * 0.1 +
+    normBetaDev * 0.05 +
+    normRSquared * 0.05;
+
+  return Math.max(0, Math.min(score, 100));
 }

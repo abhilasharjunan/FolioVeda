@@ -32,9 +32,9 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
     },
     { 
       label: 'Overall XIRR', 
-      value: `${analysis.overallXirr?.toFixed(2) ?? '0.00'}%`, 
+      value: analysis.overallXirr != null ? `${analysis.overallXirr.toFixed(2)}%` : 'N/A', 
       icon: <PieChart className="text-indigo-600" />, 
-      trend: 'Annualized' 
+      trend: analysis.overallXirr != null ? 'Annualized' : 'Unable to calculate'
     },
   ];
 
@@ -55,8 +55,14 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
             <p className="text-slate-500">Live analysis of your mutual fund investments.</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-slate-400">Last updated</p>
-            <p className="text-sm font-medium text-slate-700">Today, 11:00 PM IST</p>
+            <p className="text-sm text-slate-400">As of</p>
+            <p className="text-sm font-medium text-slate-700">
+              {new Date().toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })} IST
+            </p>
           </div>
         </header>
       </FadeIn>
@@ -145,10 +151,18 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-sm font-bold ${fund.xirr >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {fund.xirr?.toFixed(2) ?? '0.00'}%
+                      <p className={`text-sm font-bold ${
+                        fund.xirr == null
+                          ? 'text-slate-400'
+                          : fund.xirr >= 0
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}>
+                        {fund.xirr != null ? `${fund.xirr.toFixed(2)}%` : 'N/A'}
                       </p>
-                      <p className="text-[10px] text-slate-400">XIRR</p>
+                      <p className="text-[10px] text-slate-400">
+                        {fund.xirr != null ? 'XIRR' : 'Insufficient data'}
+                      </p>
                     </div>
                   </div>
                 ))}

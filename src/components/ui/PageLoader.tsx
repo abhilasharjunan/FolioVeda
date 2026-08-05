@@ -1,10 +1,10 @@
 'use client';
 
-export function AILoader() {
+export function PageLoader() {
   return (
     <>
       <style>{`
-        .ai-loader-wrapper {
+        .page-loader-wrapper {
           position: relative;
           display: flex;
           align-items: center;
@@ -20,7 +20,7 @@ export function AILoader() {
           user-select: none;
         }
 
-        .ai-loader {
+        .page-loader {
           position: absolute;
           top: 0;
           left: 0;
@@ -28,11 +28,11 @@ export function AILoader() {
           aspect-ratio: 1 / 1;
           border-radius: 50%;
           background-color: transparent;
-          animation: ai-loader-rotate 2s linear infinite;
+          animation: page-loader-rotate 2s linear infinite;
           z-index: 0;
         }
 
-        @keyframes ai-loader-rotate {
+        @keyframes page-loader-rotate {
           0% {
             transform: rotate(90deg);
             box-shadow:
@@ -56,28 +56,25 @@ export function AILoader() {
           }
         }
 
-        .ai-loader-letter {
+        .page-loader-letter {
           display: inline-block;
           opacity: 0.4;
           transform: translateY(0);
-          animation: ai-loader-letter-anim 2s infinite;
+          animation: page-loader-letter-anim 2s infinite;
           z-index: 1;
           border-radius: 50ch;
           border: none;
         }
 
-        .ai-loader-letter:nth-child(1) { animation-delay: 0s; }
-        .ai-loader-letter:nth-child(2) { animation-delay: 0.1s; }
-        .ai-loader-letter:nth-child(3) { animation-delay: 0.2s; }
-        .ai-loader-letter:nth-child(4) { animation-delay: 0.3s; }
-        .ai-loader-letter:nth-child(5) { animation-delay: 0.4s; }
-        .ai-loader-letter:nth-child(6) { animation-delay: 0.5s; }
-        .ai-loader-letter:nth-child(7) { animation-delay: 0.6s; }
-        .ai-loader-letter:nth-child(8) { animation-delay: 0.7s; }
-        .ai-loader-letter:nth-child(9) { animation-delay: 0.8s; }
-        .ai-loader-letter:nth-child(10) { animation-delay: 0.9s; }
+        .page-loader-letter:nth-child(1) { animation-delay: 0s; }
+        .page-loader-letter:nth-child(2) { animation-delay: 0.1s; }
+        .page-loader-letter:nth-child(3) { animation-delay: 0.2s; }
+        .page-loader-letter:nth-child(4) { animation-delay: 0.3s; }
+        .page-loader-letter:nth-child(5) { animation-delay: 0.4s; }
+        .page-loader-letter:nth-child(6) { animation-delay: 0.5s; }
+        .page-loader-letter:nth-child(7) { animation-delay: 0.6s; }
 
-        @keyframes ai-loader-letter-anim {
+        @keyframes page-loader-letter-anim {
           0%, 100% {
             opacity: 0.4;
             transform: translateY(0);
@@ -93,18 +90,15 @@ export function AILoader() {
         }
       `}</style>
       <div className="flex flex-col items-center gap-4">
-        <div className="ai-loader-wrapper">
-          <span className="ai-loader-letter">G</span>
-          <span className="ai-loader-letter">e</span>
-          <span className="ai-loader-letter">n</span>
-          <span className="ai-loader-letter">e</span>
-          <span className="ai-loader-letter">r</span>
-          <span className="ai-loader-letter">a</span>
-          <span className="ai-loader-letter">t</span>
-          <span className="ai-loader-letter">i</span>
-          <span className="ai-loader-letter">n</span>
-          <span className="ai-loader-letter">g</span>
-          <div className="ai-loader" />
+        <div className="page-loader-wrapper">
+          <span className="page-loader-letter">L</span>
+          <span className="page-loader-letter">o</span>
+          <span className="page-loader-letter">a</span>
+          <span className="page-loader-letter">d</span>
+          <span className="page-loader-letter">i</span>
+          <span className="page-loader-letter">n</span>
+          <span className="page-loader-letter">g</span>
+          <div className="page-loader" />
         </div>
       </div>
     </>

@@ -24,7 +24,10 @@ export async function POST(req: Request) {
     }
     const meta = schemeData.meta as { scheme_name?: string; scheme_category?: string };
     const navEntries = schemeData.data as Array<{ date: string; nav: string }>;
-    const latestNav = navEntries.length > 0 ? navEntries[navEntries.length - 1].nav : "0";
+    // mfapi.in returns NAV history newest-first — data[0] is the latest NAV
+    // (same convention used by /api/funds/batch). Using the last element stored
+    // a stale/oldest NAV into SchemeMaster.
+    const latestNav = navEntries.length > 0 ? navEntries[0].nav : "0";
 
     await prisma.schemeMaster.upsert({
       where: { schemeCode: validated.schemeCode },
@@ -60,6 +63,12 @@ export async function POST(req: Request) {
       });
 
       if (!holding) {
+        if (validated.type === "SELL") {
+          return NextResponse.json(
+            { error: "Cannot sell units for a fund you do not hold." },
+            { status: 400 }
+          );
+        }
         holding = await tx.holding.create({
           data: {
             portfolioId: portfolio.id,
@@ -68,11 +77,17 @@ export async function POST(req: Request) {
           },
         });
       } else {
+        const delta = validated.type === "BUY" ? validated.units : -validated.units;
+        const nextUnits = Number(holding.units) + Number(delta);
+        if (nextUnits < -1e-9) {
+          return NextResponse.json(
+            { error: "Sell would reduce units below zero." },
+            { status: 400 }
+          );
+        }
         await tx.holding.update({
           where: { id: holding.id },
-          data: {
-            units: { increment: validated.type === "BUY" ? validated.units : -validated.units },
-          },
+          data: { units: nextUnits },
         });
       }
 

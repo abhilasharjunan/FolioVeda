@@ -60,7 +60,7 @@ export const METRIC_EXPLANATIONS: Record<string, string> = {
   concentrationRisk: "How concentrated the fund's top disclosed holdings are (HHI). Higher means the fund's returns depend heavily on a few stocks.",
   sectorConcentration: "The combined weight of the fund's top 3 sectors among its disclosed holdings. Higher means less sector diversification.",
   overlapPercentage: "Weighted overlap between two funds' top disclosed holdings — the share of stocks (by allocation) they both hold.",
-  compositeScore: "A single 0-100 blend of volatility, drawdown, Sharpe, Sortino, alpha, beta, and R-squared. Lower generally means lower risk.",
+  compositeScore: "A 0-100 risk exposure score. Higher means riskier. Volatility and drawdown raise it; stronger Sharpe/Sortino/alpha lower it.",
   diversificationScore: "0-100 score based on how evenly your holdings are spread across fund categories (via HHI). Higher means better diversified.",
   xirr: "Extended Internal Rate of Return — your annualized return accounting for the exact dates and sizes of every investment and withdrawal.",
 };

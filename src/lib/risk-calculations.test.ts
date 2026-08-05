@@ -44,12 +44,23 @@ describe('Risk Calculations', () => {
     expect(computeSortinoRatio(returns)).toBe(0);
   });
 
-  it('computeMaxDrawdown should find the largest peak-to-trough drop', () => {
-    const navs = [100, 120, 90, 110, 80, 130];
-    const result = computeMaxDrawdown(navs);
-    // Peak 120 -> Trough 80 = (120-80)/120 = 40/120 = 0.3333
+  it('computeMaxDrawdown should find the largest peak-to-trough drop (newest-first NAV series)', () => {
+    // Chronological oldest→newest: 100 → 120 → 90 → 110 → 80 → 130
+    // Peak 120 → trough 80 = (120-80)/120 = 0.3333
+    // Input must be newest-first to match computeMonthlyReturns / production.
+    const navsNewestFirst = [130, 80, 110, 90, 120, 100];
+    const result = computeMaxDrawdown(navsNewestFirst);
     expect(result.drawdown).toBeCloseTo(0.3333, 4);
     expect(result.duration).toBeGreaterThan(0);
+  });
+
+  it('computeMaxDrawdown should not invent drawdowns when reading newest-first history backwards', () => {
+    // Chronological: 70 → 90 → 80 → 95 → 100 (steady recovery after a small dip)
+    // Real MDD is 90→80 = 11.11%. Newest-first walk without reverse would wrongly
+    // treat older lows as drawdowns from the current peak.
+    const navsNewestFirst = [100, 95, 80, 90, 70];
+    const result = computeMaxDrawdown(navsNewestFirst);
+    expect(result.drawdown).toBeCloseTo(0.1111, 3);
   });
 
   it('computeSharpeRatio should return 0 if volatility is 0', () => {
@@ -96,5 +107,20 @@ describe('Risk Calculations', () => {
     const score = computeCompositeScore(params);
     expect(score).toBeGreaterThanOrEqual(0);
     expect(score).toBeLessThanOrEqual(100);
+  });
+
+  it('computeCompositeScore should treat higher Sharpe as lower risk (higher = riskier scale)', () => {
+    const base = {
+      volatility: 0.15,
+      maxDrawdown: 0.2,
+      sharpeRatio: 0.2,
+      sortinoRatio: 0.2,
+      alpha: 0,
+      beta: 1,
+      rSquared: 0.5,
+    };
+    const lowSharpe = computeCompositeScore(base);
+    const highSharpe = computeCompositeScore({ ...base, sharpeRatio: 2.0, sortinoRatio: 2.0 });
+    expect(highSharpe).toBeLessThan(lowSharpe);
   });
 });

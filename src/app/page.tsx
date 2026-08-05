@@ -8,13 +8,25 @@ import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
   const router = useRouter();
+
+  const scrollToFeatures = () => {
+    document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="relative min-h-screen bg-slate-50 overflow-hidden">
       <nav className="flex justify-between items-center p-6 max-w-7xl mx-auto">
         <div className="text-2xl font-bold text-slate-900 tracking-tight">
           Folio<span className="text-blue-600">Veda</span>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-2 sm:gap-4 items-center">
+          <Button
+            variant="ghost"
+            className="text-slate-600"
+            onClick={() => router.push('/tools/sip-calculator')}
+          >
+            SIP Calculator
+          </Button>
           <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Login</Button>
           <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-all hover:scale-105" onClick={() => router.push('/auth/signin')}>Get Started</Button>
         </div>
@@ -35,13 +47,13 @@ export default function LandingPage() {
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg transition-all hover:scale-105 active:scale-95" onClick={() => router.push('/auth/signin')}>
               Start Analyzing Free
             </Button>
-            <Button size="lg" variant="outline" className="px-8 py-6 text-lg transition-all hover:bg-white" onClick={() => router.push('/auth/signin')}>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-lg transition-all hover:bg-white" onClick={scrollToFeatures}>
               How it Works
             </Button>
           </div>
         </FadeIn>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+        <div id="features" className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left scroll-mt-24">
           <FadeIn delay={0.2}>
             <FeatureCard 
               icon={<TrendingUp className="text-blue-600" />} 
@@ -68,8 +80,6 @@ export default function LandingPage() {
     </div>
   );
 }
-
-
 
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
   return (

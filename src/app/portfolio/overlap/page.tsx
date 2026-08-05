@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FadeIn } from '@/components/animations';
-import { AILoader } from '@/components/ui/AILoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
 import { Layers, AlertTriangle, TrendingUp } from 'lucide-react';
 
@@ -87,7 +87,7 @@ export default function PortfolioOverlapPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <AILoader />
+        <PageLoader />
       </div>
     );
   }
@@ -120,7 +120,7 @@ export default function PortfolioOverlapPage() {
         <header className="space-y-2">
           <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
             <Layers size={16} />
-            <span>Portfolio Intelligence</span>
+            <span>Portfolio Insights</span>
           </div>
           <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
             <MetricLabel label="Portfolio Overlap" tooltip={METRIC_EXPLANATIONS.overlapPercentage} />

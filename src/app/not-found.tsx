@@ -3,8 +3,15 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { FileQuestion } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function NotFound() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const homeHref =
+    status === 'authenticated' && session ? '/dashboard' : '/';
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-6">
       <div className="p-4 bg-slate-100 rounded-full">
@@ -16,11 +23,11 @@ export default function NotFound() {
           The page you are looking for doesn't exist or has been moved.
         </p>
       </div>
-      <Button 
-        onClick={() => window.location.href = '/'} 
+      <Button
+        onClick={() => router.push(homeHref)}
         className="bg-blue-600 hover:bg-blue-700 text-white px-8"
       >
-        Back to Home
+        {homeHref === '/dashboard' ? 'Back to Dashboard' : 'Back to Home'}
       </Button>
     </div>
   );

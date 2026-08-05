@@ -5,9 +5,6 @@ import { Search, Loader2, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { searchSchemes } from '@/lib/mfapi';
-import { TransactionSchema } from '@/lib/validations';
-import { zodError } from '@/lib/utils'; // Utility to format zod errors
 
 export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => void }) {
   const [query, setQuery] = useState('');
@@ -21,19 +18,22 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  
-  const dropdownRef = useRef(null);
 
-  // Handle autocomplete search
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Proxy through /api/funds/search — mfapi.in has no CORS headers, so calling
+  // searchSchemes() directly from the browser fails in production.
   useEffect(() => {
     const timer = setTimeout(async () => {
       if (query.length > 2) {
         setIsLoading(true);
         try {
-          const results = await searchSchemes(query);
-          setSuggestions(results);
+          const res = await fetch(`/api/funds/search?q=${encodeURIComponent(query)}`);
+          const results = await res.json();
+          setSuggestions(Array.isArray(results) ? results : []);
         } catch (e) {
           console.error("Search failed", e);
+          setSuggestions([]);
         } finally {
           setIsLoading(false);
         }
@@ -43,6 +43,16 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
     }, 300);
     return () => clearTimeout(timer);
   }, [query]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setSuggestions([]);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSelectFund = (fund: { schemeName: string; schemeCode: string }) => {
     setSelectedFund(fund);
@@ -55,8 +65,14 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
     setIsSubmitting(true);
     setMessage({ type: '', text: '' });
 
+    if (!selectedFund?.schemeCode) {
+      setMessage({ type: 'error', text: 'Please select a fund from the suggestions.' });
+      setIsSubmitting(false);
+      return;
+    }
+
     const payload = {
-      schemeCode: String(selectedFund?.schemeCode),
+      schemeCode: String(selectedFund.schemeCode),
       units: formData.units,
       amount: formData.amount,
       date: formData.date,
@@ -70,7 +86,10 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error(await response.text());
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => null);
+        throw new Error(errBody?.error || `Request failed (${response.status})`);
+      }
 
       setMessage({ type: 'success', text: 'Holding added successfully!' });
       setFormData({ units: '', amount: '', date: new Date().toISOString().split('T')[0] });
@@ -91,14 +110,16 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Autocomplete Field */}
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <label className="text-sm font-medium text-slate-700 mb-1 block">Search Mutual Fund</label>
             <div className="relative">
-              <Input 
-                placeholder="e.g. HDFC Index Fund..." 
+              <Input
+                placeholder="e.g. HDFC Index Fund..."
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelectedFund(null);
+                }}
                 className="pl-10"
               />
               <Search className="absolute left-3 top-2.5 text-slate-400" size={18} />
@@ -108,8 +129,8 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
             {suggestions.length > 0 && (
               <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                 {suggestions.map((fund) => (
-                  <div 
-                    key={fund.schemeCode} 
+                  <div
+                    key={fund.schemeCode}
                     onClick={() => handleSelectFund(fund)}
                     className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-none transition-colors"
                   >
@@ -121,30 +142,39 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1 block">Units Allotted</label>
-              <Input 
-                type="number" 
-                step="0.0001" 
-                placeholder="0.0000"
+              <label className="text-sm font-medium text-slate-700 mb-1 block">Units</label>
+              <Input
+                type="number"
+                step="any"
+                placeholder="0.00"
                 value={formData.units}
-                onChange={(e) => setFormData({...formData, units: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, units: e.target.value })}
                 required
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1 block">Invested Amount (₹)</label>
-              <Input 
-                type="number" 
+              <label className="text-sm font-medium text-slate-700 mb-1 block">Amount (₹)</label>
+              <Input
+                type="number"
+                step="any"
                 placeholder="0.00"
                 value={formData.amount}
-                onChange={(e) => setFormData({...formData, amount: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-slate-700 mb-1 block">Date</label>
+              <Input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 required
               />
             </div>
           </div>
-          <input type="hidden" name="date" value={formData.date} />
 
           {message.text && (
             <div className={`p-3 rounded-lg text-xs font-medium flex items-center gap-2 ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
@@ -153,9 +183,9 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
             </div>
           )}
 
-          <Button 
-            type="submit" 
-            disabled={!selectedFund || isSubmitting} 
+          <Button
+            type="submit"
+            disabled={!selectedFund || isSubmitting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6"
           >
             {isSubmitting ? 'Processing...' : 'Add to Holdings'}

@@ -63,9 +63,15 @@ export default function RiskAnalysisPage() {
       try {
         const res = await fetch('/api/funds/risk-analysis');
         const json = await res.json();
-        setData(json);
+        if (!res.ok || json?.error) {
+          console.error("Risk analysis unavailable:", json?.error || res.statusText);
+          setData(null);
+        } else {
+          setData(json);
+        }
       } catch (e) {
         console.error("Failed to fetch risk data", e);
+        setData(null);
       } finally {
         setLoading(false);
       }
@@ -136,6 +142,23 @@ export default function RiskAnalysisPage() {
     );
   }
 
+  if (!data) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <Card className="border-none shadow-sm bg-white">
+          <CardContent className="p-8 text-center space-y-3">
+            <ShieldAlert className="mx-auto text-rose-500" size={28} />
+            <h2 className="text-xl font-semibold text-slate-900">Risk metrics unavailable</h2>
+            <p className="text-sm text-slate-500 max-w-md mx-auto">
+              The risk cache is empty or the sync has not run yet. Trigger the weekly
+              sync-risk cron, then refresh this page.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-8 max-w-7xl mx-auto bg-slate-50/30 min-h-screen">
       <FadeIn>
@@ -143,7 +166,7 @@ export default function RiskAnalysisPage() {
           <div className="space-y-2">
              <div className="flex items-center gap-2 text-rose-600 font-semibold text-sm uppercase tracking-wider">
                <ShieldAlert size={16} />
-               <span>Risk Intelligence</span>
+            <span>Risk Analysis</span>
              </div>
 
             <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Fund Risk Analysis</h1>

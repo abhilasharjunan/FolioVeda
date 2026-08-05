@@ -37,6 +37,11 @@ export async function GET(req: NextRequest) {
     }
 
     if (localResults.length >= 10) {
+      try {
+        if (redis) await redis.set(cacheKey, JSON.stringify(localResults), 'EX', 3600);
+      } catch {
+        // Redis unavailable
+      }
       return NextResponse.json(localResults);
     }
 

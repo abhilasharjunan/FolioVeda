@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { FadeIn } from '@/components/animations';
-import { AILoader } from '@/components/ui/AILoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { downloadCSV } from '@/lib/export';
 
 type FundCategory =
@@ -64,8 +64,10 @@ export default function TopFundsClient() {
     setError(null);
     try {
       const res = await fetch('/api/funds/top-performing');
-      if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
       const data = await res.json();
+      if (!res.ok || data?.error) {
+        throw new Error(data?.error || `Request failed with status ${res.status}`);
+      }
       setFundsData(data);
     } catch (e: any) {
       console.error("Failed to fetch funds", e);
@@ -106,7 +108,7 @@ export default function TopFundsClient() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50/30">
-        <AILoader />
+        <PageLoader />
       </div>
     );
   }
