@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { FadeIn } from '@/components/animations';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
-import { Layers, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { SectorPieChart } from '@/components/funds/SectorPieChart';
+import { Layers, AlertTriangle, ShieldCheck, PieChart } from 'lucide-react';
 
 interface FundEntry {
   schemeCode: string;
@@ -41,6 +42,18 @@ interface LookThroughHolding {
   heldInFunds: { schemeCode: string; schemeName: string; weightInFund: number; contribution: number }[];
 }
 
+interface LookThroughSector {
+  sector: string;
+  weight: number;
+}
+
+interface SectorDiversification {
+  hhi: number;
+  band: 'diversified' | 'moderate' | 'concentrated';
+  label: string;
+  topSectors: LookThroughSector[];
+}
+
 function shortName(name: string, max = 28): string {
   return name.length > max ? name.slice(0, max - 1) + '…' : name;
 }
@@ -52,6 +65,12 @@ function overlapStatus(pct: number, available: boolean): { label: string; classN
   if (pct >= 10) return { label: 'Moderate', className: 'border-amber-500/40 text-amber-400 bg-amber-500/10' };
   if (pct > 0) return { label: 'Low Overlap', className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' };
   return { label: 'Optimal', className: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10' };
+}
+
+function hhiBadge(band: SectorDiversification['band']): string {
+  if (band === 'diversified') return 'border-emerald-500/40 text-emerald-500 bg-emerald-500/10';
+  if (band === 'moderate') return 'border-amber-500/40 text-amber-500 bg-amber-500/10';
+  return 'border-rose-500/40 text-rose-500 bg-rose-500/10';
 }
 
 function MiniProgress({ value, max = 100 }: { value: number; max?: number }) {
@@ -70,6 +89,9 @@ export default function PortfolioOverlapPage() {
   const [funds, setFunds] = useState<FundEntry[]>([]);
   const [pairs, setPairs] = useState<OverlapPair[]>([]);
   const [lookThrough, setLookThrough] = useState<LookThroughHolding[]>([]);
+  const [sectors, setSectors] = useState<LookThroughSector[]>([]);
+  const [sectorDiversification, setSectorDiversification] = useState<SectorDiversification | null>(null);
+  const [concentratedTickers, setConcentratedTickers] = useState<LookThroughHolding[]>([]);
   const [insightsAvailable, setInsightsAvailable] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +110,9 @@ export default function PortfolioOverlapPage() {
         setFunds(data.funds || []);
         setPairs(data.pairs || []);
         setLookThrough(data.lookThrough || []);
+        setSectors(data.sectors || []);
+        setSectorDiversification(data.sectorDiversification || null);
+        setConcentratedTickers(data.concentratedTickers || []);
         setInsightsAvailable(data.insightsAvailable || 0);
         const sorted = [...(data.pairs || [])]
           .filter((p: OverlapPair) => p.dataAvailable)
@@ -114,6 +139,11 @@ export default function PortfolioOverlapPage() {
       return b.overlapPercentage - a.overlapPercentage;
     }),
     [pairs]
+  );
+
+  const sectorChartData = useMemo(
+    () => Object.fromEntries(sectors.map((s) => [s.sector, s.weight])),
+    [sectors]
   );
 
   if (loading) {
@@ -160,7 +190,7 @@ export default function PortfolioOverlapPage() {
                 <MetricLabel label="Stock Overlap & Concentration" tooltip={METRIC_EXPLANATIONS.overlapPercentage} />
               </h1>
               <p className="text-slate-500 dark:text-slate-400 max-w-2xl mt-2 text-sm leading-relaxed">
-                Weighted MIN overlap between fund pairs, plus look-through exposure to the stocks you actually own across the portfolio.
+                Weighted MIN overlap between fund pairs, look-through stock exposure, and true sector mix after peeling open each fund.
               </p>
             </div>
             {highOverlapCount > 0 ? (
@@ -180,6 +210,86 @@ export default function PortfolioOverlapPage() {
           </p>
         </header>
       </FadeIn>
+
+      {sectorDiversification && sectors.length > 0 && (
+        <FadeIn delay={0.03}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <Card className="surface-card border-none shadow-sm lg:col-span-2">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
+                  <PieChart className="w-5 h-5 text-indigo-500" />
+                  True Sector Allocation
+                </CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
+                  Look-through sector weights across your funds (portfolio weight × stock sector weight)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SectorPieChart data={sectorChartData} />
+              </CardContent>
+            </Card>
+            <Card className="surface-card border-none shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg font-heading text-slate-900 dark:text-slate-50">
+                  <MetricLabel label="Sector Diversification (HHI)" tooltip={METRIC_EXPLANATIONS.hhi} />
+                </CardTitle>
+                <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
+                  HHI = Σ (sector weight %)² · &lt;1500 green · 1500–2500 amber · &gt;2500 red
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="text-3xl font-bold text-slate-900 dark:text-slate-50 tabular-nums">
+                    {sectorDiversification.hhi.toLocaleString('en-IN')}
+                  </p>
+                  <Badge variant="outline" className={`mt-2 ${hhiBadge(sectorDiversification.band)}`}>
+                    {sectorDiversification.label}
+                  </Badge>
+                </div>
+                <ul className="space-y-2">
+                  {sectorDiversification.topSectors.slice(0, 5).map((s) => (
+                    <li key={s.sector} className="flex items-center justify-between gap-2 text-sm">
+                      <span className="text-slate-600 dark:text-slate-300 truncate">{s.sector}</span>
+                      <span className="font-mono tabular-nums text-slate-900 dark:text-slate-50 shrink-0">{s.weight.toFixed(1)}%</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </FadeIn>
+      )}
+
+      {concentratedTickers.length > 0 && (
+        <FadeIn delay={0.04}>
+          <Card className="surface-card border-none shadow-sm border-l-4 border-l-amber-500">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                Effective Ticker Concentration
+              </CardTitle>
+              <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
+                Stocks where look-through weight is ≥10% of your portfolio and held across 2+ funds — hidden single-name risk.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {concentratedTickers.map((s) => (
+                  <Badge
+                    key={s.stockName}
+                    variant="outline"
+                    className="border-amber-500/40 text-amber-700 dark:text-amber-300 bg-amber-500/10 px-3 py-1.5"
+                  >
+                    {s.stockName}
+                    <span className="ml-2 font-mono tabular-nums">{s.effectiveWeight.toFixed(1)}%</span>
+                    <span className="ml-1 text-[10px] opacity-70">· {s.heldInFunds.length} funds</span>
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+      )}
 
       <FadeIn delay={0.05}>
         <Card className="surface-card border-none shadow-sm">
@@ -253,7 +363,7 @@ export default function PortfolioOverlapPage() {
             <CardContent className="p-0">
               {!selectedPair.dataAvailable ? (
                 <p className="p-6 text-sm text-slate-500 dark:text-slate-400 text-center">
-                  Could not load disclosed holdings for this pair. Try again later — the FinAPI/AMFI feed may be temporarily unavailable.
+                  Could not load disclosed holdings for this pair. Try again later — the holdings feed may be temporarily unavailable.
                 </p>
               ) : selectedPair.commonStocks.length === 0 ? (
                 <p className="p-6 text-sm text-slate-500 dark:text-slate-400 text-center">
@@ -327,7 +437,11 @@ export default function PortfolioOverlapPage() {
                         </td>
                         <td className="py-3 pr-3 min-w-[160px]">
                           <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums w-14">
+                            <span className={`text-sm font-bold tabular-nums w-14 ${
+                              stock.effectiveWeight >= 10
+                                ? 'text-amber-600 dark:text-amber-400'
+                                : 'text-emerald-600 dark:text-emerald-400'
+                            }`}>
                               {stock.effectiveWeight.toFixed(1)}%
                             </span>
                             <div className="flex-1 max-w-[120px]">

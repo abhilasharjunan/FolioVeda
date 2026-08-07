@@ -34,6 +34,20 @@ export interface LookThroughHolding {
   heldInFunds: { schemeCode: string; schemeName: string; weightInFund: number; contribution: number }[];
 }
 
+export interface LookThroughSector {
+  sector: string;
+  weight: number; // 0-100 of portfolio
+}
+
+export type SectorHhiBand = "diversified" | "moderate" | "concentrated";
+
+export interface SectorDiversification {
+  hhi: number; // sum(weight_pct^2), classic 0–10000 scale
+  band: SectorHhiBand;
+  label: string;
+  topSectors: LookThroughSector[];
+}
+
 export interface PortfolioFundWeight {
   schemeCode: string;
   schemeName: string;
@@ -223,11 +237,97 @@ export function calculateLookThroughHoldings(
     }));
 }
 
+/**
+ * Look-through sector weights: portfolio fund weight × stock sector weight.
+ * Falls back to FinAPI sectorAllocation when stock-level sectors are sparse.
+ */
+export function calculateLookThroughSectors(
+  fundWeights: PortfolioFundWeight[],
+  insightsByCode: Map<string, FundInsights | null>
+): LookThroughSector[] {
+  const sectorAgg = new Map<string, number>();
+
+  for (const fund of fundWeights) {
+    const insights = insightsByCode.get(fund.schemeCode);
+    if (!insights || fund.portfolioWeight <= 0) continue;
+
+    const fromHoldings = new Map<string, number>();
+    for (const h of insights.holdings || []) {
+      const sector = (h.sector || "Other").trim() || "Other";
+      fromHoldings.set(sector, (fromHoldings.get(sector) || 0) + h.allocation);
+    }
+
+    const useHoldings = fromHoldings.size > 0;
+    const entries = useHoldings
+      ? [...fromHoldings.entries()]
+      : Object.entries(insights.sectorAllocation || {});
+
+    for (const [sector, weightInFund] of entries) {
+      const contribution = (fund.portfolioWeight * Number(weightInFund)) / 100;
+      if (!Number.isFinite(contribution) || contribution <= 0) continue;
+      sectorAgg.set(sector, (sectorAgg.get(sector) || 0) + contribution);
+    }
+  }
+
+  const total = [...sectorAgg.values()].reduce((s, v) => s + v, 0);
+  if (total <= 0) return [];
+
+  return [...sectorAgg.entries()]
+    .map(([sector, weight]) => ({
+      sector,
+      weight: Number(((weight / total) * 100).toFixed(2)),
+    }))
+    .sort((a, b) => b.weight - a.weight);
+}
+
+/**
+ * Classic HHI on percentage sector weights (0–10000).
+ * <1500 diversified · 1500–2500 moderate · >2500 concentrated
+ */
+export function calculateSectorHhi(sectors: LookThroughSector[]): SectorDiversification {
+  const hhi = Number(
+    sectors.reduce((sum, s) => sum + Math.pow(s.weight, 2), 0).toFixed(0)
+  );
+
+  let band: SectorHhiBand;
+  let label: string;
+  if (hhi < 1500) {
+    band = "diversified";
+    label = "Highly diversified";
+  } else if (hhi <= 2500) {
+    band = "moderate";
+    label = "Moderate sector concentration";
+  } else {
+    band = "concentrated";
+    label = "High sector concentration";
+  }
+
+  return {
+    hhi,
+    band,
+    label,
+    topSectors: sectors.slice(0, 8),
+  };
+}
+
+/** Flag look-through stocks that hide concentrated single-name risk across funds. */
+export function flagConcentratedTickers(
+  lookThrough: LookThroughHolding[],
+  thresholdPct = 10
+): LookThroughHolding[] {
+  return lookThrough.filter(
+    (s) => s.effectiveWeight >= thresholdPct && s.heldInFunds.length >= 2
+  );
+}
+
 export async function buildPortfolioOverlapAnalysis(
   fundWeights: PortfolioFundWeight[]
 ): Promise<{
   pairs: OverlapResult[];
   lookThrough: LookThroughHolding[];
+  sectors: LookThroughSector[];
+  sectorDiversification: SectorDiversification;
+  concentratedTickers: LookThroughHolding[];
   insightsAvailable: number;
 }> {
   const uniqueCodes = [...new Set(fundWeights.map((f) => f.schemeCode))];
@@ -266,8 +366,18 @@ export async function buildPortfolioOverlapAnalysis(
     }
   }
 
-  const lookThrough = calculateLookThroughHoldings(fundWeights, insightsByCode);
+  const lookThrough = calculateLookThroughHoldings(fundWeights, insightsByCode, 15);
+  const sectors = calculateLookThroughSectors(fundWeights, insightsByCode);
+  const sectorDiversification = calculateSectorHhi(sectors);
+  const concentratedTickers = flagConcentratedTickers(lookThrough);
   const insightsAvailable = [...insightsByCode.values()].filter((v) => (v?.holdings?.length || 0) > 0).length;
 
-  return { pairs, lookThrough, insightsAvailable };
+  return {
+    pairs,
+    lookThrough,
+    sectors,
+    sectorDiversification,
+    concentratedTickers,
+    insightsAvailable,
+  };
 }

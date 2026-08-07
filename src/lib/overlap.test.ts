@@ -3,6 +3,9 @@ import {
   calculateFundOverlap,
   calculatePortfolioOverlapMatrix,
   calculateLookThroughHoldings,
+  calculateLookThroughSectors,
+  calculateSectorHhi,
+  flagConcentratedTickers,
   normalizeStockKey,
 } from './overlap';
 import { getFundInsights } from './finapi';
@@ -56,6 +59,75 @@ describe('calculateLookThroughHoldings', () => {
     // Infosys: 40*5/100 = 2
     expect(result[1].stockName).toBe('Infosys');
     expect(result[1].effectiveWeight).toBeCloseTo(2, 4);
+  });
+});
+
+describe('look-through sectors + HHI', () => {
+  it('aggregates sector weights across funds', () => {
+    const map = new Map([
+      [
+        'A',
+        {
+          ...insights('A', 'Fund A', [
+            { stockName: 'HDFC Bank', allocation: 50 },
+            { stockName: 'Infosys', allocation: 50 },
+          ]),
+          holdings: [
+            { stockName: 'HDFC Bank', allocation: 50, sector: 'Financial Services' },
+            { stockName: 'Infosys', allocation: 50, sector: 'IT' },
+          ],
+        },
+      ],
+      [
+        'B',
+        {
+          ...insights('B', 'Fund B', [{ stockName: 'ICICI Bank', allocation: 100 }]),
+          holdings: [{ stockName: 'ICICI Bank', allocation: 100, sector: 'Financial Services' }],
+        },
+      ],
+    ]);
+
+    const sectors = calculateLookThroughSectors(
+      [
+        { schemeCode: 'A', schemeName: 'Fund A', portfolioWeight: 50 },
+        { schemeCode: 'B', schemeName: 'Fund B', portfolioWeight: 50 },
+      ],
+      map as any
+    );
+
+    // Financial: 50*50/100 + 50*100/100 = 25 + 50 = 75 → 75%
+    // IT: 50*50/100 = 25 → 25%
+    expect(sectors[0].sector).toBe('Financial Services');
+    expect(sectors[0].weight).toBeCloseTo(75, 0);
+    expect(sectors[1].sector).toBe('IT');
+    expect(sectors[1].weight).toBeCloseTo(25, 0);
+
+    const div = calculateSectorHhi(sectors);
+    // 75^2 + 25^2 = 5625 + 625 = 6250 → concentrated
+    expect(div.hhi).toBe(6250);
+    expect(div.band).toBe('concentrated');
+  });
+
+  it('flags look-through tickers ≥10% held in 2+ funds', () => {
+    const flagged = flagConcentratedTickers([
+      {
+        stockName: 'HDFC Bank',
+        sector: 'Financial Services',
+        effectiveWeight: 12,
+        heldInFunds: [
+          { schemeCode: 'A', schemeName: 'A', weightInFund: 10, contribution: 6 },
+          { schemeCode: 'B', schemeName: 'B', weightInFund: 8, contribution: 6 },
+        ],
+      },
+      {
+        stockName: 'Solo Stock',
+        sector: 'IT',
+        effectiveWeight: 15,
+        heldInFunds: [{ schemeCode: 'A', schemeName: 'A', weightInFund: 20, contribution: 15 }],
+      },
+    ]);
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0].stockName).toBe('HDFC Bank');
   });
 });
 

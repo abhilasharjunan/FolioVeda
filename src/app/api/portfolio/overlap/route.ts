@@ -75,12 +75,22 @@ export async function GET() {
       };
     });
 
-    const { pairs, lookThrough, insightsAvailable } = await buildPortfolioOverlapAnalysis(fundWeights);
+    const {
+      pairs,
+      lookThrough,
+      sectors,
+      sectorDiversification,
+      concentratedTickers,
+      insightsAvailable,
+    } = await buildPortfolioOverlapAnalysis(fundWeights);
 
     return NextResponse.json({
       funds,
       pairs,
       lookThrough,
+      sectors,
+      sectorDiversification,
+      concentratedTickers,
       insightsAvailable,
       totalFunds: funds.length,
     });

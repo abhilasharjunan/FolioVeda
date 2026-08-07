@@ -41,8 +41,28 @@ export default function PortfolioSectorChart() {
     );
   }
 
-  if (error || !data || Object.keys(data.sectors).length === 0) {
-    return null;
+  if (error) {
+    return (
+      <ChartCard title="Sector Allocation" subtitle="Could not load sector mix">
+        <p className="text-sm text-slate-500 dark:text-slate-400 py-10 text-center px-4">
+          {error}
+        </p>
+      </ChartCard>
+    );
+  }
+
+  if (!data || Object.keys(data.sectors).length === 0) {
+    return (
+      <ChartCard
+        title="Sector Allocation"
+        subtitle="Look-through sectors need disclosed fund holdings"
+      >
+        <p className="text-sm text-slate-500 dark:text-slate-400 py-10 text-center px-4 leading-relaxed">
+          Sector mix appears once monthly portfolio holdings are available for your funds.
+          Refresh the Overlap page after holdings sync to populate this chart.
+        </p>
+      </ChartCard>
+    );
   }
 
   const sectorCount = Object.keys(data.sectors).length;

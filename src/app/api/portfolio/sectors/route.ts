@@ -50,9 +50,19 @@ export async function GET() {
     const finapiPromises = schemeCodes.map(async (code) => {
       try {
         const insights = await getFundInsights(code);
-        return { code, sectorAllocation: insights?.sectorAllocation || {} };
+        // Prefer look-through from stock holdings; fall back to FinAPI sector map.
+        const fromHoldings: Record<string, number> = {};
+        for (const h of insights?.holdings || []) {
+          const sector = (h.sector || "Other").trim() || "Other";
+          fromHoldings[sector] = (fromHoldings[sector] || 0) + h.allocation;
+        }
+        const sectorAllocation =
+          Object.keys(fromHoldings).length > 0
+            ? fromHoldings
+            : insights?.sectorAllocation || {};
+        return { code, sectorAllocation };
       } catch {
-        return { code, sectorAllocation: {} };
+        return { code, sectorAllocation: {} as Record<string, number> };
       }
     });
 

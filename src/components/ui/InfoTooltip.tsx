@@ -56,7 +56,7 @@ export const METRIC_EXPLANATIONS: Record<string, string> = {
   alpha: "Excess return versus what beta alone would predict — a rough measure of the fund's skill beyond just tracking the market.",
   rSquared: "How much of the fund's movement is explained by the benchmark (0-100%). Higher means it behaves more like an index fund.",
   treynorRatio: "Return earned per unit of market risk (beta), rather than total risk. Useful for comparing well-diversified funds.",
-  hhi: "Herfindahl-Hirschman Index — a concentration measure. Closer to 0 means spread across many holdings/categories; closer to 1 means concentrated in few.",
+  hhi: "Herfindahl-Hirschman Index — Σ (weight %)² on a 0–10,000 scale. Under 1,500 is diversified; 1,500–2,500 moderate; above 2,500 means high sector concentration.",
   concentrationRisk: "How concentrated the fund's top disclosed holdings are (HHI). Higher means the fund's returns depend heavily on a few stocks.",
   sectorConcentration: "The combined weight of the fund's top 3 sectors among its disclosed holdings. Higher means less sector diversification.",
   overlapPercentage: "Weighted overlap between two funds' top disclosed holdings — the share of stocks (by allocation) they both hold.",
