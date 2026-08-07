@@ -193,18 +193,24 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
       }
     }
 
+    // Curated benchmark codes are hand-picked Direct Growth/Cumulative plans —
+    // always keep them. Full-universe rows still require a Direct Growth name.
     const eligible = Array.from(merged.values()).filter((f) => {
+      if (curatedCodeSet.has(f.schemeCode)) return true;
       const catalogName = catalogNameByCode.get(f.schemeCode);
-      if (catalogName) {
-        return isDirectGrowthScheme(catalogName);
-      }
-      // No catalog row: keep curated benchmark codes; otherwise require name filter.
-      return curatedCodeSet.has(f.schemeCode) || isDirectGrowthScheme(f.schemeName);
+      return isDirectGrowthScheme(catalogName || f.schemeName);
     });
 
+    const TARGET_PER_CATEGORY = 10;
     const sorted = eligible
       .sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity))
-      .slice(0, 10);
+      .slice(0, TARGET_PER_CATEGORY);
+
+    if (sorted.length < TARGET_PER_CATEGORY) {
+      console.warn(
+        `Top funds sync: ${cat} only ranked ${sorted.length}/${TARGET_PER_CATEGORY} schemes`
+      );
+    }
 
     results[cat] = sorted;
 

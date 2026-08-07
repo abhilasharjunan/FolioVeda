@@ -6,6 +6,7 @@ describe('isDirectGrowthScheme', () => {
     expect(isDirectGrowthScheme('HDFC Mid Cap Opportunities Fund - Direct Plan - Growth Option')).toBe(true);
     expect(isDirectGrowthScheme('Parag Parikh Flexi Cap Fund (Direct) - Growth')).toBe(true);
     expect(isDirectGrowthScheme('NIPPON INDIA SMALL CAP FUND - DIRECT PLAN - GROWTH PLAN')).toBe(true);
+    expect(isDirectGrowthScheme('ICICI Prudential BSE Sensex Index Fund - Direct Plan - Cumulative Option')).toBe(true);
   });
 
   it('rejects Regular and IDCW / dividend plans', () => {

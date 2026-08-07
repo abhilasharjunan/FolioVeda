@@ -51,6 +51,10 @@ export async function GET() {
       );
     }
 
+    const categoryByCode = new Map(
+      BENCHMARK_SCHEMES.map((s) => [s.schemeCode, s.category] as const)
+    );
+
     const results: Record<string, any[]> = {};
 
     for (const s of schemes) {
@@ -58,7 +62,7 @@ export async function GET() {
       // rather than show misleading zeroed-out metrics.
       if (s.riskScore == null || s.sharpeRatio == null) continue;
 
-      const cat = s.category || "Other";
+      const cat = categoryByCode.get(s.schemeCode) || s.category || "Other";
       if (!results[cat]) results[cat] = [];
 
       results[cat].push({

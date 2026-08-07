@@ -1,15 +1,32 @@
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
+import { FundCategory } from "@/lib/funds";
+import { syncTopFundsCache } from "@/lib/sync-top-funds";
 import {
   TOP_FUNDS_REDIS_KEY,
+  TopFundsPayload,
   buildTopFundsHttpResponse,
   loadTopFundsPayloadFromDb,
   setTopFundsRedisPayload,
 } from "@/lib/top-funds-cache";
 
-// Public, identical-for-all payload — allow CDN caching via response headers
-// (Vercel-CDN-Cache-Control) instead of force-dynamic, which opts out of edge cache.
+const EXPECTED_CATEGORIES: FundCategory[] = [
+  "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap",
+  "ELSS", "Debt", "Hybrid", "Index Funds", "International Funds",
+];
+const TARGET_PER_CATEGORY = 10;
+
+// Allow a short on-demand refill when a category is empty (e.g. after bad
+// scheme codes wiped Index Funds from cache). Cron remains the primary path.
+export const maxDuration = 60;
 export const revalidate = 3600;
+
+function thinCategories(payload: TopFundsPayload | null): FundCategory[] {
+  if (!payload) return [...EXPECTED_CATEGORIES];
+  return EXPECTED_CATEGORIES.filter(
+    (cat) => !payload[cat] || payload[cat].length < TARGET_PER_CATEGORY
+  );
+}
 
 export async function GET() {
   try {
@@ -17,14 +34,30 @@ export async function GET() {
       try {
         const cachedPayload = await redis.get(TOP_FUNDS_REDIS_KEY);
         if (cachedPayload) {
-          return buildTopFundsHttpResponse(JSON.parse(cachedPayload));
+          const parsed = JSON.parse(cachedPayload) as TopFundsPayload;
+          const thin = thinCategories(parsed);
+          // Serve Redis only when every category has data; otherwise refill.
+          if (thin.length === 0) {
+            return buildTopFundsHttpResponse(parsed);
+          }
         }
       } catch (redisErr) {
         console.warn("Redis read failed for top-performing:", redisErr);
       }
     }
 
-    const results = await loadTopFundsPayloadFromDb();
+    let results = await loadTopFundsPayloadFromDb();
+    const thin = thinCategories(results);
+
+    if (thin.length > 0) {
+      try {
+        await syncTopFundsCache(thin);
+        results = await loadTopFundsPayloadFromDb();
+      } catch (syncErr) {
+        console.warn("On-demand top-funds refill failed:", syncErr);
+      }
+    }
+
     if (results) {
       setTopFundsRedisPayload(results).catch(() => {});
       return buildTopFundsHttpResponse(results);

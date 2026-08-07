@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import redis from "@/lib/redis";
 
 /** Shared Redis key for GET /api/funds/top-performing payload. */
-export const TOP_FUNDS_REDIS_KEY = "funds:top-performing:v2";
+export const TOP_FUNDS_REDIS_KEY = "funds:top-performing:v3";
 export const TOP_FUNDS_REDIS_TTL_SECONDS = 24 * 60 * 60; // 24h — matches daily cron cadence
 
 export type TopFundsPayload = Record<
