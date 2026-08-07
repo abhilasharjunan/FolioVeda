@@ -156,7 +156,7 @@ export default function PortfolioOverlapPage() {
 
   if (error) {
     return (
-      <div className="p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
+      <div className="px-4 py-6 sm:p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
         <AlertTriangle size={40} className="text-rose-400" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Couldn't load overlap data</h2>
         <p className="text-slate-500 dark:text-slate-300">{error}</p>
@@ -166,7 +166,7 @@ export default function PortfolioOverlapPage() {
 
   if (funds.length < 2) {
     return (
-      <div className="p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
+      <div className="px-4 py-6 sm:p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
         <Layers size={40} className="text-slate-300" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Add at least 2 holdings</h2>
         <p className="text-slate-500 dark:text-slate-300 max-w-md">
@@ -177,7 +177,7 @@ export default function PortfolioOverlapPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="px-4 py-6 sm:p-6 space-y-6 max-w-6xl mx-auto">
       <FadeIn>
         <header className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">

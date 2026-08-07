@@ -51,11 +51,11 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
       : null;
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="px-4 py-6 sm:p-6 space-y-6 max-w-7xl mx-auto">
       <FadeIn>
         <header className="flex justify-between items-end gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Overview</h1>
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Overview</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Live analysis of your mutual fund investments.</p>
           </div>
           <div className="text-right hidden sm:block">

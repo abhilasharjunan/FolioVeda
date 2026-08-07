@@ -3,7 +3,7 @@ import { SkeletonCard, SkeletonText, SkeletonChart } from '@/components/ui/skele
 
 export default function PortfolioLoading() {
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8">
+    <div className="px-4 py-6 sm:p-6 max-w-5xl mx-auto space-y-8">
       <div className="space-y-2">
         <SkeletonText className="h-8 w-64" />
         <SkeletonText className="h-4 w-80" />

@@ -19,7 +19,7 @@ export default async function PortfolioReportPage() {
 
   if (!analysis) {
     return (
-      <div className="p-6 max-w-3xl mx-auto min-h-[50vh] flex flex-col items-center justify-center text-center space-y-4">
+      <div className="px-4 py-6 sm:p-6 max-w-3xl mx-auto min-h-[50vh] flex flex-col items-center justify-center text-center space-y-4">
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">No portfolio to report on yet</h2>
         <p className="text-slate-500 dark:text-slate-300">Add holdings first, then come back here to generate a report.</p>
       </div>
@@ -33,7 +33,7 @@ export default async function PortfolioReportPage() {
       : null;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8 print:p-0 print:max-w-none">
+    <div className="px-4 py-6 sm:p-6 max-w-4xl mx-auto space-y-8 print:p-0 print:max-w-none">
       <div className="flex justify-between items-start print:hidden">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Report</h1>

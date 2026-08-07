@@ -3,7 +3,7 @@ import { SkeletonCard, SkeletonText } from '@/components/ui/skeletons';
 
 export default function PortfolioReportLoading() {
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="px-4 py-6 sm:p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
           <SkeletonText className="h-8 w-56" />

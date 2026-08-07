@@ -124,7 +124,7 @@ export default function RiskAnalysisPage() {
 
   if (loading) {
     return (
-      <div className="p-6 space-y-8 max-w-7xl mx-auto">
+      <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-end">
           <div className="space-y-2">
             <SkeletonText className="h-8 w-64" />
@@ -144,7 +144,7 @@ export default function RiskAnalysisPage() {
 
   if (!data) {
     return (
-      <div className="p-6 max-w-7xl mx-auto">
+      <div className="px-4 py-6 sm:p-6 max-w-7xl mx-auto">
         <Card className="surface-card border-none shadow-sm">
           <CardContent className="p-8 text-center space-y-3">
             <ShieldAlert className="mx-auto text-rose-500" size={28} />
@@ -160,7 +160,7 @@ export default function RiskAnalysisPage() {
   }
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto bg-slate-50/30 min-h-screen">
+    <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto bg-slate-50/30 min-h-screen">
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">

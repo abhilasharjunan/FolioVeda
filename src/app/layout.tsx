@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Navbar from '@/components/shared/Navbar';
 import { SEBIFooter } from '@/components/shared/SEBIFooter';
@@ -16,6 +17,17 @@ const outfit = Outfit({
   variable: '--font-heading',
 });
 
+export const metadata: Metadata = {
+  title: 'FolioVeda',
+  description: 'Mutual fund portfolio analyzer for Indian investors',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -23,10 +35,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={cn("dark font-sans", plusJakarta.variable, outfit.variable)} suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col bg-background text-foreground">
+      <body className="min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
         <Providers>
           <Navbar />
-          <main className="flex-grow page-shell">
+          <main className="flex-grow page-shell min-w-0">
             {children}
           </main>
           <SEBIFooter />

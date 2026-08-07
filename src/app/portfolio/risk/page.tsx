@@ -13,7 +13,7 @@ export default async function PortfolioRiskPage() {
 
   if (!analysis) {
     return (
-      <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+      <div className="px-4 py-6 sm:p-6 flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <AlertCircle size={48} className="text-slate-300" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">No Portfolio Data</h2>
         <p className="text-slate-500 dark:text-slate-300 text-center max-w-md">
@@ -41,7 +41,7 @@ export default async function PortfolioRiskPage() {
     : `Higher risk overall (${getRiskLevel(analysis.weightedScore)}) — consider reviewing concentration and volatility below.`;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8">
+    <div className="px-4 py-6 sm:p-6 max-w-6xl mx-auto space-y-8">
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">

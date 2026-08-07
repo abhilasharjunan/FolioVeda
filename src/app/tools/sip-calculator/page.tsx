@@ -179,7 +179,7 @@ export default function SIPCalculatorPage() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
+    <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto">
       <FadeIn>
         <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-900 p-6 sm:p-8 text-white mb-8">
           <Sparkles className="absolute -right-4 -top-4 text-white/10" size={140} strokeWidth={1} />

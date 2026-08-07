@@ -3,7 +3,7 @@ import { SkeletonCard, SkeletonText, SkeletonChart } from '@/components/ui/skele
 
 export default function RiskAnalysisLoading() {
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
+    <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto">
       <div className="flex justify-between items-end">
         <div className="space-y-2">
           <SkeletonText className="h-8 w-64" />

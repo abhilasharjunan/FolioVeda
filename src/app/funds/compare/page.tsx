@@ -138,7 +138,7 @@ export default function FundComparePage() {
   }, null);
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto min-h-screen">
+    <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto min-h-screen">
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">
@@ -289,7 +289,7 @@ export default function FundComparePage() {
                   </CardTitle>
                   <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">{fund.fundHouse}</p>
                 </CardHeader>
-                <CardContent className="p-6 space-y-6">
+                <CardContent className="px-4 py-6 sm:p-6 space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
                       <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-bold">AUM</p>
