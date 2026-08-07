@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { calculateFundOverlap, calculatePortfolioOverlapMatrix } from './overlap';
+import {
+  calculateFundOverlap,
+  calculatePortfolioOverlapMatrix,
+  calculateLookThroughHoldings,
+  normalizeStockKey,
+} from './overlap';
 import { getFundInsights } from './finapi';
 
 vi.mock('./finapi', () => ({
@@ -22,6 +27,37 @@ function insights(schemeCode: string, schemeName: string, holdings: { stockName:
     peers: [],
   };
 }
+
+describe('normalizeStockKey', () => {
+  it('strips corporate suffixes and punctuation', () => {
+    expect(normalizeStockKey('HDFC Bank Ltd.')).toBe(normalizeStockKey('HDFC Bank'));
+    expect(normalizeStockKey('Reliance Industries Limited')).toBe(normalizeStockKey('Reliance Industries'));
+  });
+});
+
+describe('calculateLookThroughHoldings', () => {
+  it('weights stock exposure by portfolio allocation × fund weight', () => {
+    const map = new Map([
+      ['A', insights('A', 'Fund A', [{ stockName: 'HDFC Bank', allocation: 10 }])],
+      ['B', insights('B', 'Fund B', [{ stockName: 'HDFC Bank', allocation: 8 }, { stockName: 'Infosys', allocation: 5 }])],
+    ]);
+    const result = calculateLookThroughHoldings(
+      [
+        { schemeCode: 'A', schemeName: 'Fund A', portfolioWeight: 60 },
+        { schemeCode: 'B', schemeName: 'Fund B', portfolioWeight: 40 },
+      ],
+      map,
+      10
+    );
+    // HDFC: 60*10/100 + 40*8/100 = 6 + 3.2 = 9.2
+    expect(result[0].stockName).toBe('HDFC Bank');
+    expect(result[0].effectiveWeight).toBeCloseTo(9.2, 4);
+    expect(result[0].heldInFunds).toHaveLength(2);
+    // Infosys: 40*5/100 = 2
+    expect(result[1].stockName).toBe('Infosys');
+    expect(result[1].effectiveWeight).toBeCloseTo(2, 4);
+  });
+});
 
 describe('calculateFundOverlap (MIN-weight method)', () => {
   beforeEach(() => {
@@ -51,6 +87,8 @@ describe('calculateFundOverlap (MIN-weight method)', () => {
     expect(result).not.toBeNull();
     // 5 + 6 = 11
     expect(result!.overlapPercentage).toBeCloseTo(11, 4);
+    expect(result!.commonCount).toBe(2);
+    expect(result!.dataAvailable).toBe(true);
     expect(result!.commonStocks).toHaveLength(2);
     expect(result!.commonStocks[0].stockName).toBe('Reliance Industries'); // sorted by minWeight desc
     expect(result!.commonStocks[0].minWeight).toBeCloseTo(6, 4);
@@ -58,7 +96,7 @@ describe('calculateFundOverlap (MIN-weight method)', () => {
 
   it('is case-insensitive and whitespace-tolerant on stock name matching', async () => {
     mockedGetFundInsights.mockImplementation(async (code: string) => {
-      if (code === 'A') return insights('A', 'Fund A', [{ stockName: ' HDFC Bank ', allocation: 4 }]);
+      if (code === 'A') return insights('A', 'Fund A', [{ stockName: ' HDFC Bank Ltd. ', allocation: 4 }]);
       if (code === 'B') return insights('B', 'Fund B', [{ stockName: 'hdfc bank', allocation: 3 }]);
       return null;
     });

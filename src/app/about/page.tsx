@@ -6,9 +6,18 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/animations';
-import { formatBuildTime, getBuildInfo } from '@/lib/build-info';
+import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
+  {
+    version: '1.3.6',
+    date: 'Aug 2026',
+    items: [
+      'Fixed stock overlap: holdings are cached correctly (no more empty N/A heatmap)',
+      'Look-through concentration shows your true aggregated stock exposure across funds',
+      'Pairwise overlap cards with weighted MIN methodology and stock-level detail',
+    ],
+  },
   {
     version: '1.3.5',
     date: 'Aug 2026',
@@ -30,7 +39,7 @@ const CHANGELOG = [
 ];
 
 export default function AboutPage() {
-  const { version, buildTime, gitCommit, gitCommitUrl, environment } = getBuildInfo();
+  const { version, environment } = getBuildInfo();
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-10">
@@ -44,7 +53,7 @@ export default function AboutPage() {
               <Sparkles className="w-3.5 h-3.5 mr-1" />
               Version {version}
             </Badge>
-            {environment && (
+            {environment && environment !== 'production' && (
               <Badge variant="secondary" className="h-7 px-3 capitalize">
                 {environment}
               </Badge>
@@ -113,23 +122,20 @@ export default function AboutPage() {
       <FadeIn delay={0.1}>
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <CardTitle className="text-xl font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
-                <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                What&apos;s New
-              </CardTitle>
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                Current release v{version}
-                {buildTime ? ` · built ${formatBuildTime(buildTime)} IST` : ''}
-              </span>
-            </div>
+            <CardTitle className="text-xl font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
+              <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              What&apos;s New
+            </CardTitle>
+            <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
+              Current release v{version}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {CHANGELOG.map((release) => (
               <div key={release.version} className="space-y-2">
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={release.version === version || release.version.startsWith(version.split('.').slice(0, 2).join('.')) ? 'default' : 'outline'}
+                    variant={release.version === version ? 'default' : 'outline'}
                     className="font-mono"
                   >
                     v{release.version}
@@ -146,18 +152,6 @@ export default function AboutPage() {
                 </ul>
               </div>
             ))}
-            {gitCommit && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-200 dark:border-slate-800">
-                Deploy commit:{' '}
-                {gitCommitUrl ? (
-                  <a href={gitCommitUrl} target="_blank" rel="noopener noreferrer" className="font-mono text-indigo-600 dark:text-indigo-400 hover:underline">
-                    {gitCommit}
-                  </a>
-                ) : (
-                  <span className="font-mono">{gitCommit}</span>
-                )}
-              </p>
-            )}
           </CardContent>
         </Card>
       </FadeIn>
