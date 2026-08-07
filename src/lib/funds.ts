@@ -138,6 +138,74 @@ function parseMFDate(dateStr: string): Date {
   return new Date(`${yyyy}-${mm}-${dd}`);
 }
 
+const NAV_LOOKUP_TOLERANCE_MS = 7 * 24 * 60 * 60 * 1000;
+
+const PERIOD_WINDOWS: Record<string, number> = {
+  "1M": 30,
+  "3M": 90,
+  "6M": 180,
+  "1Y": 365,
+  "3Y": 3 * 365,
+  "5Y": 5 * 365,
+  "10Y": 10 * 365,
+};
+
+function findNavNearDate(
+  navData: { date: string; nav: string }[],
+  target: Date
+): { nav: number; date: Date; daysAgo: number } | null {
+  if (!navData.length) return null;
+  let best = navData[0];
+  let bestDiff = Math.abs(parseMFDate(navData[0].date).getTime() - target.getTime());
+  for (const row of navData) {
+    const diff = Math.abs(parseMFDate(row.date).getTime() - target.getTime());
+    if (diff < bestDiff) {
+      best = row;
+      bestDiff = diff;
+    }
+  }
+  if (bestDiff > NAV_LOOKUP_TOLERANCE_MS) return null;
+  const date = parseMFDate(best.date);
+  const daysAgo = Math.max(1, Math.round((Date.now() - date.getTime()) / (24 * 60 * 60 * 1000)));
+  return { nav: parseFloat(best.nav), date, daysAgo };
+}
+
+/**
+ * One mfapi.in fetch → all Top Funds return windows + since-inception.
+ * Rejects NAV points that drift >7 days from the target (avoids inventing
+ * 10Y returns from a 2-year-old fund's first NAV).
+ */
+export async function computePeriodReturnsFromMfapi(schemeCode: string): Promise<{
+  nav: number;
+  returns: Record<string, number | null>;
+  sinceInception: number | null;
+} | null> {
+  const data = await fetchSchemeDetails(schemeCode);
+  const navData = data.data as { date: string; nav: string }[] | undefined;
+  if (!navData?.length) return null;
+
+  const current = findNavNearDate(navData, new Date());
+  if (!current || !Number.isFinite(current.nav)) return null;
+
+  const returns: Record<string, number | null> = {};
+  for (const [label, days] of Object.entries(PERIOD_WINDOWS)) {
+    const target = new Date();
+    target.setDate(target.getDate() - days);
+    const past = findNavNearDate(navData, target);
+    returns[label] = past ? calculateCAGR(current.nav, past.nav, days) : null;
+  }
+
+  const oldest = navData[navData.length - 1]; // mfapi returns newest-first
+  const oldestDate = parseMFDate(oldest.date);
+  const daysSinceInception = Math.round((Date.now() - oldestDate.getTime()) / (24 * 60 * 60 * 1000));
+  const sinceInception =
+    daysSinceInception > 30
+      ? calculateCAGR(current.nav, parseFloat(oldest.nav), daysSinceInception)
+      : null;
+
+  return { nav: current.nav, returns, sinceInception };
+}
+
 export async function getHistoricalNav(schemeCode: string, daysAgo: number) {
   const data = await fetchSchemeDetails(schemeCode);
   const navData = data.data;
@@ -146,13 +214,12 @@ export async function getHistoricalNav(schemeCode: string, daysAgo: number) {
   
   const targetDate = new Date();
   targetDate.setDate(targetDate.getDate() - daysAgo);
-  
-  const closest = navData.reduce((prev: { date: string; nav: string }, curr: { date: string; nav: string }) => {
-    const currDate = parseMFDate(curr.date);
-    const prevDate = parseMFDate(prev.date);
-    return Math.abs(currDate.getTime() - targetDate.getTime()) < Math.abs(prevDate.getTime() - targetDate.getTime()) 
-      ? curr : prev;
-  });
-  
-  return parseFloat(closest.nav);
+
+  if (daysAgo === 0) {
+    const near = findNavNearDate(navData, targetDate);
+    return near?.nav ?? parseFloat(navData[0].nav);
+  }
+
+  const near = findNavNearDate(navData, targetDate);
+  return near?.nav ?? null;
 }

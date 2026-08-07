@@ -110,7 +110,7 @@ export default function TopFundsClient() {
 
   if (error) {
     return (
-      <div className="p-6 space-y-8 max-w-7xl mx-auto">
+      <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto">
         <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
           <div className="p-4 bg-rose-50 text-rose-600 rounded-full">
             <TrendingUp size={32} className="rotate-180" />
@@ -146,7 +146,7 @@ export default function TopFundsClient() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto min-h-screen">
+    <div className="px-4 py-6 sm:p-6 space-y-8 max-w-7xl mx-auto min-h-screen">
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">

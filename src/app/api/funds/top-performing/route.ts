@@ -21,11 +21,18 @@ const TARGET_PER_CATEGORY = 10;
 export const maxDuration = 60;
 export const revalidate = 3600;
 
+function categoryNeedsRefill(funds: TopFundsPayload[string] | undefined): boolean {
+  if (!funds || funds.length < TARGET_PER_CATEGORY) return true;
+  // Snapshot-only syncs leave 3Y/1Y null while 1M is filled — force refill.
+  const withLongHorizon = funds.filter(
+    (f) => f.returns?.["3Y"] != null || f.returns?.["1Y"] != null
+  ).length;
+  return withLongHorizon < Math.ceil(funds.length / 2);
+}
+
 function thinCategories(payload: TopFundsPayload | null): FundCategory[] {
   if (!payload) return [...EXPECTED_CATEGORIES];
-  return EXPECTED_CATEGORIES.filter(
-    (cat) => !payload[cat] || payload[cat].length < TARGET_PER_CATEGORY
-  );
+  return EXPECTED_CATEGORIES.filter((cat) => categoryNeedsRefill(payload[cat]));
 }
 
 export async function GET() {
@@ -51,7 +58,8 @@ export async function GET() {
 
     if (thin.length > 0) {
       try {
-        await syncTopFundsCache(thin);
+        // Cap on-demand work under Vercel 60s — remaining thin cats refill on later GETs / cron.
+        await syncTopFundsCache(thin.slice(0, 3));
         results = await loadTopFundsPayloadFromDb();
       } catch (syncErr) {
         console.warn("On-demand top-funds refill failed:", syncErr);

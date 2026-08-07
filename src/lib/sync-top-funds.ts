@@ -1,5 +1,11 @@
 import { prisma } from "@/lib/prisma";
-import { BENCHMARK_SCHEMES, FundCategory, calculateCAGR, getHistoricalNav } from "@/lib/funds";
+import {
+  BENCHMARK_SCHEMES,
+  FundCategory,
+  calculateCAGR,
+  computePeriodReturnsFromMfapi,
+  getHistoricalNav,
+} from "@/lib/funds";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
 import { isDirectGrowthScheme } from "@/lib/scheme-filters";
 import { refreshTopFundsRedisFromDb } from "@/lib/top-funds-cache";
@@ -32,10 +38,45 @@ interface RankedFund {
   sinceInception: number | null;
 }
 
+function mergeReturns(
+  primary: Record<string, number | null>,
+  fallback: Record<string, number | null>
+): Record<string, number | null> {
+  const out = { ...primary };
+  for (const [k, v] of Object.entries(fallback)) {
+    if (out[k] == null && v != null) out[k] = v;
+  }
+  return out;
+}
+
+/** Local NavSnapshot history is often only weeks old — treat as complete only when 1Y/3Y exists. */
+function hasLongHorizonReturns(returns: Record<string, number | null>): boolean {
+  return returns["3Y"] != null || returns["1Y"] != null;
+}
+
+async function enrichReturnsFromMfapi(fund: RankedFund): Promise<RankedFund> {
+  if (hasLongHorizonReturns(fund.returns) && fund.sinceInception != null) {
+    return fund;
+  }
+  try {
+    const mf = await computePeriodReturnsFromMfapi(fund.schemeCode);
+    if (!mf) return fund;
+    return {
+      ...fund,
+      nav: fund.nav || mf.nav,
+      returns: mergeReturns(fund.returns, mf.returns),
+      sinceInception: fund.sinceInception ?? mf.sinceInception,
+    };
+  } catch (e) {
+    console.warn(`mfapi return backfill failed for ${fund.schemeCode}:`, e);
+    return fund;
+  }
+}
+
 /**
- * Curated ~90-scheme list. Prefer locally stored NavSnapshot history (no
- * network) when enough history exists; fall back to live mfapi.in only when
- * snapshots are missing — keeps the daily cron inside Vercel's time budget.
+ * Curated ~90-scheme list. Prefer local NavSnapshot history when long-horizon
+ * windows exist; otherwise fill missing windows from mfapi.in (local snapshots
+ * alone often only cover ~1M after a fresh deploy).
  */
 async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
   const schemes = BENCHMARK_SCHEMES.filter((s) => s.category === cat);
@@ -46,7 +87,6 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
     const batch = schemes.slice(i, i + CONCURRENCY);
     const batchResults = await Promise.all(batch.map(async (scheme): Promise<RankedFund | null> => {
       try {
-        // Try local snapshots first (same path as full-universe ranking).
         const lookbackDate = new Date(Date.now() - RECENT_SNAPSHOT_LOOKBACK_DAYS * 24 * 60 * 60 * 1000);
         const recent = await prisma.navSnapshot.findFirst({
           where: { schemeCode: scheme.schemeCode, date: { gte: lookbackDate } },
@@ -56,7 +96,7 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
 
         if (recent) {
           const local = await computeReturnsFromSnapshots(scheme.schemeCode, Number(recent.nav));
-          if (hasMinimumHistory(local.earliestSnapshotDate)) {
+          if (hasMinimumHistory(local.earliestSnapshotDate) && hasLongHorizonReturns(local.returns)) {
             return {
               schemeCode: scheme.schemeCode,
               schemeName: scheme.schemeName,
@@ -66,22 +106,43 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
               sinceInception: local.sinceInception,
             };
           }
+
+          // Thin local history (e.g. only 1M) — keep local shorts, fill longer windows from mfapi.
+          if (hasMinimumHistory(local.earliestSnapshotDate)) {
+            const mf = await computePeriodReturnsFromMfapi(scheme.schemeCode);
+            if (mf) {
+              return {
+                schemeCode: scheme.schemeCode,
+                schemeName: scheme.schemeName,
+                fundHouse: "Mutual Fund",
+                nav: Number(recent.nav),
+                returns: mergeReturns(local.returns, mf.returns),
+                sinceInception: local.sinceInception ?? mf.sinceInception,
+              };
+            }
+          }
         }
 
-        // Fallback: live mfapi.in (slower; only when snapshots are thin).
+        const mf = await computePeriodReturnsFromMfapi(scheme.schemeCode);
+        if (mf) {
+          return {
+            schemeCode: scheme.schemeCode,
+            schemeName: scheme.schemeName,
+            fundHouse: "Mutual Fund",
+            nav: mf.nav,
+            returns: mf.returns,
+            sinceInception: mf.sinceInception,
+          };
+        }
+
         const currentNav = await getHistoricalNav(scheme.schemeCode, 0);
         if (!currentNav) return null;
 
         const returns: Record<string, number | null> = {};
-        let oldestNav = currentNav;
-
         for (const [label, days] of Object.entries(RETURN_WINDOWS)) {
           const pastNav = await getHistoricalNav(scheme.schemeCode, days);
           returns[label] = pastNav ? calculateCAGR(currentNav, pastNav, days) : null;
-          if (pastNav && pastNav < oldestNav) oldestNav = pastNav;
         }
-
-        const inceptionCagr = calculateCAGR(currentNav, oldestNav, 365 * 10);
 
         return {
           schemeCode: scheme.schemeCode,
@@ -89,7 +150,7 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
           fundHouse: "Mutual Fund",
           nav: currentNav,
           returns,
-          sinceInception: inceptionCagr,
+          sinceInception: returns["10Y"],
         };
       } catch (e) {
         console.error(`Error fetching ${scheme.schemeCode}:`, e);
@@ -109,12 +170,11 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
  * history only. Direct Growth plans only — Regular / IDCW / Dividend excluded.
  */
 async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[]> {
-  // Stable order so the Direct Growth slice is deterministic across cron runs.
   const schemes = await prisma.schemeCatalog.findMany({
     where: { category: cat },
     select: { schemeCode: true, schemeName: true, fundHouse: true },
     orderBy: { schemeName: "asc" },
-    take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3, // oversample then filter Direct Growth
+    take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
   });
   if (schemes.length === 0) return [];
 
@@ -173,8 +233,6 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     for (const f of curated) merged.set(f.schemeCode, f);
     for (const f of fullUniverse) if (!merged.has(f.schemeCode)) merged.set(f.schemeCode, f);
 
-    // Prefer AMFI catalog names for curated short labels so Regular/IDCW codes
-    // cannot slip through when BENCHMARK_SCHEMES omits "Direct/Growth".
     const curatedCodeSet = new Set(curated.map((f) => f.schemeCode));
     const catalogNames =
       curatedCodeSet.size > 0
@@ -193,8 +251,6 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
       }
     }
 
-    // Curated benchmark codes are hand-picked Direct Growth/Cumulative plans —
-    // always keep them. Full-universe rows still require a Direct Growth name.
     const eligible = Array.from(merged.values()).filter((f) => {
       if (curatedCodeSet.has(f.schemeCode)) return true;
       const catalogName = catalogNameByCode.get(f.schemeCode);
@@ -202,9 +258,20 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     });
 
     const TARGET_PER_CATEGORY = 10;
-    const sorted = eligible
-      .sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity))
+    const sortedThin = eligible
+      .sort((a, b) => {
+        const score = (f: RankedFund) =>
+          f.returns["3Y"] ?? f.returns["1Y"] ?? f.returns["1M"] ?? -Infinity;
+        return score(b) - score(a);
+      })
       .slice(0, TARGET_PER_CATEGORY);
+
+    // Backfill mfapi for finalists still missing long-horizon returns.
+    const sorted: RankedFund[] = [];
+    for (const fund of sortedThin) {
+      sorted.push(await enrichReturnsFromMfapi(fund));
+    }
+    sorted.sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity));
 
     if (sorted.length < TARGET_PER_CATEGORY) {
       console.warn(
@@ -248,8 +315,6 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     }
   }
 
-  // Write the full DB snapshot into Redis so concurrent GETs cannot refill Redis
-  // from a mid-batch / pre-sync Postgres view.
   await refreshTopFundsRedisFromDb();
 
   return results;
