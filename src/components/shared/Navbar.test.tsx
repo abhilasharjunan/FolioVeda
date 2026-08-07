@@ -91,8 +91,17 @@ describe('Navbar', () => {
     const { container } = render(<Navbar />);
     expect(within(container).getByText('About')).toBeTruthy();
     expect(within(container).getByText('SIP Calculator')).toBeTruthy();
+    expect(within(container).getByText('MF Academy')).toBeTruthy();
     expect(within(container).getByText('Sign in')).toBeTruthy();
     expect(within(container).queryByText('Dashboard')).toBeNull();
     expect(within(container).queryByText('Logout')).toBeNull();
+  });
+
+  it('shows MF Academy in authenticated primary nav', () => {
+    mockUsePathname.mockReturnValue('/academy');
+    const { container } = render(<Navbar />);
+    const academy = within(container).getByRole('link', { name: 'MF Academy' });
+    expect(academy.getAttribute('href')).toBe('/academy');
+    expect(academy.className).toContain('bg-teal-500/15');
   });
 });

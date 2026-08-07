@@ -14,11 +14,13 @@ const primaryLinks = [
   { href: "/top-funds", label: "Top Funds" },
   { href: "/risk-analysis", label: "Fund Ratings" },
   { href: "/tools/sip-calculator", label: "SIP Calculator" },
+  { href: "/academy", label: "MF Academy" },
   { href: "/about", label: "About" },
 ];
 
 const publicLinks = [
   { href: "/tools/sip-calculator", label: "SIP Calculator" },
+  { href: "/academy", label: "MF Academy" },
   { href: "/about", label: "About" },
 ];
 
