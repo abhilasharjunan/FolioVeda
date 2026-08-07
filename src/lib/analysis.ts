@@ -2,20 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { calculateXIRR } from "@/lib/xirr";
 import { auth } from "@/auth";
 import { cache } from 'react';
-
-interface HoldingWithTransactions {
-  schemeCode: string;
-  units: any;
-  transactions: Array<{
-    type: string;
-    amount: any;
-    date: Date;
-  }>;
-}
-
-interface PortfolioWithHoldings {
-  holdings: HoldingWithTransactions[];
-}
+import { ensureSchemeNavs } from "@/lib/ensure-scheme-navs";
 
 // Use React cache for request memoization within a single render pass
 export const getPortfolioAnalysis = cache(async () => {
@@ -73,19 +60,14 @@ export const getPortfolioAnalysis = cache(async () => {
     },
   }) as any;
 
-  if (!portfolio) return null;
+  if (!portfolio || portfolio.holdings.length === 0) return null;
 
   let totalInvested = 0;
   let currentMarketValue = 0;
   const overallCashFlows: { amount: number; date: Date }[] = [];
 
-  // Single batched lookup instead of one findUnique() per holding (N+1 query fix
-  // — see FolioVeda_Audit_and_Roadmap.md, section 1.5/3.6).
-  const schemeCodes = [...new Set(portfolio.holdings.map((h: any) => h.schemeCode))];
-  const schemes = await prisma.schemeMaster.findMany({
-    where: { schemeCode: { in: schemeCodes as string[] } },
-  });
-  const schemeMap = new Map(schemes.map((s) => [s.schemeCode, s]));
+  const schemeCodes = [...new Set(portfolio.holdings.map((h: any) => h.schemeCode as string))] as string[];
+  const schemeMap = await ensureSchemeNavs(schemeCodes);
 
   const holdingAnalysis = await Promise.all(
     portfolio.holdings.map(async (holding: any) => {
@@ -93,24 +75,25 @@ export const getPortfolioAnalysis = cache(async () => {
 
       const nav = scheme?.latestNav || 0;
       const currentVal = Number(holding.units) * Number(nav);
-      
-      const invested = holding.transactions.reduce((sum: number, tx: any) => 
+
+      const invested = holding.transactions.reduce((sum: number, tx: any) =>
         tx.type === "BUY" ? sum + Number(tx.amount) : sum - Number(tx.amount), 0
       );
+
+      // If NAV still missing, show invested as current so the dashboard isn't blank zeros
+      const effectiveCurrent = currentVal > 0 ? currentVal : invested;
 
       const fundCashFlows = holding.transactions.map((tx: any) => ({
         amount: tx.type === "BUY" ? -Number(tx.amount) : Number(tx.amount),
         date: tx.date,
       }));
-      
-      fundCashFlows.push({ amount: currentVal, date: new Date() });
-      // null = could not converge / insufficient data — do NOT coerce to 0,
-      // which is a legitimate return and would mislead the UI.
+
+      fundCashFlows.push({ amount: effectiveCurrent, date: new Date() });
       const fundXirr = calculateXIRR(fundCashFlows);
 
       totalInvested += invested;
-      currentMarketValue += currentVal;
-      
+      currentMarketValue += effectiveCurrent;
+
       overallCashFlows.push(...holding.transactions.map((tx: any) => ({
         amount: tx.type === "BUY" ? -Number(tx.amount) : Number(tx.amount),
         date: tx.date,
@@ -118,10 +101,10 @@ export const getPortfolioAnalysis = cache(async () => {
 
       return {
         schemeName: scheme?.schemeName || "Unknown Fund",
-        currentVal,
+        currentVal: effectiveCurrent,
         invested,
         xirr: fundXirr != null ? fundXirr * 100 : null,
-        gain: currentVal - invested,
+        gain: effectiveCurrent - invested,
       };
     })
   );

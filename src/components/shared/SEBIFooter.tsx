@@ -1,23 +1,16 @@
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
 import { AppVersion } from '@/components/shared/AppVersion';
 
 export const SEBIFooter = () => {
   return (
-    <footer className="print:hidden border-t border-slate-200/70 dark:border-slate-800/70 bg-slate-100/80 dark:bg-[#0d1219] py-6 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-center gap-2 mb-2 text-slate-600 dark:text-slate-300 font-medium">
-          <AlertCircle size={14} />
-          <span>SEBI Regulatory Disclaimer</span>
-        </div>
-        <p className="leading-relaxed">
-          Disclaimer: FolioVeda is a portfolio analytics tool and does not provide investment advice. 
-          Mutual Fund investments are subject to market risks; read all scheme related documents carefully. 
-          All NAV data is sourced from third-party providers (AMFI/mfapi.in) and may have a reporting lag. 
-          Past performance is not indicative of future results.
+    <footer className="print:hidden border-t border-slate-200/60 dark:border-slate-800/60 bg-transparent py-2.5 px-4 text-center text-[10px] leading-snug text-slate-400 dark:text-slate-500">
+      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+        <p className="sm:text-left">
+          FolioVeda is analytics only — not investment advice. Mutual fund investments are subject to market risks.
+          NAV data from AMFI/mfapi.in may lag.
         </p>
-        <p className="mt-2 flex items-center justify-center gap-2 flex-wrap">
-          <span>© {new Date().getFullYear()} FolioVeda. All rights reserved.</span>
+        <p className="flex items-center justify-center sm:justify-end gap-1.5 shrink-0 whitespace-nowrap">
+          <span>© {new Date().getFullYear()} FolioVeda</span>
           <span aria-hidden="true">·</span>
           <AppVersion />
         </p>

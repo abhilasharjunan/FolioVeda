@@ -171,12 +171,9 @@ export default async function PortfolioReportPage() {
           </section>
         )}
 
-        <section className="print:break-inside-avoid pt-4 border-t border-slate-200 text-[10px] text-slate-500 leading-relaxed">
+        <section className="print:break-inside-avoid pt-3 border-t border-slate-200 text-[9px] text-slate-400 leading-snug">
           <p>
-            <strong>Disclaimer:</strong> FolioVeda is a portfolio analytics tool and does not provide investment advice.
-            Mutual Fund investments are subject to market risks; read all scheme related documents carefully.
-            All NAV data is sourced from third-party providers (AMFI/mfapi.in) and may have a reporting lag.
-            Past performance is not indicative of future results. Report generated on {generatedAt}.
+            Analytics only — not investment advice. Market risks apply. NAV may lag (AMFI/mfapi.in). Generated {generatedAt}.
           </p>
         </section>
       </div>

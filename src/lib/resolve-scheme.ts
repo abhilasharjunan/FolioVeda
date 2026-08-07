@@ -14,14 +14,15 @@ export type ResolvedScheme = {
  */
 export async function resolveSchemeForTransaction(
   schemeCode: string,
-  fallbackName?: string
+  fallbackName?: string,
+  estimatedNav?: number
 ): Promise<ResolvedScheme> {
   const existing = await prisma.schemeMaster.findUnique({
     where: { schemeCode },
     select: { schemeCode: true, schemeName: true, category: true, latestNav: true },
   });
 
-  if (existing) {
+  if (existing && Number(existing.latestNav) > 0) {
     return {
       schemeCode: existing.schemeCode,
       schemeName: existing.schemeName,
@@ -43,19 +44,22 @@ export async function resolveSchemeForTransaction(
 
     return {
       schemeCode,
-      schemeName: meta?.scheme_name || catalog?.schemeName || fallbackName || "Unknown Fund",
-      category: meta?.scheme_category || catalog?.category || null,
-      latestNav,
+      schemeName: meta?.scheme_name || catalog?.schemeName || fallbackName || existing?.schemeName || "Unknown Fund",
+      category: meta?.scheme_category || catalog?.category || existing?.category || null,
+      latestNav: Number(latestNav) > 0 ? latestNav : (estimatedNav && estimatedNav > 0 ? String(estimatedNav) : "0"),
     };
   } catch (err) {
     console.warn(`mfapi.in unavailable for ${schemeCode}, using local fallback:`, err);
 
-    if (catalog || fallbackName) {
+    const navFromEstimate = estimatedNav && estimatedNav > 0 ? String(estimatedNav) : "0";
+    const navFromExisting = existing && Number(existing.latestNav) > 0 ? String(existing.latestNav) : null;
+
+    if (catalog || fallbackName || existing || navFromEstimate !== "0") {
       return {
         schemeCode,
-        schemeName: catalog?.schemeName || fallbackName || "Unknown Fund",
-        category: catalog?.category || null,
-        latestNav: "0",
+        schemeName: catalog?.schemeName || fallbackName || existing?.schemeName || "Unknown Fund",
+        category: catalog?.category || existing?.category || null,
+        latestNav: navFromExisting || navFromEstimate,
       };
     }
 

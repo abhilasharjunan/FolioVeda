@@ -14,11 +14,15 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validated = TransactionSchema.parse(body);
 
+    const estimatedNav =
+      validated.units > 0 ? validated.amount / validated.units : undefined;
+
     let resolved;
     try {
       resolved = await resolveSchemeForTransaction(
         validated.schemeCode,
-        validated.schemeName
+        validated.schemeName,
+        estimatedNav
       );
     } catch (err) {
       return NextResponse.json({
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
       update: {
         schemeName: resolved.schemeName,
         category: resolved.category,
-        ...(resolved.latestNav !== "0" ? { latestNav: resolved.latestNav } : {}),
+        ...(Number(resolved.latestNav) > 0 ? { latestNav: resolved.latestNav } : {}),
       },
     });
 

@@ -13,15 +13,20 @@ vi.mock('@/auth', () => ({
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     holding: { findMany: vi.fn() },
-    schemeMaster: { findMany: vi.fn() },
+    schemeMaster: { findMany: vi.fn(), upsert: vi.fn() },
   },
+}));
+
+vi.mock('@/lib/ensure-scheme-navs', () => ({
+  ensureSchemeNavs: vi.fn(),
 }));
 
 import { getPortfolioDiversification } from './diversification';
 import { prisma } from '@/lib/prisma';
+import { ensureSchemeNavs } from '@/lib/ensure-scheme-navs';
 
 const mockedHoldingFindMany = vi.mocked(prisma.holding.findMany);
-const mockedSchemeFindMany = vi.mocked(prisma.schemeMaster.findMany);
+const mockedEnsureSchemeNavs = vi.mocked(ensureSchemeNavs);
 
 describe('getPortfolioDiversification', () => {
   const originalDbUrl = process.env.DATABASE_URL;
@@ -29,7 +34,7 @@ describe('getPortfolioDiversification', () => {
   beforeEach(() => {
     process.env.DATABASE_URL = 'postgres://test'; // skip the build-time mock branch
     mockedHoldingFindMany.mockReset();
-    mockedSchemeFindMany.mockReset();
+    mockedEnsureSchemeNavs.mockReset();
   });
 
   afterAll(() => {
@@ -42,13 +47,13 @@ describe('getPortfolioDiversification', () => {
     // Unit-weighted (the bug) would show Debt ~91%. Value-weighted (correct):
     // Equity 45,000 / 60,000 = 75%, Debt 15,000 / 60,000 = 25%.
     mockedHoldingFindMany.mockResolvedValue([
-      { schemeCode: 'DEBT1', units: 1000 },
-      { schemeCode: 'EQ1', units: 100 },
+      { schemeCode: 'DEBT1', units: 1000, transactions: [] },
+      { schemeCode: 'EQ1', units: 100, transactions: [] },
     ] as any);
-    mockedSchemeFindMany.mockResolvedValue([
-      { schemeCode: 'DEBT1', category: 'Debt', latestNav: 15 },
-      { schemeCode: 'EQ1', category: 'Large Cap', latestNav: 450 },
-    ] as any);
+    mockedEnsureSchemeNavs.mockResolvedValue(new Map([
+      ['DEBT1', { schemeName: 'Debt Fund', category: 'Debt', latestNav: 15 }],
+      ['EQ1', { schemeName: 'Equity Fund', category: 'Large Cap', latestNav: 450 }],
+    ]));
 
     const result = await getPortfolioDiversification();
 
@@ -62,7 +67,7 @@ describe('getPortfolioDiversification', () => {
 
   it('returns null when the portfolio has no holdings', async () => {
     mockedHoldingFindMany.mockResolvedValue([]);
-    mockedSchemeFindMany.mockResolvedValue([]);
+    mockedEnsureSchemeNavs.mockResolvedValue(new Map());
 
     const result = await getPortfolioDiversification();
     expect(result).toBeNull();
@@ -70,11 +75,11 @@ describe('getPortfolioDiversification', () => {
 
   it('scores a single-category portfolio as highly concentrated (HHI = 1)', async () => {
     mockedHoldingFindMany.mockResolvedValue([
-      { schemeCode: 'EQ1', units: 100 },
+      { schemeCode: 'EQ1', units: 100, transactions: [] },
     ] as any);
-    mockedSchemeFindMany.mockResolvedValue([
-      { schemeCode: 'EQ1', category: 'Large Cap', latestNav: 100 },
-    ] as any);
+    mockedEnsureSchemeNavs.mockResolvedValue(new Map([
+      ['EQ1', { schemeName: 'Equity', category: 'Large Cap', latestNav: 100 }],
+    ]));
 
     const result = await getPortfolioDiversification();
     expect(result!.score).toBe(0); // HHI = 1 -> score = (1 - 1) * 100 = 0
@@ -83,18 +88,18 @@ describe('getPortfolioDiversification', () => {
 
   it('scores an evenly split multi-category portfolio as well diversified', async () => {
     mockedHoldingFindMany.mockResolvedValue([
-      { schemeCode: 'A', units: 100 },
-      { schemeCode: 'B', units: 100 },
-      { schemeCode: 'C', units: 100 },
-      { schemeCode: 'D', units: 100 },
-      { schemeCode: 'E', units: 100 },
+      { schemeCode: 'A', units: 100, transactions: [] },
+      { schemeCode: 'B', units: 100, transactions: [] },
+      { schemeCode: 'C', units: 100, transactions: [] },
+      { schemeCode: 'D', units: 100, transactions: [] },
+      { schemeCode: 'E', units: 100, transactions: [] },
     ] as any);
-    const schemeRows = ['A', 'B', 'C', 'D', 'E'].map((code, i) => ({
-      schemeCode: code,
-      category: `Category ${i}`,
-      latestNav: 100, // equal value in each of 5 categories -> HHI = 5 * 0.2^2 = 0.2
-    }));
-    mockedSchemeFindMany.mockResolvedValue(schemeRows as any);
+    mockedEnsureSchemeNavs.mockResolvedValue(new Map(
+      ['A', 'B', 'C', 'D', 'E'].map((code, i) => [
+        code,
+        { schemeName: code, category: `Category ${i}`, latestNav: 100 },
+      ])
+    ));
 
     const result = await getPortfolioDiversification();
     expect(result!.score).toBe(80); // (1 - 0.2) * 100 = 80
