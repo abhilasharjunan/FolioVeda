@@ -12,7 +12,7 @@ type ChartCardProps = {
   empty?: boolean;
   emptyMessage?: string;
   className?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export function ChartCard({
