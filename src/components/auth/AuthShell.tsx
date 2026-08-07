@@ -20,17 +20,28 @@ export function AuthShell({
       </div>
       <FadeIn className="w-full max-w-md">
         <div className="text-center mb-6">
-          <div className="text-3xl font-bold text-slate-50 font-heading">
+          <Link href="/" className="inline-block text-3xl font-bold text-slate-50 font-heading hover:opacity-90 transition-opacity">
             Folio<span className="text-teal-400">Veda</span>
-          </div>
+          </Link>
           {subtitle && (
             <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
           )}
         </div>
         {children}
-        <p className="mt-6 text-center text-xs text-slate-500">
+        <nav className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+          <Link href="/" className="hover:text-teal-400 transition-colors">
+            Home
+          </Link>
+          <Link href="/academy" className="hover:text-teal-400 transition-colors">
+            MF Academy
+          </Link>
+          <Link href="/tools/sip-calculator" className="hover:text-teal-400 transition-colors">
+            SIP Calculator
+          </Link>
+        </nav>
+        <p className="mt-3 text-center text-xs text-slate-500">
           <Link href="/about" className="font-mono hover:text-slate-300 transition-colors">
-            v{process.env.NEXT_PUBLIC_APP_VERSION ?? 'unknown'}
+            v{process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown"}
           </Link>
         </p>
       </FadeIn>

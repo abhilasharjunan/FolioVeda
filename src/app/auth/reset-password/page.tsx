@@ -52,8 +52,8 @@ function ResetPasswordForm() {
     <AuthShell subtitle="Choose a new password for your account">
       <Card className="w-full border-none shadow-xl surface-card">
         <CardHeader className="text-center pb-0">
-          <div className="mx-auto w-12 h-12 bg-blue-100 dark:bg-blue-950 rounded-full flex items-center justify-center mb-4">
-            <Lock className="text-blue-600" size={24} />
+          <div className="mx-auto w-12 h-12 bg-teal-100 dark:bg-teal-950/50 rounded-full flex items-center justify-center mb-4">
+            <Lock className="text-teal-600 dark:text-teal-400" size={24} />
           </div>
           <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Reset Password</CardTitle>
         </CardHeader>
@@ -92,15 +92,15 @@ function ResetPasswordForm() {
                 />
               </div>
               {error && (
-                <div className="p-3 bg-red-50 rounded-lg text-xs text-red-700 flex items-center gap-2">
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 rounded-lg text-xs text-red-700 dark:text-red-400 flex items-center gap-2 border border-red-100 dark:border-red-900/50">
                   <AlertTriangle size={14} /> {error}
                 </div>
               )}
-              <Button type="submit" disabled={loading || !token || !password || !confirm} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6">
+              <Button type="submit" disabled={loading || !token || !password || !confirm} className="w-full bg-teal-600 hover:bg-teal-500 text-white py-6">
                 {loading ? <><Loader2 size={16} className="mr-2 animate-spin" /> Resetting...</> : 'Reset Password'}
               </Button>
               <div className="text-center">
-                <Link href="/auth/signin" className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                <Link href="/auth/signin" className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-500 font-medium">
                   Back to Sign In
                 </Link>
               </div>
@@ -114,7 +114,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><Loader2 size={24} className="animate-spin text-blue-600" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center p-4"><Loader2 size={24} className="animate-spin text-teal-600 dark:text-teal-400" /></div>}>
       <ResetPasswordForm />
     </Suspense>
   );

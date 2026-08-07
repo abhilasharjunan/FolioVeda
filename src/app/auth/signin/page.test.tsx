@@ -59,4 +59,10 @@ describe('AuthPage', () => {
     const toggles = screen.getAllByText(/Need an account\? Sign up/);
     expect(toggles.length).toBeGreaterThan(0);
   });
+
+  it('uses teal brand accents on primary actions', () => {
+    render(<AuthPage />);
+    const signIn = screen.getAllByRole('button', { name: 'Sign In' })[0];
+    expect(signIn.className).toMatch(/teal-600/);
+  });
 });

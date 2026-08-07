@@ -80,12 +80,13 @@ export default function AuthPage() {
 
   return (
     <AuthShell subtitle={isLogin ? 'Welcome back' : 'Create your secure account'}>
-      {isLoading && isLogin && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-[1px]">
-          <Loader2 className="animate-spin text-blue-600 mb-3" size={32} />
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Signing you in…</p>
-        </div>
-      )}
+      <div className="relative">
+        {isLoading && isLogin && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-[1px]">
+            <Loader2 className="animate-spin text-teal-600 dark:text-teal-400 mb-3" size={32} />
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Signing you in…</p>
+          </div>
+        )}
         <Card className="w-full border-none shadow-xl surface-card">
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-lg font-medium text-slate-500 dark:text-slate-400">
@@ -96,54 +97,54 @@ export default function AuthPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-600 flex items-center gap-2">
+                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                     <User size={14} /> Full Name
                   </label>
-                  <Input 
-                    placeholder="John Doe" 
-                    value={formData.name} 
-                    onChange={e => setFormData({...formData, name: e.target.value})} 
-                    required 
+                  <Input
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={e => setFormData({...formData, name: e.target.value})}
+                    required
                     disabled={isLoading}
                   />
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600 flex items-center gap-2">
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Mail size={14} /> Email Address
                 </label>
-                <Input 
-                  type="email" 
-                  placeholder="name@company.com" 
-                  value={formData.email} 
-                  onChange={e => setFormData({...formData, email: e.target.value})} 
-                  required 
+                <Input
+                  type="email"
+                  placeholder="name@company.com"
+                  value={formData.email}
+                  onChange={e => setFormData({...formData, email: e.target.value})}
+                  required
                   disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600 flex items-center gap-2">
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Lock size={14} /> Password
                 </label>
-                <Input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  value={formData.password} 
-                  onChange={e => setFormData({...formData, password: e.target.value})} 
-                  required 
+                <Input
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={e => setFormData({...formData, password: e.target.value})}
+                  required
                   disabled={isLoading}
                 />
               </div>
 
               {error && (
-                <div className="p-3 text-xs bg-red-50 text-red-600 rounded-lg border border-red-100">
+                <div className="p-3 text-xs bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-lg border border-red-100 dark:border-red-900/50">
                   {error}
                 </div>
               )}
 
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6" 
+              <Button
+                type="submit"
+                className="w-full bg-teal-600 hover:bg-teal-500 text-white py-6"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -158,7 +159,7 @@ export default function AuthPage() {
 
               {isLogin && (
                 <div className="text-center">
-                  <a href="/auth/forgot-password" className="text-xs text-slate-500 hover:text-blue-600 font-medium">
+                  <a href="/auth/forgot-password" className="text-xs text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 font-medium">
                     Forgot password?
                   </a>
                 </div>
@@ -166,9 +167,9 @@ export default function AuthPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <button 
-                onClick={() => setIsLogin(!isLogin)} 
-                className="text-sm text-blue-600 hover:underline font-medium"
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-teal-600 dark:text-teal-400 hover:underline font-medium"
                 disabled={isLoading}
               >
                 {isLogin ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
@@ -176,6 +177,7 @@ export default function AuthPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
     </AuthShell>
   );
 }
