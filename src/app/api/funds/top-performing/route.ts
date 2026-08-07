@@ -1,58 +1,33 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import redis from "@/lib/redis";
+import {
+  TOP_FUNDS_REDIS_KEY,
+  buildTopFundsHttpResponse,
+  loadTopFundsPayloadFromDb,
+  setTopFundsRedisPayload,
+} from "@/lib/top-funds-cache";
 
-export const dynamic = 'force-dynamic';
-
-const REDIS_KEY = "funds:top-performing:v2";
-const REDIS_TTL_SECONDS = 24 * 60 * 60; // 24h — matches daily cron cadence
-
-function buildResponse(results: Record<string, unknown[]>, status = 200) {
-  return NextResponse.json(results, {
-    status,
-    headers: {
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
-    },
-  });
-}
+// Public, identical-for-all payload — allow CDN caching via response headers
+// (Vercel-CDN-Cache-Control) instead of force-dynamic, which opts out of edge cache.
+export const revalidate = 3600;
 
 export async function GET() {
   try {
     if (redis) {
       try {
-        const cachedPayload = await redis.get(REDIS_KEY);
+        const cachedPayload = await redis.get(TOP_FUNDS_REDIS_KEY);
         if (cachedPayload) {
-          return buildResponse(JSON.parse(cachedPayload));
+          return buildTopFundsHttpResponse(JSON.parse(cachedPayload));
         }
       } catch (redisErr) {
         console.warn("Redis read failed for top-performing:", redisErr);
       }
     }
 
-    const cached = await prisma.topFundsCache.findMany({
-      orderBy: [{ category: 'asc' }, { rank: 'asc' }],
-    });
-
-    if (cached.length > 0) {
-      const results: Record<string, any[]> = {};
-      for (const entry of cached) {
-        if (!results[entry.category]) results[entry.category] = [];
-        results[entry.category].push({
-          schemeCode: entry.schemeCode,
-          schemeName: entry.schemeName,
-          fundHouse: entry.fundHouse,
-          nav: Number(entry.nav),
-          returns: entry.returns as Record<string, number | null>,
-          sinceInception: entry.sinceInception ? Number(entry.sinceInception) : null,
-          rank: entry.rank,
-        });
-      }
-
-      if (redis) {
-        redis.set(REDIS_KEY, JSON.stringify(results), 'EX', REDIS_TTL_SECONDS).catch(() => {});
-      }
-
-      return buildResponse(results);
+    const results = await loadTopFundsPayloadFromDb();
+    if (results) {
+      setTopFundsRedisPayload(results).catch(() => {});
+      return buildTopFundsHttpResponse(results);
     }
 
     return NextResponse.json(

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,12 +9,21 @@ import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, Loader2 } from 'lucide-react';
 import { FadeIn } from '@/components/animations';
 
+const LOGIN_NAV_FALLBACK_MS = 8000;
+
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const navFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (navFallbackRef.current) clearTimeout(navFallbackRef.current);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +42,20 @@ export default function AuthPage() {
           setIsLoading(false);
           return;
         }
-        // Keep loading true through the dashboard navigation so the UI does not
-        // flash a non-loading state during the redirect gap.
-        router.push('/dashboard');
-        router.refresh();
+        // Keep loading through the redirect gap, but recover if navigation stalls.
+        if (navFallbackRef.current) clearTimeout(navFallbackRef.current);
+        navFallbackRef.current = setTimeout(() => {
+          setIsLoading(false);
+          setError('Signed in, but navigation is taking too long. Open /dashboard manually or retry.');
+        }, LOGIN_NAV_FALLBACK_MS);
+        try {
+          router.push('/dashboard');
+          router.refresh();
+        } catch {
+          if (navFallbackRef.current) clearTimeout(navFallbackRef.current);
+          setIsLoading(false);
+          setError('Signed in, but could not open the dashboard. Please try again.');
+        }
         return;
       }
 

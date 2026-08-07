@@ -21,20 +21,12 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState<string>('Loading...');
 
   useEffect(() => {
     const loadFundDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        setProgress(0);
-        setStatus('Starting...');
-        
-        // Step 1: Get basic scheme info
-        setStatus('Fetching basic information...');
-        setProgress(10);
         
         // Try to get from cache first, then fall back to API
         let schemeData: any = null;
@@ -63,13 +55,6 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
           throw new Error('Unable to fetch fund data');
         }
         
-        setProgress(30);
-        setStatus('Processing basic data...');
-        
-        // Step 2: Get enhanced data if available
-        setStatus('Loading enhanced data...');
-        setProgress(40);
-        
         // If we don't have full insights yet, try to get them
         let enhancedData: any = {};
         if (!schemeData.cagrReturns || !schemeData.sectorAllocation) {
@@ -89,9 +74,6 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
             // Continue with basic data
           }
         }
-        
-        setProgress(70);
-        setStatus('Calculating metrics...');
         
         // Merge data
         const finalData = {
@@ -124,21 +106,11 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
           fundManagerTenure: schemeData.fundManagerTenure || null
         };
         
-        setProgress(90);
-        setStatus('Finalizing...');
-        
         setAnalysis(finalData);
-        setProgress(100);
-        setStatus('Done!');
       } catch (err: any) {
         console.error('Error loading fund details:', err);
         setError(err.message || 'Failed to load fund details. Please try again.');
       } finally {
-        if (progress >= 100) {
-          setTimeout(() => {
-            setStatus('Ready!');
-          }, 1500);
-        }
         setLoading(false);
       }
     };

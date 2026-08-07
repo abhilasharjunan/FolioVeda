@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { BENCHMARK_SCHEMES, FundCategory, calculateCAGR, getHistoricalNav } from "@/lib/funds";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
 import { isDirectGrowthScheme } from "@/lib/scheme-filters";
-import redis from "@/lib/redis";
+import { refreshTopFundsRedisFromDb } from "@/lib/top-funds-cache";
 
 const CATEGORIES: FundCategory[] = [
   "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap",
@@ -22,7 +22,6 @@ export const CATEGORY_BATCHES: FundCategory[][] = [
 
 const FULL_UNIVERSE_CANDIDATES_PER_CATEGORY = 200;
 const RECENT_SNAPSHOT_LOOKBACK_DAYS = 14;
-const REDIS_TOP_FUNDS_KEY = "funds:top-performing:v2";
 
 interface RankedFund {
   schemeCode: string;
@@ -110,9 +109,11 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
  * history only. Direct Growth plans only — Regular / IDCW / Dividend excluded.
  */
 async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[]> {
+  // Stable order so the Direct Growth slice is deterministic across cron runs.
   const schemes = await prisma.schemeCatalog.findMany({
     where: { category: cat },
     select: { schemeCode: true, schemeName: true, fundHouse: true },
+    orderBy: { schemeName: "asc" },
     take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3, // oversample then filter Direct Growth
   });
   if (schemes.length === 0) return [];
@@ -172,13 +173,34 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     for (const f of curated) merged.set(f.schemeCode, f);
     for (const f of fullUniverse) if (!merged.has(f.schemeCode)) merged.set(f.schemeCode, f);
 
-    // Safety net: drop Regular / IDCW even if a curated display name slipped through.
-    // Curated BENCHMARK names sometimes omit "Direct/Growth" in the short label while
-    // the scheme code itself is Direct Growth — keep those (they come from curated).
-    const curatedCodes = new Set(curated.map((f) => f.schemeCode));
-    const eligible = Array.from(merged.values()).filter(
-      (f) => curatedCodes.has(f.schemeCode) || isDirectGrowthScheme(f.schemeName)
-    );
+    // Prefer AMFI catalog names for curated short labels so Regular/IDCW codes
+    // cannot slip through when BENCHMARK_SCHEMES omits "Direct/Growth".
+    const curatedCodeSet = new Set(curated.map((f) => f.schemeCode));
+    const catalogNames =
+      curatedCodeSet.size > 0
+        ? await prisma.schemeCatalog.findMany({
+            where: { schemeCode: { in: [...curatedCodeSet] } },
+            select: { schemeCode: true, schemeName: true },
+          })
+        : [];
+    const catalogNameByCode = new Map(catalogNames.map((s) => [s.schemeCode, s.schemeName]));
+
+    for (const f of curated) {
+      const catalogName = catalogNameByCode.get(f.schemeCode);
+      if (catalogName) {
+        const entry = merged.get(f.schemeCode);
+        if (entry) entry.schemeName = catalogName;
+      }
+    }
+
+    const eligible = Array.from(merged.values()).filter((f) => {
+      const catalogName = catalogNameByCode.get(f.schemeCode);
+      if (catalogName) {
+        return isDirectGrowthScheme(catalogName);
+      }
+      // No catalog row: keep curated benchmark codes; otherwise require name filter.
+      return curatedCodeSet.has(f.schemeCode) || isDirectGrowthScheme(f.schemeName);
+    });
 
     const sorted = eligible
       .sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity))
@@ -220,10 +242,9 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     }
   }
 
-  // Invalidate the page-facing Redis payload so the next read rebuilds from DB.
-  if (redis) {
-    redis.del(REDIS_TOP_FUNDS_KEY).catch(() => {});
-  }
+  // Write the full DB snapshot into Redis so concurrent GETs cannot refill Redis
+  // from a mid-batch / pre-sync Postgres view.
+  await refreshTopFundsRedisFromDb();
 
   return results;
 }
