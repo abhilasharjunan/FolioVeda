@@ -76,13 +76,13 @@ describe('Navbar', () => {
   it('highlights only the longest-matching portfolio sub-link', () => {
     mockUsePathname.mockReturnValue('/portfolio/risk');
     const { container } = render(<Navbar />);
-    const risk = within(container).getByRole('button', { name: 'Risk' });
-    const holdings = within(container).getByRole('button', { name: 'Holdings' });
-    expect(risk.className).toContain('bg-blue-50');
-    expect(holdings.className).not.toContain('bg-blue-50');
+    const risk = within(container).getByRole('link', { name: 'Risk' });
+    const holdings = within(container).getByRole('link', { name: 'Holdings' });
+    expect(risk.className).toContain('bg-teal-500/15');
+    expect(holdings.className).not.toContain('bg-teal-500/15');
     // Primary Portfolio stays active for any /portfolio/* route
-    const portfolio = within(container).getByRole('button', { name: 'Portfolio' });
-    expect(portfolio.className).toContain('bg-blue-50');
+    const portfolio = within(container).getByRole('link', { name: 'Portfolio' });
+    expect(portfolio.className).toContain('bg-teal-500/15');
   });
 
   it('shows public links and Sign in when unauthenticated', () => {

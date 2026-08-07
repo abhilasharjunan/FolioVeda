@@ -12,46 +12,46 @@ export default function AboutPage() {
         <FadeIn>
           <div className="surface-card rounded-2xl border border-slate-200/70 dark:border-slate-800 shadow-sm p-8">
             <div className="flex items-center gap-3 mb-8">
-              <Info className="text-blue-600" size={28} />
+              <Info className="text-teal-600 dark:text-teal-400" size={28} />
               <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">About FolioVeda</h1>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl p-6 mb-8">
-              <p className="text-sm font-medium text-blue-600 mb-4">Deployment info — confirm live version after each release</p>
+            <div className="bg-teal-50/80 dark:bg-teal-950/30 border border-teal-200/70 dark:border-teal-900/50 rounded-xl p-6 mb-8">
+              <p className="text-sm font-medium text-teal-700 dark:text-teal-400 mb-4">Deployment info — confirm live version after each release</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Version</p>
-                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100 font-heading">{version}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400 mb-1">Version</p>
+                  <p className="text-3xl font-bold text-teal-900 dark:text-teal-100 font-heading">{version}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Environment</p>
-                  <p className="text-lg font-semibold text-blue-900 dark:text-blue-100 capitalize">{environment}</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400 mb-1">Environment</p>
+                  <p className="text-lg font-semibold text-teal-900 dark:text-teal-100 capitalize">{environment}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Built at</p>
-                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">{formatBuildTime(buildTime)} IST</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400 mb-1">Built at</p>
+                  <p className="text-sm font-semibold text-teal-900 dark:text-teal-100">{formatBuildTime(buildTime)} IST</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Git commit</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-teal-700 dark:text-teal-400 mb-1">Git commit</p>
                   {gitCommit ? (
                     gitCommitUrl ? (
                       <a
                         href={gitCommitUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-mono font-semibold text-blue-700 dark:text-blue-300 hover:underline"
+                        className="text-sm font-mono font-semibold text-teal-700 dark:text-teal-300 hover:underline"
                       >
                         {gitCommit}
                       </a>
                     ) : (
-                      <p className="text-sm font-mono font-semibold text-blue-900 dark:text-blue-100">{gitCommit}</p>
+                      <p className="text-sm font-mono font-semibold text-teal-900 dark:text-teal-100">{gitCommit}</p>
                     )
                   ) : (
-                    <p className="text-sm text-blue-700 dark:text-blue-300">—</p>
+                    <p className="text-sm text-teal-700 dark:text-teal-300">—</p>
                   )}
                 </div>
               </div>
-              <p className="mt-4 text-xs text-blue-600">
+              <p className="mt-4 text-xs text-teal-700 dark:text-teal-400">
                 JSON: <code className="font-mono">/api/version</code>
               </p>
             </div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
                     'SIP Calculator',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-3">
-                      <span className="text-blue-600 font-bold mt-1">•</span>
+                      <span className="text-teal-600 dark:text-teal-400 font-bold mt-1">•</span>
                       <span className="text-slate-600 dark:text-slate-400">{item}</span>
                     </li>
                   ))}

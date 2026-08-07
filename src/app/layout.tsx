@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", dmSans.variable, sora.variable)} suppressHydrationWarning>
+    <html lang="en" className={cn("dark font-sans", dmSans.variable, sora.variable)} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col bg-background text-foreground">
         <Providers>
           <Navbar />

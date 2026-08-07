@@ -4,7 +4,7 @@ import { AppVersion } from '@/components/shared/AppVersion';
 
 export const SEBIFooter = () => {
   return (
-    <footer className="print:hidden border-t bg-slate-50 dark:bg-slate-950 py-6 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+    <footer className="print:hidden border-t border-slate-200/70 dark:border-slate-800/70 bg-slate-100/80 dark:bg-[#0d1219] py-6 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-2 mb-2 text-slate-600 dark:text-slate-300 font-medium">
           <AlertCircle size={14} />

@@ -4,12 +4,14 @@ import { motion, useReducedMotion, useMotionValue, useTransform, animate } from 
 import { useEffect, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
+/** Keep motion short — long entrance animations make navigation feel sluggish. */
 const easeOut = [0.22, 1, 0.36, 1] as const;
+const FAST = 0.22;
 
 export const FadeIn = ({
   children,
   delay = 0,
-  duration = 0.4,
+  duration = FAST,
   className,
 }: {
   children: ReactNode;
@@ -22,7 +24,7 @@ export const FadeIn = ({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration, delay, ease: easeOut }}
     >
@@ -37,9 +39,9 @@ export const ScaleIn = ({ children, className }: { children: ReactNode; classNam
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, scale: 0.96 }}
+      initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, ease: easeOut }}
+      transition={{ duration: FAST, ease: easeOut }}
     >
       {children}
     </motion.div>
@@ -60,9 +62,9 @@ export const SlideIn = ({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, x: direction === "right" ? 16 : -16 }}
+      initial={{ opacity: 0, x: direction === "right" ? 8 : -8 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.35, ease: easeOut }}
+      transition={{ duration: FAST, ease: easeOut }}
     >
       {children}
     </motion.div>
@@ -72,7 +74,7 @@ export const SlideIn = ({
 export function StaggerChildren({
   children,
   className,
-  stagger = 0.06,
+  stagger = 0.04,
   delay = 0,
 }: {
   children: ReactNode;
@@ -112,8 +114,8 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, y: 12 },
-        show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: easeOut } },
+        hidden: { opacity: 0, y: 6 },
+        show: { opacity: 1, y: 0, transition: { duration: FAST, ease: easeOut } },
       }}
     >
       {children}
@@ -121,6 +123,7 @@ export function StaggerItem({
   );
 }
 
+/** CSS-based lift — avoids Framer Motion listeners on every card hover/click. */
 export function HoverLift({
   children,
   className,
@@ -128,17 +131,7 @@ export function HoverLift({
   children: ReactNode;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-  return (
-    <motion.div
-      className={className}
-      whileHover={{ y: -2, transition: { duration: 0.2 } }}
-      whileTap={{ scale: 0.99 }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={cn("hover-lift", className)}>{children}</div>;
 }
 
 export function PageSection({
@@ -156,10 +149,10 @@ export function PageSection({
     <motion.section
       id={id}
       className={className}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.4, ease: easeOut }}
+      viewport={{ once: true, margin: "-24px", amount: 0.15 }}
+      transition={{ duration: FAST, ease: easeOut }}
     >
       {children}
     </motion.section>
@@ -182,7 +175,7 @@ export function AnimatedNumber({
   prefix = "",
   suffix = "",
   decimals = 0,
-  duration = 0.6,
+  duration = 0.35,
   format,
 }: AnimatedNumberProps) {
   const reduce = useReducedMotion();

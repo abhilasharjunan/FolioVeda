@@ -14,6 +14,10 @@ vi.mock('@/components/animations', () => ({
   StaggerItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('@/components/ui/ThemeToggle', () => ({
+  ThemeToggle: () => <button type="button" aria-label="Toggle theme">Theme</button>,
+}));
+
 import LandingPage from './page';
 
 describe('LandingPage', () => {
