@@ -31,6 +31,13 @@ export default function LandingPage() {
           >
             SIP Calculator
           </Button>
+          <Button
+            variant="ghost"
+            className="text-slate-600 dark:text-slate-300"
+            onClick={() => router.push('/about')}
+          >
+            About
+          </Button>
           <Button variant="ghost" onClick={() => router.push('/auth/signin')}>Login</Button>
           <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.02 }}>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => router.push('/auth/signin')}>

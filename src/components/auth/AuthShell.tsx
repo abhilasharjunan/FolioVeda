@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { FadeIn } from "@/components/animations";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
@@ -27,6 +28,11 @@ export function AuthShell({
           )}
         </div>
         {children}
+        <p className="mt-6 text-center text-xs text-slate-400">
+          <Link href="/about" className="font-mono hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            v{process.env.NEXT_PUBLIC_APP_VERSION ?? 'unknown'}
+          </Link>
+        </p>
       </FadeIn>
     </div>
   );

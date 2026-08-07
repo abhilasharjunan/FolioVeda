@@ -58,7 +58,7 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         }
         
         // If we don't have full insights yet, try to get them
-        let enhancedData: any = {};
+        const enhancedData: Record<string, unknown> = {};
         if (!schemeData.cagrReturns || !schemeData.sectorAllocation) {
           try {
             const insightsRes = await fetch(`/api/funds/${id}`);

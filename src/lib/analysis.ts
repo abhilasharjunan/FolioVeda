@@ -77,7 +77,7 @@ export const getPortfolioAnalysis = cache(async () => {
 
   let totalInvested = 0;
   let currentMarketValue = 0;
-  let overallCashFlows: { amount: number; date: Date }[] = [];
+  const overallCashFlows: { amount: number; date: Date }[] = [];
 
   // Single batched lookup instead of one findUnique() per holding (N+1 query fix
   // — see FolioVeda_Audit_and_Roadmap.md, section 1.5/3.6).

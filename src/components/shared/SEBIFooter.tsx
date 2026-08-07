@@ -1,11 +1,12 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
+import { AppVersion } from '@/components/shared/AppVersion';
 
 export const SEBIFooter = () => {
   return (
-    <footer className="print:hidden border-t bg-slate-50 py-6 px-4 text-center text-xs text-slate-500">
+    <footer className="print:hidden border-t bg-slate-50 dark:bg-slate-950 py-6 px-4 text-center text-xs text-slate-500 dark:text-slate-400">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-center gap-2 mb-2 text-slate-600 font-medium">
+        <div className="flex items-center justify-center gap-2 mb-2 text-slate-600 dark:text-slate-300 font-medium">
           <AlertCircle size={14} />
           <span>SEBI Regulatory Disclaimer</span>
         </div>
@@ -15,7 +16,11 @@ export const SEBIFooter = () => {
           All NAV data is sourced from third-party providers (AMFI/mfapi.in) and may have a reporting lag. 
           Past performance is not indicative of future results.
         </p>
-        <p className="mt-2">© {new Date().getFullYear()} FolioVeda. All rights reserved.</p>
+        <p className="mt-2 flex items-center justify-center gap-2 flex-wrap">
+          <span>© {new Date().getFullYear()} FolioVeda. All rights reserved.</span>
+          <span aria-hidden="true">·</span>
+          <AppVersion />
+        </p>
       </div>
     </footer>
   );

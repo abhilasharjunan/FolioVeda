@@ -1,12 +1,10 @@
-"use client";
-
 import React from 'react';
 import { Info } from 'lucide-react';
-import packageJson from '../../../package.json';
 import { FadeIn, PageSection } from '@/components/animations';
+import { formatBuildTime, getBuildInfo } from '@/lib/build-info';
 
 export default function AboutPage() {
-  const version = packageJson.version;
+  const { version, buildTime, gitCommit, gitCommitUrl, environment } = getBuildInfo();
 
   return (
     <div className="min-h-[calc(100vh-200px)]">
@@ -19,16 +17,43 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl p-6 mb-8">
-              <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-blue-600 mb-4">Deployment info — confirm live version after each release</p>
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 mb-1">Version</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Version</p>
                   <p className="text-3xl font-bold text-blue-900 dark:text-blue-100 font-heading">{version}</p>
                 </div>
-                <div className="text-right text-xs text-blue-600">
-                  <p>Latest Build</p>
-                  <p className="text-lg font-semibold">{new Date().toLocaleDateString()}</p>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Environment</p>
+                  <p className="text-lg font-semibold text-blue-900 dark:text-blue-100 capitalize">{environment}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Built at</p>
+                  <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">{formatBuildTime(buildTime)} IST</p>
+                </div>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-blue-600 mb-1">Git commit</p>
+                  {gitCommit ? (
+                    gitCommitUrl ? (
+                      <a
+                        href={gitCommitUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-mono font-semibold text-blue-700 dark:text-blue-300 hover:underline"
+                      >
+                        {gitCommit}
+                      </a>
+                    ) : (
+                      <p className="text-sm font-mono font-semibold text-blue-900 dark:text-blue-100">{gitCommit}</p>
+                    )
+                  ) : (
+                    <p className="text-sm text-blue-700 dark:text-blue-300">—</p>
+                  )}
                 </div>
               </div>
+              <p className="mt-4 text-xs text-blue-600">
+                JSON: <code className="font-mono">/api/version</code>
+              </p>
             </div>
 
             <PageSection className="space-y-6">
