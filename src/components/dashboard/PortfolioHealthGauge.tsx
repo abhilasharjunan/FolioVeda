@@ -44,23 +44,23 @@ export function PortfolioHealthGauge({ diversificationScore, riskScore }: Portfo
       : 'Needs attention — your portfolio is either concentrated, high-risk, or both.';
 
   return (
-    <Card className="border-none shadow-sm bg-white">
+    <Card className="surface-card border-none shadow-sm">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">
+        <CardTitle className="text-lg font-semibold font-heading">
           <MetricLabel label="Portfolio Health Score" tooltip="A single 0-100 score combining how well-diversified your portfolio is and how much risk it carries. Higher is always better." />
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col sm:flex-row items-center gap-6">
         <ProgressCircle progress={healthScore} size={120} color={color} />
         <div className="flex-1 space-y-3 w-full">
-          <p className="text-sm font-medium text-slate-700">{verdict}</p>
+          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{verdict}</p>
           <div className="space-y-2">
             {hasDiversification && (
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-500">
                   <MetricLabel label="Diversification" tooltip={METRIC_EXPLANATIONS.diversificationScore} />
                 </span>
-                <span className="font-semibold text-slate-800">{diversificationScore}/100</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-100">{diversificationScore}/100</span>
               </div>
             )}
             {hasRisk && (
@@ -68,7 +68,7 @@ export function PortfolioHealthGauge({ diversificationScore, riskScore }: Portfo
                 <span className="text-slate-500">
                   <MetricLabel label="Risk Exposure" tooltip={METRIC_EXPLANATIONS.compositeScore} />
                 </span>
-                <span className="font-semibold text-slate-800">{Math.round(riskScore as number)}/100</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-100">{Math.round(riskScore as number)}/100</span>
               </div>
             )}
           </div>

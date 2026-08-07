@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, Loader2 } from 'lucide-react';
-import { FadeIn } from '@/components/animations';
+import { AuthShell } from '@/components/auth/AuthShell';
 
 const LOGIN_NAV_FALLBACK_MS = 8000;
 
@@ -79,21 +79,17 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-slate-50 p-6">
+    <AuthShell subtitle={isLogin ? 'Welcome back' : 'Create your secure account'}>
       {isLoading && isLogin && (
-        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-50/80 backdrop-blur-[1px]">
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-[1px]">
           <Loader2 className="animate-spin text-blue-600 mb-3" size={32} />
-          <p className="text-sm font-medium text-slate-600">Signing you in…</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Signing you in…</p>
         </div>
       )}
-      <FadeIn>
-        <Card className="w-full max-w-md border-none shadow-xl bg-white">
+        <Card className="w-full border-none shadow-xl surface-card">
           <CardHeader className="text-center space-y-2">
-            <div className="text-3xl font-bold text-slate-900">
-              Folio<span className="text-blue-600">Veda</span>
-            </div>
-            <CardTitle className="text-lg font-medium text-slate-500">
-              {isLogin ? 'Welcome back' : 'Create your secure account'}
+            <CardTitle className="text-lg font-medium text-slate-500 dark:text-slate-400">
+              {isLogin ? 'Sign in to continue' : 'Create your secure account'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -180,7 +176,6 @@ export default function AuthPage() {
             </div>
           </CardContent>
         </Card>
-      </FadeIn>
-    </div>
+    </AuthShell>
   );
 }

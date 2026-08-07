@@ -123,8 +123,22 @@ export default function FundComparePage() {
     return 'Very High';
   };
 
+  const best3Y = comparisonList.reduce<{ code: string; value: number } | null>((best, f) => {
+    const v = f.cagrReturns['3Y'];
+    if (v == null) return best;
+    if (!best || v > best.value) return { code: f.schemeCode, value: v };
+    return best;
+  }, null);
+
+  const lowestExpense = comparisonList.reduce<{ code: string; value: number } | null>((best, f) => {
+    const raw = parseFloat(String(f.expenseRatio).replace(/[^\d.]/g, ''));
+    if (!Number.isFinite(raw)) return best;
+    if (!best || raw < best.value) return { code: f.schemeCode, value: raw };
+    return best;
+  }, null);
+
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto bg-slate-50/30 min-h-screen">
+    <div className="p-6 space-y-8 max-w-7xl mx-auto min-h-screen">
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">
@@ -132,8 +146,8 @@ export default function FundComparePage() {
               <TrendingUp size={16} />
               <span>Analysis Suite</span>
             </div>
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Fund Comparison</h1>
-            <p className="text-slate-500 max-w-2xl">
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Fund Comparison</h1>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
               Contrast performance, risk profiles, and portfolio structures of multiple funds side-by-side.
             </p>
           </div>
@@ -223,11 +237,11 @@ export default function FundComparePage() {
         )}
 
         {comparisonList.length > 1 && (
-          <Card className="border-none shadow-lg bg-white overflow-hidden">
-            <CardHeader className="bg-slate-50 border-b border-slate-100">
+          <Card className="surface-card border-none shadow-lg overflow-hidden">
+            <CardHeader className="bg-slate-50/80 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <BarChart3 size={16} className="text-blue-600" />
-                <CardTitle className="text-lg font-semibold text-slate-900">Returns Comparison (CAGR Overlay)</CardTitle>
+                <CardTitle className="text-lg font-semibold text-slate-900 dark:text-slate-50 font-heading">Returns Comparison (CAGR Overlay)</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-6">
@@ -243,27 +257,34 @@ export default function FundComparePage() {
         )}
 
         {comparisonList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 text-center space-y-4 bg-white rounded-3xl border border-dashed border-slate-200">
-            <div className="p-4 bg-slate-100 rounded-full text-slate-400">
+          <div className="flex flex-col items-center justify-center py-32 text-center space-y-4 surface-card rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+            <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-400">
               <Search size={32} />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">No funds selected</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 font-heading">No funds selected</h3>
               <p className="text-slate-500">Search for funds above to begin a side-by-side comparison.</p>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {comparisonList.map((fund) => (
-              <Card key={fund.schemeCode} className="border-none shadow-lg bg-white overflow-hidden">
-                <CardHeader className="relative bg-slate-50 border-b border-slate-100">
+            {comparisonList.map((fund) => {
+              const isBestReturn = best3Y?.code === fund.schemeCode;
+              const isLowestExpense = lowestExpense?.code === fund.schemeCode;
+              return (
+              <Card key={fund.schemeCode} className={`surface-card border-none shadow-lg overflow-hidden ${isBestReturn ? 'ring-2 ring-emerald-400/70' : ''}`}>
+                <CardHeader className="relative bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
                   <button 
                     onClick={() => removeFund(fund.schemeCode)}
                     className="absolute right-4 top-4 p-1 text-slate-400 hover:text-rose-500 transition-colors rounded-full hover:bg-rose-50"
                   >
                     <X size={16} />
                   </button>
-                  <CardTitle className="text-md font-bold text-slate-900 pr-6 line-clamp-2">
+                  <div className="flex flex-wrap gap-1 mb-2 pr-6">
+                    {isBestReturn && <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">Best 3Y</Badge>}
+                    {isLowestExpense && <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px]">Lowest expense</Badge>}
+                  </div>
+                  <CardTitle className="text-md font-bold text-slate-900 dark:text-slate-50 pr-6 line-clamp-2 font-heading">
                     {fund.schemeName}
                   </CardTitle>
                   <p className="text-xs text-slate-500 font-medium">{fund.fundHouse}</p>
@@ -301,7 +322,8 @@ export default function FundComparePage() {
                    </div>
                 </CardContent>
               </Card>
-            ))}
+            );
+            })}
           </div>
         )}
       </FadeIn>

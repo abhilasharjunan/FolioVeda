@@ -30,11 +30,11 @@ interface OverlapPair {
 }
 
 function overlapColor(pct: number): string {
-  if (pct >= 40) return 'bg-rose-500 text-white';
-  if (pct >= 25) return 'bg-orange-400 text-white';
+  if (pct >= 40) return 'bg-rose-500 text-white shadow-sm';
+  if (pct >= 25) return 'bg-orange-400 text-white shadow-sm';
   if (pct >= 10) return 'bg-amber-300 text-slate-900';
   if (pct > 0) return 'bg-emerald-200 text-slate-900';
-  return 'bg-slate-100 text-slate-400';
+  return 'bg-slate-100 text-slate-400 dark:bg-slate-800';
 }
 
 function shortName(name: string, max = 22): string {

@@ -49,11 +49,11 @@ export default async function PortfolioRiskPage() {
               <ShieldCheck size={16} />
               <span>Portfolio Insights</span>
             </div>
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Risk Aggregation</h1>
-            <p className="text-slate-500 max-w-2xl">
-              Weighted analysis of your current portfolio's risk exposure and diversification.
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Risk Aggregation</h1>
+            <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
+              Weighted analysis of your current portfolio&apos;s risk exposure and diversification.
             </p>
-            <p className="text-sm font-medium text-slate-700 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 inline-block">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg px-3 py-2 inline-block">
               {verdict}
             </p>
           </div>
@@ -74,7 +74,7 @@ export default async function PortfolioRiskPage() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-slate-500">
                 <MetricLabel label="Aggregate Risk Score" tooltip={METRIC_EXPLANATIONS.compositeScore} />
@@ -89,7 +89,7 @@ export default async function PortfolioRiskPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-slate-500">
                 <MetricLabel label="Portfolio Volatility" tooltip={METRIC_EXPLANATIONS.volatility} />
@@ -106,7 +106,7 @@ export default async function PortfolioRiskPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-sm font-medium text-slate-500">
                 <MetricLabel label="Diversification (HHI)" tooltip={METRIC_EXPLANATIONS.hhi} />

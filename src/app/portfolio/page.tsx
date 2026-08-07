@@ -6,6 +6,8 @@ import ManualHoldingEntry from '@/components/portfolio/ManualHoldingEntry';
 import CsvUpload from '@/components/portfolio/CsvUpload';
 import HoldingsList from '@/components/portfolio/HoldingsList';
 import PortfolioSectorChart from '@/components/portfolio/PortfolioSectorChart';
+import { FadeIn } from '@/components/animations';
+import { motion } from 'framer-motion';
 
 export default function PortfolioManager() {
   const [entryMode, setEntryMode] = useState<'manual' | 'csv'>('manual');
@@ -13,26 +15,36 @@ export default function PortfolioManager() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Manage Portfolio</h1>
-        <p className="text-slate-500">Add or modify your mutual fund holdings.</p>
-      </div>
+      <FadeIn>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Manage Portfolio</h1>
+          <p className="text-slate-500 dark:text-slate-400">Add or modify your mutual fund holdings.</p>
+        </div>
+      </FadeIn>
 
-      <div className="flex bg-slate-100 p-1 rounded-lg w-fit">
-        <Button 
-          variant={entryMode === 'manual' ? 'default' : 'ghost'} 
-          onClick={() => setEntryMode('manual')}
-          className={entryMode === 'manual' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}
-        >
-          Manual Entry
-        </Button>
-        <Button 
-          variant={entryMode === 'csv' ? 'default' : 'ghost'} 
-          onClick={() => { setEntryMode('csv'); setRefreshKey(k => k + 1); }}
-          className={entryMode === 'csv' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}
-        >
-          CSV Upload
-        </Button>
+      <div className="relative flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg w-fit">
+        {(['manual', 'csv'] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => {
+              setEntryMode(mode);
+              if (mode === 'csv') setRefreshKey((k) => k + 1);
+            }}
+            className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+              entryMode === mode ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500'
+            }`}
+          >
+            {entryMode === mode && (
+              <motion.span
+                layoutId="portfolio-entry-pill"
+                className="absolute inset-0 rounded-md bg-white dark:bg-slate-900 shadow-sm"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{mode === 'manual' ? 'Manual Entry' : 'CSV Upload'}</span>
+          </button>
+        ))}
       </div>
 
       {entryMode === 'manual' ? (
@@ -47,7 +59,7 @@ export default function PortfolioManager() {
         </div>
       </div>
 
-      <HoldingsList key={refreshKey} />
+      <HoldingsList key={refreshKey} onRequestAdd={() => setEntryMode('manual')} />
     </div>
   );
 }

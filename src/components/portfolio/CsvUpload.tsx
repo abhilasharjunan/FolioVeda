@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, CheckCircle2, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
   const [file, setFile] = useState<File | null>(null);
@@ -54,6 +55,7 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
       }
 
       setResult({ type: 'success', message: `Successfully imported ${data.imported} holding(s)!` });
+      toast.success(`Imported ${data.imported} holding(s)`);
       setFile(null);
       setPreview([]);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -66,9 +68,9 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <Card className="border-none shadow-sm bg-white max-w-2xl mx-auto">
+    <Card className="surface-card border-none shadow-sm max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">CSV Upload</CardTitle>
+        <CardTitle className="text-lg font-semibold font-heading">CSV Upload</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50 hover:border-blue-300 transition-colors">

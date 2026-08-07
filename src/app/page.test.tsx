@@ -5,6 +5,13 @@ import { render, screen } from '@testing-library/react';
 vi.mock('@/components/animations', () => ({
   FadeIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   ScaleIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  PageSection: ({ children, id, className }: { children: React.ReactNode; id?: string; className?: string }) => (
+    <section id={id} className={className}>{children}</section>
+  ),
+  StaggerChildren: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={className}>{children}</div>
+  ),
+  StaggerItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 import LandingPage from './page';

@@ -4,6 +4,25 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@/components/animations', () => ({
   FadeIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ScaleIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@/components/auth/AuthShell', () => ({
+  AuthShell: ({ children, subtitle }: { children: React.ReactNode; subtitle?: string }) => (
+    <div>
+      {subtitle && <p>{subtitle}</p>}
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock('@/components/ui/ThemeToggle', () => ({
+  ThemeToggle: () => null,
+}));
+
+vi.mock('next-themes', () => ({
+  useTheme: () => ({ resolvedTheme: 'light', setTheme: vi.fn() }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 import AuthPage from './page';

@@ -13,6 +13,14 @@ vi.mock('@/components/animations', () => ({
   SlideIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('@/components/ui/ThemeToggle', () => ({
+  ThemeToggle: () => <button type="button" aria-label="Toggle theme">Theme</button>,
+}));
+
+vi.mock('next-themes', () => ({
+  useTheme: () => ({ resolvedTheme: 'light', setTheme: vi.fn() }),
+}));
+
 import Navbar from './Navbar';
 
 const authedSession = {

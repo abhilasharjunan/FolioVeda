@@ -6,10 +6,29 @@ interface SectorPieChartProps {
   data: Record<string, number>;
 }
 
-const COLORS = ['#2563eb', '#7c3aed', '#db2777', '#ea580c', '#ca8a04', '#16a34a', '#475569', '#94a3b8'];
+const COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  '#0ea5e9',
+  '#64748b',
+  '#94a3b8',
+];
 
 export const SectorPieChart = ({ data }: SectorPieChartProps) => {
-  const formattedData = Object.entries(data).map(([name, value]) => ({ name, value }));
+  const formattedData = Object.entries(data)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  if (formattedData.length === 0) {
+    return (
+      <div className="flex h-[280px] items-center justify-center text-sm text-slate-400">
+        No sector data available.
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -19,19 +38,28 @@ export const SectorPieChart = ({ data }: SectorPieChartProps) => {
             data={formattedData}
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={80}
-            paddingAngle={5}
+            innerRadius={62}
+            outerRadius={88}
+            paddingAngle={3}
             dataKey="value"
+            animationBegin={0}
+            animationDuration={700}
           >
             {formattedData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} stroke="transparent" />
             ))}
           </Pie>
-          <Tooltip 
-            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+          <Tooltip
+            formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Allocation']}
+            contentStyle={{
+              borderRadius: '10px',
+              border: 'none',
+              boxShadow: '0 8px 24px rgb(15 23 42 / 0.12)',
+              background: 'hsl(var(--card))',
+              color: 'hsl(var(--card-foreground))',
+            }}
           />
-          <Legend verticalAlign="bottom" height={36} />
+          <Legend verticalAlign="bottom" height={36} iconType="circle" />
         </PieChart>
       </ResponsiveContainer>
     </div>

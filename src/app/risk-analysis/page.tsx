@@ -145,7 +145,7 @@ export default function RiskAnalysisPage() {
   if (!data) {
     return (
       <div className="p-6 max-w-7xl mx-auto">
-        <Card className="border-none shadow-sm bg-white">
+        <Card className="surface-card border-none shadow-sm">
           <CardContent className="p-8 text-center space-y-3">
             <ShieldAlert className="mx-auto text-rose-500" size={28} />
             <h2 className="text-xl font-semibold text-slate-900">Risk metrics unavailable</h2>
@@ -169,7 +169,7 @@ export default function RiskAnalysisPage() {
             <span>Risk Analysis</span>
              </div>
 
-            <h1 className="text-4xl font-bold text-slate-900 tracking-tight">Fund Risk Analysis</h1>
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Fund Risk Analysis</h1>
             <p className="text-slate-500 max-w-2xl">
               Quantitative assessment of portfolio volatility, drawdown, and concentration risk across benchmark funds.
             </p>
@@ -180,7 +180,7 @@ export default function RiskAnalysisPage() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-6 flex flex-col justify-between h-full">
               <div className="p-2 bg-rose-50 rounded-lg text-rose-600 w-fit">
                 <Activity size={20} />
@@ -191,7 +191,7 @@ export default function RiskAnalysisPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-6 flex flex-col justify-between h-full">
               <div className="p-2 bg-amber-50 rounded-lg text-amber-600 w-fit">
                 <Zap size={20} />
@@ -202,7 +202,7 @@ export default function RiskAnalysisPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-6 flex flex-col justify-between h-full">
               <div className="p-2 bg-blue-50 rounded-lg text-blue-600 w-fit">
                 <TrendingUp size={20} />
@@ -271,7 +271,7 @@ export default function RiskAnalysisPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 border-none shadow-xl bg-white overflow-hidden">
+          <Card className="lg:col-span-2 surface-card border-none shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50 border-b border-slate-100">
@@ -330,7 +330,7 @@ export default function RiskAnalysisPage() {
             </div>
           </Card>
 
-          <Card className="border-none shadow-xl bg-white p-6 space-y-6">
+          <Card className="surface-card border-none shadow-xl p-6 space-y-6">
             <CardHeader className="px-0 pt-0">
               <CardTitle className="text-lg font-semibold">Risk Details</CardTitle>
             </CardHeader>

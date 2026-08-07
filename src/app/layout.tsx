@@ -3,10 +3,18 @@ import './globals.css';
 import Navbar from '@/components/shared/Navbar';
 import { SEBIFooter } from '@/components/shared/SEBIFooter';
 import { Providers } from '@/components/providers';
-import { Geist } from "next/font/google";
+import { DM_Sans, Sora } from "next/font/google";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-heading',
+});
 
 export default function RootLayout({
   children,
@@ -14,11 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className="min-h-screen flex flex-col bg-white text-slate-900">
+    <html lang="en" className={cn("font-sans", dmSans.variable, sora.variable)} suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col bg-background text-foreground">
         <Providers>
           <Navbar />
-          <main className="flex-grow">
+          <main className="flex-grow page-shell">
             {children}
           </main>
           <SEBIFooter />

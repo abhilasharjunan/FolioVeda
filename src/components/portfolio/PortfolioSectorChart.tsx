@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
-import { Loader2 } from 'lucide-react';
+import { ChartCard } from '@/components/ui/ChartCard';
 
 interface SectorData {
   sectors: Record<string, number>;
@@ -38,14 +37,7 @@ export default function PortfolioSectorChart() {
 
   if (loading) {
     return (
-      <Card className="border-none shadow-sm bg-white">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Sector Allocation</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-[300px]">
-          <Loader2 className="animate-spin text-slate-400" size={24} />
-        </CardContent>
-      </Card>
+      <ChartCard title="Sector Allocation" loading />
     );
   }
 
@@ -56,16 +48,11 @@ export default function PortfolioSectorChart() {
   const sectorCount = Object.keys(data.sectors).length;
 
   return (
-    <Card className="border-none shadow-sm bg-white">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Sector Allocation</CardTitle>
-        <p className="text-sm text-slate-500">
-          {sectorCount} sectors across your portfolio · ₹{data.totalValue.toLocaleString('en-IN')} total
-        </p>
-      </CardHeader>
-      <CardContent>
-        <SectorPieChart data={data.sectors} />
-      </CardContent>
-    </Card>
+    <ChartCard
+      title="Sector Allocation"
+      subtitle={`${sectorCount} sectors across your portfolio · ₹${data.totalValue.toLocaleString('en-IN')} total`}
+    >
+      <SectorPieChart data={data.sectors} />
+    </ChartCard>
   );
 }

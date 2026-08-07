@@ -3,11 +3,13 @@
 import React, { useState, useEffect, use } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, ShieldCheck, ArrowUpRight, Info, User, Building2, Wallet, PieChart, Activity, RefreshCw } from 'lucide-react';
+import { TrendingUp, ShieldCheck, ArrowUpRight, Info, User, Building2, Wallet, Activity, RefreshCw } from 'lucide-react';
 import { RiskOMeter } from '@/components/funds/RiskOMeter';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
 import { ReturnsBarChart } from '@/components/funds/ReturnsBarChart';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { FadeIn, StaggerChildren, StaggerItem } from '@/components/animations';
+import { ChartCard } from '@/components/ui/ChartCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -144,34 +146,41 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
-            <TrendingUp size={16} />
-            <span>Fund Details</span>
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">{analysis.schemeName}</h1>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-[10px] font-mono">{analysis.schemeCode}</Badge>
-            <Badge variant="outline" className="text-[10px] text-slate-500">{analysis.category || 'General'}</Badge>
+      <FadeIn>
+        <div className="sticky top-14 z-20 -mx-2 px-2 py-3 mb-2 backdrop-blur bg-white/80 dark:bg-slate-950/80 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
+                <TrendingUp size={16} />
+                <span>Fund Details</span>
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">{analysis.schemeName}</h1>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-[10px] font-mono">{analysis.schemeCode}</Badge>
+                <Badge variant="outline" className="text-[10px] text-slate-500">{analysis.category || 'General'}</Badge>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-none shadow-sm bg-white">
+      <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-6" stagger={0.07}>
+        <StaggerItem>
+        <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-slate-500">Latest NAV</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">₹{analysis.latestNav != null ? Number(analysis.latestNav).toFixed(2) : 'N/A'}</div>
+            <div className="text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">₹{analysis.latestNav != null ? Number(analysis.latestNav).toFixed(2) : 'N/A'}</div>
             <p className="text-xs text-slate-400 mt-1">
               Updated: {new Date(analysis.lastUpdated).toLocaleDateString()}
             </p>
           </CardContent>
         </Card>
+        </StaggerItem>
 
-        <Card className="border-none shadow-sm bg-white">
+        <StaggerItem>
+        <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-slate-500">Risk Level</CardTitle>
           </CardHeader>
@@ -183,18 +192,20 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
             )}
           </CardContent>
         </Card>
+        </StaggerItem>
 
-        <Card className="border-none shadow-sm bg-white">
+        <StaggerItem>
+        <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-slate-500">Fund Manager</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 rounded-full text-blue-600">
+              <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-full text-blue-600">
                 <User size={20} />
               </div>
               <div>
-                <div className="text-lg font-bold text-slate-900">
+                <div className="text-lg font-bold text-slate-900 dark:text-slate-50">
                   {analysis.fundManagerName || 'Not Available'}
                 </div>
                 {analysis.fundManagerTenure && (
@@ -204,44 +215,40 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
             </div>
           </CardContent>
         </Card>
-      </div>
+        </StaggerItem>
+      </StaggerChildren>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm bg-white">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">Returns (CAGR)</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <ChartCard title="Returns (CAGR)">
             <ReturnsBarChart returns={analysis.cagrReturns} />
             <div className="mt-4 grid grid-cols-3 gap-3">
-              <div className="p-3 bg-slate-50 rounded-lg text-center">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
                 <p className="text-[10px] text-slate-400 uppercase font-bold">1 Year</p>
-                <p className={`text-sm font-bold ${(returns['1Y'] ?? -1) >= 0 ? 'text-green-600' : 'text-rose-600'}`}>
+                <p className={`text-sm font-bold ${(returns['1Y'] ?? -1) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {formatReturn(returns['1Y'])}
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 rounded-lg text-center">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
                 <p className="text-[10px] text-slate-400 uppercase font-bold">3 Year</p>
                 <p className={`text-sm font-bold ${(returns['3Y'] ?? -1) >= 0 ? 'text-green-600' : 'text-rose-600'}`}>
                   {formatReturn(returns['3Y'])}
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 rounded-lg text-center">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
                 <p className="text-[10px] text-slate-400 uppercase font-bold">5 Year</p>
-                <p className={`text-sm font-bold ${(returns['5Y'] ?? -1) >= 0 ? 'text-green-600' : 'text-rose-600'}`}>
+                <p className={`text-sm font-bold ${(returns['5Y'] ?? -1) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {formatReturn(returns['5Y'])}
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </ChartCard>
 
-        <Card className="border-none shadow-sm bg-white">
+        <Card className="surface-card border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Fund Insights</CardTitle>
+            <CardTitle className="text-lg font-semibold font-heading">Fund Insights</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg text-blue-700 text-xs leading-relaxed">
+            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/40 rounded-lg text-blue-700 dark:text-blue-200 text-xs leading-relaxed">
               <Info size={16} className="mt-0.5 flex-shrink-0" />
               <p>
                 {analysis.fundHouse !== 'N/A' ? `Managed by ${analysis.fundHouse}.` : ''}
@@ -300,27 +307,19 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {Object.keys(analysis.sectorAllocation).length > 0 && (
-        <Card className="border-none shadow-sm bg-white">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <PieChart size={16} className="text-slate-400" />
-              <CardTitle className="text-lg font-semibold">Sector Allocation</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[300px]">
-              <SectorPieChart data={analysis.sectorAllocation} />
-            </div>
-          </CardContent>
-        </Card>
+        <ChartCard title="Sector Allocation">
+          <div className="h-[300px]">
+            <SectorPieChart data={analysis.sectorAllocation} />
+          </div>
+        </ChartCard>
       )}
 
       {analysis.holdings.length > 0 && (
-        <Card className="border-none shadow-sm bg-white">
+        <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <TrendingUp size={16} className="text-slate-400" />
-              <CardTitle className="text-lg font-semibold">Top Holdings</CardTitle>
+              <CardTitle className="text-lg font-semibold font-heading">Top Holdings</CardTitle>
             </div>
           </CardHeader>
           <CardContent>

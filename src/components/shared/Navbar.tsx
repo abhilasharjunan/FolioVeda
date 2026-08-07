@@ -4,6 +4,7 @@ import React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { TrendingUp, LogOut } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const primaryLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -44,8 +45,8 @@ function getActiveHref(pathname: string, hrefs: string[]): string | null {
 function navButtonClass(active: boolean) {
   return `px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
     active
-      ? "bg-blue-50 text-blue-600"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      ? "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-50"
   }`;
 }
 
@@ -78,11 +79,11 @@ export default function Navbar() {
   const brandHome = isAuthenticated ? "/dashboard" : "/";
 
   return (
-    <nav className="print:hidden sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+    <nav className="print:hidden sticky top-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center justify-between h-14">
         <div
           onClick={() => router.push(brandHome)}
-          className="flex items-center gap-2 font-bold text-lg text-slate-900 cursor-pointer shrink-0"
+          className="flex items-center gap-2 font-bold text-lg text-slate-900 dark:text-slate-50 cursor-pointer shrink-0 font-heading"
         >
           <TrendingUp className="text-blue-600" size={20} />
           <span className="hidden sm:inline">
@@ -99,10 +100,11 @@ export default function Navbar() {
               {link.label}
             </button>
           ))}
+          <ThemeToggle />
           {isAuthenticated ? (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors ml-1"
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors ml-1"
             >
               <LogOut size={14} />
               <span className="hidden sm:inline">Logout</span>
@@ -119,7 +121,7 @@ export default function Navbar() {
       </div>
 
       {showPortfolioSub && (
-        <div className="border-t border-slate-100 bg-slate-50/80">
+        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60">
           <div className="max-w-7xl mx-auto px-2 sm:px-4 flex items-center gap-1 h-10 overflow-x-auto no-scrollbar">
             <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mr-1 shrink-0">
               Portfolio

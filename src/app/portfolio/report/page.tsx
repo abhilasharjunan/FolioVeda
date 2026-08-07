@@ -36,7 +36,7 @@ export default async function PortfolioReportPage() {
     <div className="p-6 max-w-4xl mx-auto space-y-8 print:p-0 print:max-w-none">
       <div className="flex justify-between items-start print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Portfolio Report</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Report</h1>
           <p className="text-slate-500 text-sm">Print-ready summary of your portfolio, diversification, and risk.</p>
         </div>
         <PrintReportButton />

@@ -4,6 +4,15 @@ import { render, screen } from '@testing-library/react';
 
 vi.mock('@/components/animations', () => ({
   FadeIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ScaleIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+vi.mock('@/components/auth/AuthShell', () => ({
+  AuthShell: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/components/ui/ThemeToggle', () => ({
+  ThemeToggle: () => null,
 }));
 
 import ResetPasswordPage from './page';

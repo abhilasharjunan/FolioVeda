@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { FadeIn } from '@/components/animations';
+import { FadeIn, AnimatedNumber } from '@/components/animations';
 import { Calculator, Target, GitCompare, Plus, X, TrendingUp, Crown, Sparkles } from 'lucide-react';
 import {
   AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -181,7 +181,7 @@ export default function SIPCalculatorPage() {
   return (
     <div className="p-6 space-y-8 max-w-5xl mx-auto">
       <FadeIn>
-        <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 p-6 sm:p-8 text-white mb-8">
+        <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-600 to-blue-800 p-6 sm:p-8 text-white mb-8">
           <Sparkles className="absolute -right-4 -top-4 text-white/10" size={140} strokeWidth={1} />
           <div className="relative flex items-center gap-2 text-blue-100 font-semibold text-sm uppercase tracking-wider">
             <Calculator size={16} />
@@ -202,8 +202,8 @@ export default function SIPCalculatorPage() {
 
           <TabsContent value="sip">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="border-none shadow-sm bg-white lg:col-span-1">
-                <CardHeader><CardTitle className="text-base font-semibold">Inputs</CardTitle></CardHeader>
+              <Card className="surface-card border-none shadow-sm lg:col-span-1">
+                <CardHeader><CardTitle className="text-base font-semibold font-heading">Inputs</CardTitle></CardHeader>
                 <CardContent className="space-y-5">
                   <div className="space-y-2">
                     <SliderField label="Monthly Investment" value={monthlyAmount} onChange={setMonthlyAmount} suffix=" ₹" min={500} max={100000} step={500} formatValue={(v) => v.toLocaleString('en-IN')} />
@@ -217,13 +217,24 @@ export default function SIPCalculatorPage() {
               </Card>
 
               <div className="lg:col-span-2 space-y-6">
-                <Card className="border-none shadow-md bg-gradient-to-br from-blue-600 to-indigo-700 text-white overflow-hidden relative">
+                <Card className="border-none shadow-md bg-gradient-to-br from-blue-600 to-blue-800 text-white overflow-hidden relative">
                   <CardContent className="p-6">
                     <p className="text-xs text-blue-100 uppercase font-bold tracking-wide">Future Value</p>
-                    <p className="text-4xl sm:text-5xl font-bold mt-1 tracking-tight">{fmtCompact(sipResult.futureValue)}</p>
+                    <p className="text-4xl sm:text-5xl font-bold mt-1 tracking-tight font-heading">
+                      ₹
+                      <AnimatedNumber
+                        value={sipResult.futureValue}
+                        decimals={0}
+                        format={(n) => {
+                          if (n >= 10000000) return `${(n / 10000000).toFixed(2)}Cr`;
+                          if (n >= 100000) return `${(n / 100000).toFixed(2)}L`;
+                          return Math.round(n).toLocaleString('en-IN');
+                        }}
+                      />
+                    </p>
                     {growthMultiple > 0 && (
                       <p className="text-sm text-blue-100 mt-2">
-                        That's <span className="font-semibold text-white">{growthMultiple.toFixed(1)}×</span> your total contribution over {years} {years === 1 ? 'year' : 'years'}
+                        That&apos;s <span className="font-semibold text-white">{growthMultiple.toFixed(1)}×</span> your total contribution over {years} {years === 1 ? 'year' : 'years'}
                       </p>
                     )}
                   </CardContent>
@@ -234,8 +245,8 @@ export default function SIPCalculatorPage() {
                   <StatTile label="Estimated Gain" value={fmtCurrency(sipResult.totalGain)} tone="good" />
                 </div>
 
-                <Card className="border-none shadow-sm bg-white">
-                  <CardHeader><CardTitle className="text-sm font-semibold text-slate-600">Growth Over Time</CardTitle></CardHeader>
+                <Card className="surface-card border-none shadow-sm">
+                  <CardHeader><CardTitle className="text-sm font-semibold text-slate-600 font-heading">Growth Over Time</CardTitle></CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={260}>
                       <AreaChart data={sipResult.yearlyBreakdown}>

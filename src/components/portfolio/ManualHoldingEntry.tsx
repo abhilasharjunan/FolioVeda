@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+import { toast } from 'sonner';
+
 export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => void }) {
   const [query, setQuery] = useState('');
   const [suggestions, setSuggestions] = useState<{ schemeName: string; schemeCode: string }[]>([]);
@@ -92,6 +94,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
       }
 
       setMessage({ type: 'success', text: 'Holding added successfully!' });
+      toast.success('Holding added successfully');
       setFormData({ units: '', amount: '', date: new Date().toISOString().split('T')[0] });
       setSelectedFund(null);
       setQuery('');
@@ -104,9 +107,9 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
   };
 
   return (
-    <Card className="border-none shadow-sm bg-white max-w-2xl mx-auto">
+    <Card className="surface-card border-none shadow-sm max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Manual Fund Entry</CardTitle>
+        <CardTitle className="text-lg font-semibold font-heading">Manual Fund Entry</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
