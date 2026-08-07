@@ -18,7 +18,7 @@ export default function PortfolioManager() {
       <FadeIn>
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Manage Portfolio</h1>
-          <p className="text-slate-500 dark:text-slate-400">Add or modify your mutual fund holdings.</p>
+          <p className="text-slate-500 dark:text-slate-300">Add or modify your mutual fund holdings.</p>
         </div>
       </FadeIn>
 
@@ -32,7 +32,7 @@ export default function PortfolioManager() {
               if (mode === 'csv') setRefreshKey((k) => k + 1);
             }}
             className={`relative px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-              entryMode === mode ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500'
+              entryMode === mode ? 'text-slate-900 dark:text-slate-50' : 'text-slate-500 dark:text-slate-400'
             }`}
           >
             {entryMode === mode && (

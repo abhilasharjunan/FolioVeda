@@ -8,7 +8,7 @@ interface VolatilityChartProps {
 export const VolatilityChart = ({ data }: VolatilityChartProps) => {
   if (!data?.length) {
     return (
-      <div className="flex h-[200px] items-center justify-center text-sm text-slate-400">
+      <div className="flex h-[200px] items-center justify-center text-sm text-slate-400 dark:text-slate-400">
         No volatility history yet.
       </div>
     );

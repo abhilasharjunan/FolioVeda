@@ -34,7 +34,7 @@ function overlapColor(pct: number): string {
   if (pct >= 25) return 'bg-orange-400 text-white shadow-sm';
   if (pct >= 10) return 'bg-amber-300 text-slate-900';
   if (pct > 0) return 'bg-emerald-200 text-slate-900';
-  return 'bg-slate-100 text-slate-400 dark:bg-slate-800';
+  return 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400';
 }
 
 function shortName(name: string, max = 22): string {
@@ -96,8 +96,8 @@ export default function PortfolioOverlapPage() {
     return (
       <div className="p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
         <AlertTriangle size={40} className="text-rose-400" />
-        <h2 className="text-xl font-bold text-slate-900">Couldn't load overlap data</h2>
-        <p className="text-slate-500">{error}</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Couldn't load overlap data</h2>
+        <p className="text-slate-500 dark:text-slate-300">{error}</p>
       </div>
     );
   }
@@ -106,8 +106,8 @@ export default function PortfolioOverlapPage() {
     return (
       <div className="p-6 max-w-4xl mx-auto flex flex-col items-center justify-center py-24 text-center space-y-4">
         <Layers size={40} className="text-slate-300" />
-        <h2 className="text-xl font-bold text-slate-900">Add at least 2 holdings</h2>
-        <p className="text-slate-500 max-w-md">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Add at least 2 holdings</h2>
+        <p className="text-slate-500 dark:text-slate-300 max-w-md">
           Portfolio overlap compares the stock holdings across your funds. Add a second fund to your portfolio to see how much they duplicate each other.
         </p>
       </div>
@@ -122,13 +122,13 @@ export default function PortfolioOverlapPage() {
             <Layers size={16} />
             <span>Portfolio Insights</span>
           </div>
-          <h1 className="text-4xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
             <MetricLabel label="Portfolio Overlap" tooltip={METRIC_EXPLANATIONS.overlapPercentage} />
           </h1>
-          <p className="text-slate-500 max-w-2xl">
+          <p className="text-slate-500 dark:text-slate-300 max-w-2xl">
             How much your funds' top disclosed holdings duplicate each other. High overlap between two funds means you're paying two expense ratios for largely the same stocks.
           </p>
-          <p className="text-xs text-slate-400 max-w-2xl">
+          <p className="text-xs text-slate-400 dark:text-slate-400 max-w-2xl">
             Based on each fund's top 15 disclosed holdings, not full portfolios — treat this as directional, not exact.
           </p>
         </header>
@@ -136,12 +136,12 @@ export default function PortfolioOverlapPage() {
         {topOverlap && topOverlap.overlapPercentage > 0 && (
           <Card className="border-none shadow-sm bg-gradient-to-br from-amber-50 to-orange-50 border border-orange-100">
             <CardContent className="p-5 flex items-start gap-3">
-              <div className="p-2 bg-white rounded-lg text-orange-600 shrink-0">
+              <div className="p-2 bg-white dark:bg-slate-900 rounded-lg text-orange-600 shrink-0">
                 <TrendingUp size={20} />
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-900">Highest overlap: {topOverlap.overlapPercentage.toFixed(1)}%</p>
-                <p className="text-sm text-slate-600 mt-0.5">
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-50">Highest overlap: {topOverlap.overlapPercentage.toFixed(1)}%</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">
                   {topOverlap.schemeNameA} and {topOverlap.schemeNameB} share a significant chunk of top holdings.
                   {topOverlap.overlapPercentage >= 40 ? ' Worth reviewing whether you need both.' : ''}
                 </p>
@@ -150,8 +150,8 @@ export default function PortfolioOverlapPage() {
           </Card>
         )}
 
-        <Card className="border-none shadow-xl bg-white overflow-hidden">
-          <CardHeader className="border-b border-slate-50">
+        <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden">
+          <CardHeader className="border-b border-slate-50 dark:border-slate-800">
             <CardTitle className="text-lg font-semibold">Overlap Heatmap</CardTitle>
           </CardHeader>
           <CardContent className="p-4">
@@ -159,9 +159,9 @@ export default function PortfolioOverlapPage() {
               <table className="border-collapse">
                 <thead>
                   <tr>
-                    <th className="sticky left-0 bg-white p-2 min-w-[160px]" />
+                    <th className="sticky left-0 bg-white dark:bg-slate-900 p-2 min-w-[160px]" />
                     {funds.map((f) => (
-                      <th key={f.schemeCode} className="p-2 text-[10px] font-semibold text-slate-500 min-w-[80px] max-w-[80px] align-bottom">
+                      <th key={f.schemeCode} className="p-2 text-[10px] font-semibold text-slate-500 dark:text-slate-300 min-w-[80px] max-w-[80px] align-bottom">
                         <div className="truncate" title={f.schemeName}>{shortName(f.schemeName, 14)}</div>
                       </th>
                     ))}
@@ -170,14 +170,14 @@ export default function PortfolioOverlapPage() {
                 <tbody>
                   {funds.map((rowFund) => (
                     <tr key={rowFund.schemeCode}>
-                      <th className="sticky left-0 bg-white p-2 text-left text-xs font-semibold text-slate-700 min-w-[160px] max-w-[160px]">
+                      <th className="sticky left-0 bg-white dark:bg-slate-900 p-2 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 min-w-[160px] max-w-[160px]">
                         <div className="truncate" title={rowFund.schemeName}>{shortName(rowFund.schemeName)}</div>
                       </th>
                       {funds.map((colFund) => {
                         if (rowFund.schemeCode === colFund.schemeCode) {
                           return (
                             <td key={colFund.schemeCode} className="p-1">
-                              <div className="w-full h-10 rounded bg-slate-200 flex items-center justify-center text-[10px] text-slate-400 font-medium">—</div>
+                              <div className="w-full h-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 dark:text-slate-400 font-medium">—</div>
                             </td>
                           );
                         }
@@ -190,7 +190,7 @@ export default function PortfolioOverlapPage() {
                               disabled={!pair}
                               className={`w-full h-10 rounded flex items-center justify-center text-xs font-bold transition-transform ${
                                 pair ? 'cursor-pointer hover:scale-105' : 'cursor-default'
-                              } ${overlapColor(pct ?? -1)}`}
+                              }${overlapColor(pct ?? -1)}`}
                               title={pair ? `${pair.overlapPercentage.toFixed(1)}% overlap` : 'No holdings data available'}
                             >
                               {pct != null ? `${pct.toFixed(0)}%` : 'N/A'}
@@ -203,7 +203,7 @@ export default function PortfolioOverlapPage() {
                 </tbody>
               </table>
             </div>
-            <div className="flex items-center gap-4 mt-4 px-2 text-[10px] text-slate-500">
+            <div className="flex items-center gap-4 mt-4 px-2 text-[10px] text-slate-500 dark:text-slate-300">
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-200 inline-block" /> Low (&lt;10%)</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-300 inline-block" /> Moderate</span>
               <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-orange-400 inline-block" /> High</span>
@@ -214,34 +214,34 @@ export default function PortfolioOverlapPage() {
         </Card>
 
         {selectedPair && (
-          <Card className="border-none shadow-xl bg-white overflow-hidden">
-            <CardHeader className="border-b border-slate-50">
+          <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden">
+            <CardHeader className="border-b border-slate-50 dark:border-slate-800">
               <CardTitle className="text-lg font-semibold">
                 {selectedPair.schemeNameA} vs {selectedPair.schemeNameB}
-                <span className="ml-3 text-sm font-normal text-slate-400">{selectedPair.overlapPercentage.toFixed(1)}% overlap</span>
+                <span className="ml-3 text-sm font-normal text-slate-400 dark:text-slate-400">{selectedPair.overlapPercentage.toFixed(1)}% overlap</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {selectedPair.commonStocks.length === 0 ? (
-                <p className="p-6 text-sm text-slate-400 text-center">No common stocks in their top disclosed holdings.</p>
+                <p className="p-6 text-sm text-slate-400 dark:text-slate-400 text-center">No common stocks in their top disclosed holdings.</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
-                    <thead className="bg-slate-50 border-b border-slate-100">
+                    <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                       <tr>
-                        <th className="p-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Stock</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Weight in A</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Weight in B</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Overlap (min)</th>
+                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Stock</th>
+                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider text-right">Weight in A</th>
+                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider text-right">Weight in B</th>
+                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider text-right">Overlap (min)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {selectedPair.commonStocks.map((s) => (
-                        <tr key={s.stockName} className="border-b border-slate-50">
-                          <td className="p-3 text-sm font-medium text-slate-800">{s.stockName}</td>
-                          <td className="p-3 text-sm font-mono text-slate-600 text-right">{s.weightA.toFixed(2)}%</td>
-                          <td className="p-3 text-sm font-mono text-slate-600 text-right">{s.weightB.toFixed(2)}%</td>
-                          <td className="p-3 text-sm font-mono text-slate-900 font-bold text-right">{s.minWeight.toFixed(2)}%</td>
+                        <tr key={s.stockName} className="border-b border-slate-50 dark:border-slate-800">
+                          <td className="p-3 text-sm font-medium text-slate-800 dark:text-slate-100">{s.stockName}</td>
+                          <td className="p-3 text-sm font-mono text-slate-600 dark:text-slate-300 text-right">{s.weightA.toFixed(2)}%</td>
+                          <td className="p-3 text-sm font-mono text-slate-600 dark:text-slate-300 text-right">{s.weightB.toFixed(2)}%</td>
+                          <td className="p-3 text-sm font-mono text-slate-900 dark:text-slate-50 font-bold text-right">{s.minWeight.toFixed(2)}%</td>
                         </tr>
                       ))}
                     </tbody>

@@ -73,12 +73,12 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
         <CardTitle className="text-lg font-semibold font-heading">CSV Upload</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50 hover:border-blue-300 transition-colors">
+        <div className="p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl text-center bg-slate-50/50 hover:border-blue-300 transition-colors">
           {!file ? (
             <>
               <Upload className="mx-auto text-slate-300 mb-3" size={32} />
-              <p className="text-sm text-slate-600 mb-1">Drop your CSV file here or click to browse</p>
-              <p className="text-xs text-slate-400">File must include: schemeName, schemeCode, units, investedAmount, date</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">Drop your CSV file here or click to browse</p>
+              <p className="text-xs text-slate-400 dark:text-slate-400">File must include: schemeName, schemeCode, units, investedAmount, date</p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -103,21 +103,21 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
                 <div className="flex items-center gap-2">
                   <FileText size={20} className="text-blue-500" />
                   <div>
-                    <p className="text-sm font-medium text-slate-800">{file.name}</p>
-                    <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{file.name}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
                   </div>
                 </div>
                 <button
                   onClick={() => { setFile(null); setPreview([]); setResult(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
                   className="p-1 hover:bg-slate-100 rounded-full"
                 >
-                  <X size={16} className="text-slate-400" />
+                  <X size={16} className="text-slate-400 dark:text-slate-400" />
                 </button>
               </div>
-              <div className="bg-slate-50 p-3 rounded-lg text-xs font-mono text-slate-500 max-h-24 overflow-y-auto">
+              <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg text-xs font-mono text-slate-500 dark:text-slate-300 max-h-24 overflow-y-auto">
                 {preview.map((line, i) => <div key={i}>{line}</div>)}
               </div>
-              {preview.length > 0 && <p className="text-xs text-slate-400">Showing first {preview.length} lines</p>}
+              {preview.length > 0 && <p className="text-xs text-slate-400 dark:text-slate-400">Showing first {preview.length} lines</p>}
               <Button
                 onClick={handleUpload}
                 disabled={uploading}
@@ -152,9 +152,9 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         )}
 
-        <div className="bg-slate-50 rounded-lg p-4">
-          <p className="text-xs font-bold text-slate-600 mb-2">Required CSV Format</p>
-          <div className="bg-white rounded border border-slate-200 p-3 font-mono text-[11px] text-slate-500 leading-relaxed">
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
+          <p className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Required CSV Format</p>
+          <div className="bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 p-3 font-mono text-[11px] text-slate-500 dark:text-slate-300 leading-relaxed">
             schemeName,schemeCode,units,investedAmount,date<br />
             "HDFC Index Fund",118531,100.0000,15000.00,2024-01-15<br />
             "SBI Bluechip Fund",118839,50.0000,10000.00,2024-02-01

@@ -115,7 +115,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative" ref={dropdownRef}>
-            <label className="text-sm font-medium text-slate-700 mb-1 block">Search Mutual Fund</label>
+            <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Search Mutual Fund</label>
             <div className="relative">
               <Input
                 placeholder="e.g. HDFC Index Fund..."
@@ -126,20 +126,20 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
                 }}
                 className="pl-10"
               />
-              <Search className="absolute left-3 top-2.5 text-slate-400" size={18} />
-              {isLoading && <Loader2 className="absolute right-3 top-2.5 text-slate-400 animate-spin" size={18} />}
+              <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-400" size={18} />
+              {isLoading && <Loader2 className="absolute right-3 top-2.5 text-slate-400 dark:text-slate-400 animate-spin" size={18} />}
             </div>
 
             {suggestions.length > 0 && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
                 {suggestions.map((fund) => (
                   <div
                     key={fund.schemeCode}
                     onClick={() => handleSelectFund(fund)}
-                    className="p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-none transition-colors"
+                    className="p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer border-b border-slate-50 dark:border-slate-800 last:border-none transition-colors"
                   >
-                    <p className="text-sm font-medium text-slate-900">{fund.schemeName}</p>
-                    <p className="text-[10px] text-slate-500">Code: {fund.schemeCode}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{fund.schemeName}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-300">Code: {fund.schemeCode}</p>
                   </div>
                 ))}
               </div>
@@ -148,7 +148,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1 block">Units</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Units</label>
               <Input
                 type="number"
                 step="any"
@@ -159,7 +159,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1 block">Amount (₹)</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Amount (₹)</label>
               <Input
                 type="number"
                 step="any"
@@ -170,7 +170,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1 block">Date</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Date</label>
               <Input
                 type="date"
                 value={formData.date}

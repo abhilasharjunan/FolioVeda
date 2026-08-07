@@ -148,8 +148,8 @@ export default function RiskAnalysisPage() {
         <Card className="surface-card border-none shadow-sm">
           <CardContent className="p-8 text-center space-y-3">
             <ShieldAlert className="mx-auto text-rose-500" size={28} />
-            <h2 className="text-xl font-semibold text-slate-900">Risk metrics unavailable</h2>
-            <p className="text-sm text-slate-500 max-w-md mx-auto">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Risk metrics unavailable</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-300 max-w-md mx-auto">
               The risk cache is empty or the sync has not run yet. Trigger the weekly
               sync-risk cron, then refresh this page.
             </p>
@@ -170,12 +170,12 @@ export default function RiskAnalysisPage() {
              </div>
 
             <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Fund Risk Analysis</h1>
-            <p className="text-slate-500 max-w-2xl">
+            <p className="text-slate-500 dark:text-slate-300 max-w-2xl">
               Quantitative assessment of portfolio volatility, drawdown, and concentration risk across benchmark funds.
             </p>
           </div>
-          <div className="flex items-center gap-3 bg-white p-1 rounded-lg border border-slate-200 shadow-sm">
-            <div className="px-3 py-1 text-xs font-medium text-slate-400">Data refreshed every 24h</div>
+          <div className="flex items-center gap-3 bg-white dark:bg-slate-900 p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+            <div className="px-3 py-1 text-xs font-medium text-slate-400 dark:text-slate-400">Data refreshed every 24h</div>
           </div>
         </header>
 
@@ -186,8 +186,8 @@ export default function RiskAnalysisPage() {
                 <Activity size={20} />
               </div>
               <div className="mt-8">
-                <p className="text-slate-500 text-sm font-medium">Market Volatility</p>
-                <h3 className="text-2xl font-bold text-slate-900">Moderate</h3>
+                <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Market Volatility</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Moderate</h3>
               </div>
             </CardContent>
           </Card>
@@ -197,19 +197,19 @@ export default function RiskAnalysisPage() {
                 <Zap size={20} />
               </div>
               <div className="mt-8">
-                <p className="text-slate-500 text-sm font-medium">Highest Risk Cat</p>
-                <h3 className="text-2xl font-bold text-slate-900">Small Cap</h3>
+                <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Highest Risk Cat</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">Small Cap</h3>
               </div>
             </CardContent>
           </Card>
           <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-6 flex flex-col justify-between h-full">
-              <div className="p-2 bg-blue-50 rounded-lg text-blue-600 w-fit">
+              <div className="p-2 bg-blue-50 dark:bg-teal-950/40 rounded-lg text-blue-600 w-fit">
                 <TrendingUp size={20} />
               </div>
               <div className="mt-8">
-                <p className="text-slate-500 text-sm font-medium">Total Schemes</p>
-                <h3 className="text-2xl font-bold text-slate-900">{Object.keys(data || {}).reduce((sum, cat) => sum + (data?.[cat]?.length || 0), 0)} Funds</h3>
+                <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Total Schemes</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{Object.keys(data || {}).reduce((sum, cat) => sum + (data?.[cat]?.length || 0), 0)} Funds</h3>
               </div>
             </CardContent>
           </Card>
@@ -220,7 +220,7 @@ export default function RiskAnalysisPage() {
             <button 
               onClick={() => setActiveCategory('All')}
               className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
-                activeCategory === 'All' ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                activeCategory === 'All' ? 'bg-slate-900 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
               }`}
             >
               All Categories
@@ -230,7 +230,7 @@ export default function RiskAnalysisPage() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
-                activeCategory === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                activeCategory === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
               }`}
               >
                 {cat}
@@ -238,10 +238,10 @@ export default function RiskAnalysisPage() {
             ))}
           </div>
           <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" size={16} />
             <Input 
               placeholder="Search funds..." 
-              className="pl-10 rounded-full bg-white border-slate-200 focus:ring-rose-500"
+              className="pl-10 rounded-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-rose-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -274,45 +274,45 @@ export default function RiskAnalysisPage() {
           <Card className="lg:col-span-2 surface-card border-none shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 border-b border-slate-100">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                    <tr>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fund</th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-rose-600" onClick={() => setSortConfig({key: 'compositeScore', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc'})}>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Fund</th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-rose-600" onClick={() => setSortConfig({key: 'compositeScore', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc'})}>
                        <MetricLabel label="Risk Score" tooltip={METRIC_EXPLANATIONS.compositeScore} />
                        {sortConfig.key === 'compositeScore' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                      </th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider"><MetricLabel label="Volatility" tooltip={METRIC_EXPLANATIONS.volatility} /></th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider"><MetricLabel label="Sharpe" tooltip={METRIC_EXPLANATIONS.sharpeRatio} /></th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider"><MetricLabel label="Sortino" tooltip={METRIC_EXPLANATIONS.sortinoRatio} /></th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider"><MetricLabel label="Max DD" tooltip={METRIC_EXPLANATIONS.maxDrawdown} /></th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">DD Duration</th>
-                     <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Risk Bar</th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider"><MetricLabel label="Volatility" tooltip={METRIC_EXPLANATIONS.volatility} /></th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider"><MetricLabel label="Sharpe" tooltip={METRIC_EXPLANATIONS.sharpeRatio} /></th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider"><MetricLabel label="Sortino" tooltip={METRIC_EXPLANATIONS.sortinoRatio} /></th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider"><MetricLabel label="Max DD" tooltip={METRIC_EXPLANATIONS.maxDrawdown} /></th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">DD Duration</th>
+                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Risk Bar</th>
                    </tr>
                 </thead>
                 <tbody>
                   {currentFunds.length === 0 ? (
-                    <tr><td colSpan={8} className="p-12 text-center text-slate-400 font-medium">No risk data available.</td></tr>
+                    <tr><td colSpan={8} className="p-12 text-center text-slate-400 dark:text-slate-400 font-medium">No risk data available.</td></tr>
                   ) : (
                     currentFunds.map((fund) => (
                       <tr 
                         key={fund.schemeCode} 
                         onClick={() => handleFundClick(fund)}
-                        className="border-b border-slate-50 hover:bg-rose-50/30 transition-all duration-200 cursor-pointer group"
+                        className="border-b border-slate-50 dark:border-slate-800 hover:bg-rose-50/30 transition-all duration-200 cursor-pointer group"
                       >
                         <td className="p-4">
                           <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-slate-800">{fund.schemeName}</span>
-                            <span className="text-[10px] text-slate-400 uppercase font-medium">{fund.category}</span>
+                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fund.schemeName}</span>
+                            <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-medium">{fund.category}</span>
                           </div>
                         </td>
                         <td className={`p-4 text-sm font-mono font-bold ${getRiskColor(fund.metrics.compositeScore)}`}>
                           {fund.metrics.compositeScore.toFixed(1)}
                         </td>
-                        <td className="p-4 text-sm font-mono text-slate-600">{(fund.metrics.volatility * 100).toFixed(2)}%</td>
-                        <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.sharpeRatio.toFixed(2)}</td>
-                        <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.sortinoRatio.toFixed(2)}</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">{(fund.metrics.volatility * 100).toFixed(2)}%</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">{fund.metrics.sharpeRatio.toFixed(2)}</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">{fund.metrics.sortinoRatio.toFixed(2)}</td>
                         <td className="p-4 text-sm font-mono text-rose-600">{(fund.metrics.maxDrawdown * 100).toFixed(2)}%</td>
-                        <td className="p-4 text-sm font-mono text-slate-600">{fund.metrics.maxDrawdownDuration}mo</td>
+                        <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">{fund.metrics.maxDrawdownDuration}mo</td>
                         <td className="p-4">
                           <RiskOMeterInline level={
                             fund.metrics.compositeScore < 20 ? 'Low' :
@@ -338,18 +338,18 @@ export default function RiskAnalysisPage() {
               {!selectedFund ? (
                 <div className="flex flex-col items-center justify-center h-64 text-center space-y-2">
                   <ShieldAlert size={40} className="text-slate-300" />
-                  <p className="text-sm text-slate-400">Select a fund to view deep risk analysis</p>
+                  <p className="text-sm text-slate-400 dark:text-slate-400">Select a fund to view deep risk analysis</p>
                 </div>
               ) : (
                 <FadeIn>
                   <div className="space-y-6">
-                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                      <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase mb-3">
                         <MetricLabel label="Portfolio Concentration (HHI)" tooltip={METRIC_EXPLANATIONS.concentrationRisk} />
                       </h4>
                       <div className="flex items-end justify-between mb-1">
-                        <span className="text-2xl font-bold text-slate-900">{selectedFund.metrics.concentrationRisk.toFixed(4)}</span>
-                        <span className="text-xs text-slate-500">Higher = More Concentrated</span>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-slate-50">{selectedFund.metrics.concentrationRisk.toFixed(4)}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-300">Higher = More Concentrated</span>
                       </div>
                       <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                         <div 
@@ -360,44 +360,44 @@ export default function RiskAnalysisPage() {
                     </div>
 
                      <div className="space-y-2">
-                       <h4 className="text-xs font-bold text-slate-400 uppercase px-1">Fund Manager</h4>
-                       <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                       <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase px-1">Fund Manager</h4>
+                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                          <div className="space-y-2">
                            <div className="flex justify-between">
-                             <span className="text-sm font-medium text-slate-600">Name</span>
-                             <span className="text-sm font-medium text-slate-900">{selectedFund.fundManagerName || 'Not Available'}</span>
+                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Name</span>
+                             <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{selectedFund.fundManagerName || 'Not Available'}</span>
                            </div>
                            <div className="flex justify-between">
-                             <span className="text-sm font-medium text-slate-600">Tenure</span>
-                             <span className="text-sm font-medium text-slate-900">{selectedFund.fundManagerTenure || 'Not Available'}</span>
+                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Tenure</span>
+                             <span className="text-sm font-medium text-slate-900 dark:text-slate-50">{selectedFund.fundManagerTenure || 'Not Available'}</span>
                            </div>
                          </div>
                        </div>
                      </div>
                      
                      <div className="space-y-2">
-                       <h4 className="text-xs font-bold text-slate-400 uppercase px-1">Sector Exposure</h4>
-                       <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                       <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase px-1">Sector Exposure</h4>
+                       <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                          <SectorPieChart data={selectedFund.metrics.sectorConcentration > 0 ? { "Top Sectors": selectedFund.metrics.sectorConcentration, "Others": 100 - selectedFund.metrics.sectorConcentration } : {}} />
                        </div>
                      </div>
 
                     <div className="space-y-2">
-                      <h4 className="text-xs font-bold text-slate-400 uppercase px-1">Volatility Trend (3Y)</h4>
-                      <div className="p-4 bg-white rounded-xl border border-slate-100 shadow-sm">
+                      <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase px-1">Volatility Trend (3Y)</h4>
+                      <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm">
                         <VolatilityChart data={[{date: '2023', value: 0.12}, {date: '2024', value: 0.15}, {date: '2025', value: 0.11}, {date: '2026', value: 0.14}]} />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <p className="text-[10px] text-slate-500 uppercase font-bold">
+                      <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                        <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">
                           <MetricLabel label="Sharpe Ratio" tooltip={METRIC_EXPLANATIONS.sharpeRatio} />
                         </p>
-                        <p className="text-lg font-bold text-slate-900">{selectedFund.metrics.sharpeRatio.toFixed(2)}</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{selectedFund.metrics.sharpeRatio.toFixed(2)}</p>
                       </div>
-                      <div className="p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <p className="text-[10px] text-slate-500 uppercase font-bold">
+                      <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800">
+                        <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">
                           <MetricLabel label="Max Drawdown" tooltip={METRIC_EXPLANATIONS.maxDrawdown} />
                         </p>
                         <p className="text-lg font-bold text-rose-600">{(selectedFund.metrics.maxDrawdown * 100).toFixed(2)}%</p>

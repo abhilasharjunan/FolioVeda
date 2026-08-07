@@ -15,8 +15,8 @@ export default async function PortfolioRiskPage() {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] space-y-4">
         <AlertCircle size={48} className="text-slate-300" />
-        <h2 className="text-xl font-bold text-slate-900">No Portfolio Data</h2>
-        <p className="text-slate-500 text-center max-w-md">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">No Portfolio Data</h2>
+        <p className="text-slate-500 dark:text-slate-300 text-center max-w-md">
           We couldn't find any holdings in your portfolio to analyze. Please add some mutual funds first.
         </p>
       </div>
@@ -50,10 +50,10 @@ export default async function PortfolioRiskPage() {
               <span>Portfolio Insights</span>
             </div>
             <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Risk Aggregation</h1>
-            <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
+            <p className="text-slate-500 dark:text-slate-300 max-w-2xl">
               Weighted analysis of your current portfolio&apos;s risk exposure and diversification.
             </p>
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-lg px-3 py-2 inline-block">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-lg px-3 py-2 inline-block">
               {verdict}
             </p>
           </div>
@@ -67,8 +67,8 @@ export default async function PortfolioRiskPage() {
               Export CSV
             </a>
             <div className="text-right">
-              <p className="text-xs text-slate-400 uppercase font-bold">Total Value</p>
-              <p className="text-3xl font-bold text-slate-900">₹{analysis.totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-400 uppercase font-bold">Total Value</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">₹{analysis.totalValue.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
             </div>
           </div>
         </header>
@@ -76,59 +76,59 @@ export default async function PortfolioRiskPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="surface-card border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-slate-500">
+              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">
                 <MetricLabel label="Aggregate Risk Score" tooltip={METRIC_EXPLANATIONS.compositeScore} />
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 py-6">
               <RiskOMeter level={getRiskLevel(analysis.weightedScore)} />
               <div className="text-center">
-                <p className="text-3xl font-bold text-slate-900">{analysis.weightedScore.toFixed(1)}</p>
-                <p className="text-xs text-slate-400 uppercase font-medium">Weighted Score</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{analysis.weightedScore.toFixed(1)}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-400 uppercase font-medium">Weighted Score</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="surface-card border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-slate-500">
+              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">
                 <MetricLabel label="Portfolio Volatility" tooltip={METRIC_EXPLANATIONS.volatility} />
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 py-6">
-              <div className="p-4 bg-blue-50 rounded-full text-blue-600">
+              <div className="p-4 bg-blue-50 dark:bg-teal-950/40 rounded-full text-blue-600">
                 <Activity size={32} />
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-slate-900">{(analysis.weightedVol * 100).toFixed(2)}%</p>
-                <p className="text-xs text-slate-400 uppercase font-medium">Annualized σ</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{(analysis.weightedVol * 100).toFixed(2)}%</p>
+                <p className="text-xs text-slate-400 dark:text-slate-400 uppercase font-medium">Annualized σ</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="surface-card border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-slate-500">
+              <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">
                 <MetricLabel label="Diversification (HHI)" tooltip={METRIC_EXPLANATIONS.hhi} />
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 py-6">
-              <div className="p-4 bg-indigo-50 rounded-full text-indigo-600">
+              <div className="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-full text-indigo-600">
                 <PieChart size={32} />
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-slate-900">{analysis.hhi.toFixed(4)}</p>
-                <p className="text-xs text-slate-400 uppercase font-medium">Concentration Index</p>
+                <p className="text-3xl font-bold text-slate-900 dark:text-slate-50">{analysis.hhi.toFixed(4)}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-400 uppercase font-medium">Concentration Index</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {analysis.categories && analysis.categories.length > 0 && (
-          <Card className="border-none shadow-xl bg-white overflow-hidden">
-            <CardHeader className="border-b border-slate-50">
+          <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden">
+            <CardHeader className="border-b border-slate-50 dark:border-slate-800">
               <div className="flex items-center gap-2">
-                <BarChart3 size={16} className="text-slate-400" />
+                <BarChart3 size={16} className="text-slate-400 dark:text-slate-400" />
                 <CardTitle className="text-lg font-semibold">Category Allocation</CardTitle>
               </div>
             </CardHeader>
@@ -141,12 +141,12 @@ export default async function PortfolioRiskPage() {
                 </div>
                 <div className="space-y-3">
                   {analysis.categories.map((cat) => (
-                    <div key={cat.name} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div key={cat.name} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                       <div>
-                        <p className="text-sm font-medium text-slate-800">{cat.name.replace(/-/g, ' ')}</p>
-                        <p className="text-xs text-slate-400">₹{cat.value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{cat.name.replace(/-/g, ' ')}</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-400">₹{cat.value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}</p>
                       </div>
-                      <span className="text-sm font-bold text-slate-900">{cat.percentage.toFixed(1)}%</span>
+                      <span className="text-sm font-bold text-slate-900 dark:text-slate-50">{cat.percentage.toFixed(1)}%</span>
                     </div>
                   ))}
                 </div>
@@ -155,42 +155,42 @@ export default async function PortfolioRiskPage() {
           </Card>
         )}
 
-        <Card className="border-none shadow-xl bg-white overflow-hidden">
-          <CardHeader className="border-b border-slate-50">
+        <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden">
+          <CardHeader className="border-b border-slate-50 dark:border-slate-800">
             <CardTitle className="text-lg font-semibold">Holdings Risk Breakdown</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 border-b border-slate-100">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <tr>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fund</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Weight</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Value</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Volatility</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-sider">Score</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Fund</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Weight</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Value</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Volatility</th>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Score</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysis.holdings.map((h, i) => (
-                    <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                    <tr key={i} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
                       <td className="p-4">
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-slate-800">{h.schemeName}</span>
-                          <span className="text-[10px] text-slate-400 uppercase">{h.category}</span>
+                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{h.schemeName}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase">{h.category}</span>
                         </div>
                       </td>
-                      <td className="p-4 text-sm font-mono text-slate-600">
+                      <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">
                         {((h.currentValue / analysis.totalValue) * 100).toFixed(2)}%
                       </td>
-                      <td className="p-4 text-sm font-mono text-slate-800 font-medium">
+                      <td className="p-4 text-sm font-mono text-slate-800 dark:text-slate-100 font-medium">
                         ₹{h.currentValue.toLocaleString('en-IN')}
                       </td>
-                      <td className="p-4 text-sm font-mono text-slate-600">
+                      <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">
                         {(h.volatility * 100).toFixed(2)}%
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline" className="text-slate-700 font-bold">
+                        <Badge variant="outline" className="text-slate-700 dark:text-slate-200 font-bold">
                           {h.riskScore.toFixed(1)}
                         </Badge>
                       </td>

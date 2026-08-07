@@ -12,7 +12,7 @@ export const RiskOMeterInline = ({ level }: RiskOMeterInlineProps) => {
   
   return (
     <div className="flex items-center gap-2 w-full max-w-[120px]">
-      <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden flex">
+      <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex">
         {colors.map((color, i) => (
           <div 
             key={i} 
@@ -20,7 +20,7 @@ export const RiskOMeterInline = ({ level }: RiskOMeterInlineProps) => {
           />
         ))}
       </div>
-      <span className="text-[10px] font-medium text-slate-600 truncate max-w-[60px]">{level}</span>
+      <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate max-w-[60px]">{level}</span>
     </div>
   );
 };

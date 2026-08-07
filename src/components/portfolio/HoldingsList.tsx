@@ -116,7 +116,7 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
   if (loading) {
     return (
       <Card className="surface-card border-none shadow-sm max-w-2xl mx-auto">
-        <CardContent className="flex items-center justify-center gap-3 py-16 text-slate-500">
+        <CardContent className="flex items-center justify-center gap-3 py-16 text-slate-500 dark:text-slate-300">
           <Loader2 className="animate-spin" size={22} />
           <span className="text-sm font-medium">Loading holdings…</span>
         </CardContent>
@@ -141,7 +141,7 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
     <Card className="surface-card border-none shadow-sm max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="text-lg font-semibold font-heading">Your Holdings ({holdings.length})</CardTitle>
-        <div className="flex flex-wrap gap-6 text-sm text-slate-500">
+        <div className="flex flex-wrap gap-6 text-sm text-slate-500 dark:text-slate-300">
           <span>
             Invested:{' '}
             <strong className="text-slate-800 dark:text-slate-100">
@@ -154,7 +154,7 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
               ₹<AnimatedNumber value={totalValue} decimals={0} />
             </strong>
           </span>
-          <span className={gain >= 0 ? 'text-emerald-600' : 'text-rose-600'}>
+          <span className={gain >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
             Gain:{' '}
             <strong>
               {gain >= 0 ? '+' : ''}₹
@@ -177,7 +177,7 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
                   <div className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{meta.name}</p>
-                      <p className="text-xs text-slate-400">{h.units.toFixed(4)} units · ₹{invested.toLocaleString('en-IN')} invested</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-400">{h.units.toFixed(4)} units · ₹{invested.toLocaleString('en-IN')} invested</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button size="xs" variant="ghost" onClick={() => setExpanded(isOpen ? null : h.id)}>
@@ -199,16 +199,16 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
                         className="overflow-hidden"
                       >
                         <div className="px-3 pb-3 border-t border-slate-50 dark:border-slate-800 pt-2 space-y-3">
-                          <p className="text-xs font-medium text-slate-500">Transactions ({h.transactions.length})</p>
-                          {h.transactions.length === 0 && <p className="text-xs text-slate-400">No transactions yet</p>}
+                          <p className="text-xs font-medium text-slate-500 dark:text-slate-300">Transactions ({h.transactions.length})</p>
+                          {h.transactions.length === 0 && <p className="text-xs text-slate-400 dark:text-slate-400">No transactions yet</p>}
                           {h.transactions.map((t) => (
                             <div key={t.id} className="flex items-center justify-between text-xs py-1 px-1 rounded hover:bg-slate-50 dark:hover:bg-slate-800 group">
                               <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-slate-500 shrink-0">{new Date(t.date).toLocaleDateString('en-IN')}</span>
-                                <span className={t.type === 'BUY' ? 'text-emerald-600 font-medium' : 'text-rose-600 font-medium'}>
+                                <span className="text-slate-500 dark:text-slate-300 shrink-0">{new Date(t.date).toLocaleDateString('en-IN')}</span>
+                                <span className={t.type === 'BUY' ? 'text-emerald-600 dark:text-emerald-400 font-medium' : 'text-rose-600 dark:text-rose-400 font-medium'}>
                                   {t.type === 'BUY' ? '+' : '-'}₹{t.amount.toLocaleString('en-IN')}
                                 </span>
-                                <span className="text-slate-400">({t.units} units)</span>
+                                <span className="text-slate-400 dark:text-slate-400">({t.units} units)</span>
                               </div>
                               <button
                                 onClick={async () => {
@@ -217,7 +217,7 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
                                   toast.success('Transaction deleted');
                                   fetchHoldings();
                                 }}
-                                className="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                                className="text-slate-300 dark:text-slate-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                                 title="Delete transaction"
                               >
                                 <Trash2 size={12} />

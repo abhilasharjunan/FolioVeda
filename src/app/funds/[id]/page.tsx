@@ -126,8 +126,8 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         {error ? (
           <>
             <TrendingUp size={48} className="text-rose-500 mb-4" />
-            <h2 className="text-xl font-bold text-slate-900">Error loading fund</h2>
-            <p className="text-slate-500">{error}</p>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Error loading fund</h2>
+            <p className="text-slate-500 dark:text-slate-300">{error}</p>
             <button 
               onClick={() => window.location.reload()}
               className="px-4 py-2 bg-slate-900 text-white rounded-full text-sm font-medium hover:bg-slate-800 transition-colors"
@@ -150,14 +150,14 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <div className="sticky top-14 z-20 -mx-2 px-2 py-3 mb-2 backdrop-blur bg-white/80 dark:bg-slate-950/80 border-b border-slate-100 dark:border-slate-800">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider">
                 <TrendingUp size={16} />
                 <span>Fund Details</span>
               </div>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">{analysis.schemeName}</h1>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="text-[10px] font-mono">{analysis.schemeCode}</Badge>
-                <Badge variant="outline" className="text-[10px] text-slate-500">{analysis.category || 'General'}</Badge>
+                <Badge variant="outline" className="text-[10px] text-slate-500 dark:text-slate-300">{analysis.category || 'General'}</Badge>
               </div>
             </div>
           </div>
@@ -168,11 +168,11 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <StaggerItem>
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-slate-500">Latest NAV</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">Latest NAV</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">₹{analysis.latestNav != null ? Number(analysis.latestNav).toFixed(2) : 'N/A'}</div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-400 dark:text-slate-400 mt-1">
               Updated: {new Date(analysis.lastUpdated).toLocaleDateString()}
             </p>
           </CardContent>
@@ -182,13 +182,13 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <StaggerItem>
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-slate-500">Risk Level</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">Risk Level</CardTitle>
           </CardHeader>
           <CardContent>
             {analysis.riskLevel ? (
               <RiskOMeter level={analysis.riskLevel as any} />
             ) : (
-              <div className="text-sm text-slate-400">Not available</div>
+              <div className="text-sm text-slate-400 dark:text-slate-400">Not available</div>
             )}
           </CardContent>
         </Card>
@@ -197,11 +197,11 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <StaggerItem>
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-slate-500">Fund Manager</CardTitle>
+            <CardTitle className="text-sm font-medium text-slate-500 dark:text-slate-300">Fund Manager</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-full text-blue-600">
+              <div className="p-2 bg-blue-50 dark:bg-teal-950/40 rounded-full text-blue-600 dark:text-teal-400">
                 <User size={20} />
               </div>
               <div>
@@ -209,7 +209,7 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
                   {analysis.fundManagerName || 'Not Available'}
                 </div>
                 {analysis.fundManagerTenure && (
-                  <p className="text-xs text-slate-500">Tenure: {analysis.fundManagerTenure}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-300">Tenure: {analysis.fundManagerTenure}</p>
                 )}
               </div>
             </div>
@@ -222,21 +222,21 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <ChartCard title="Returns (CAGR)">
             <ReturnsBarChart returns={analysis.cagrReturns} />
             <div className="mt-4 grid grid-cols-3 gap-3">
-              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">1 Year</p>
-                <p className={`text-sm font-bold ${(returns['1Y'] ?? -1) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg text-center">
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-bold">1 Year</p>
+                <p className={`text-sm font-bold ${(returns['1Y'] ?? -1) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {formatReturn(returns['1Y'])}
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">3 Year</p>
-                <p className={`text-sm font-bold ${(returns['3Y'] ?? -1) >= 0 ? 'text-green-600' : 'text-rose-600'}`}>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg text-center">
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-bold">3 Year</p>
+                <p className={`text-sm font-bold ${(returns['3Y'] ?? -1) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {formatReturn(returns['3Y'])}
                 </p>
               </div>
-              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-                <p className="text-[10px] text-slate-400 uppercase font-bold">5 Year</p>
-                <p className={`text-sm font-bold ${(returns['5Y'] ?? -1) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg text-center">
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-bold">5 Year</p>
+                <p className={`text-sm font-bold ${(returns['5Y'] ?? -1) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                   {formatReturn(returns['5Y'])}
                 </p>
               </div>
@@ -248,8 +248,8 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
             <CardTitle className="text-lg font-semibold font-heading">Fund Insights</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/40 rounded-lg text-blue-700 dark:text-blue-200 text-xs leading-relaxed">
-              <Info size={16} className="mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-3 p-3 bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 text-xs leading-relaxed">
+              <Info size={16} className="mt-0.5 flex-shrink-0 text-teal-600 dark:text-teal-400" />
               <p>
                 {analysis.fundHouse !== 'N/A' ? `Managed by ${analysis.fundHouse}.` : ''}
                 This {analysis.category ? `${analysis.category} fund` : 'fund'} 
@@ -257,46 +257,46 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
               </p>
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 border-b border-slate-50">
+              <div className="flex justify-between items-center p-3 border-b border-slate-50 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <Building2 size={14} className="text-slate-400" />
-                  <span className="text-sm text-slate-500">Fund House</span>
+                  <Building2 size={14} className="text-slate-400 dark:text-slate-400" />
+                  <span className="text-sm text-slate-500 dark:text-slate-300">Fund House</span>
                 </div>
-                <span className="text-sm font-medium text-slate-800">{analysis.fundHouse}</span>
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{analysis.fundHouse}</span>
               </div>
-              <div className="flex justify-between items-center p-3 border-b border-slate-50">
+              <div className="flex justify-between items-center p-3 border-b border-slate-50 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <Wallet size={14} className="text-slate-400" />
-                  <span className="text-sm text-slate-500">Expense Ratio</span>
+                  <Wallet size={14} className="text-slate-400 dark:text-slate-400" />
+                  <span className="text-sm text-slate-500 dark:text-slate-300">Expense Ratio</span>
                 </div>
-                <span className="text-sm font-medium text-slate-800">{analysis.expenseRatio}</span>
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{analysis.expenseRatio}</span>
               </div>
-              <div className="flex justify-between items-center p-3 border-b border-slate-50">
+              <div className="flex justify-between items-center p-3 border-b border-slate-50 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={14} className="text-slate-400" />
-                  <span className="text-sm text-slate-500">AUM</span>
+                  <TrendingUp size={14} className="text-slate-400 dark:text-slate-400" />
+                  <span className="text-sm text-slate-500 dark:text-slate-300">AUM</span>
                 </div>
-                <span className="text-sm font-medium text-slate-800">{analysis.aum}</span>
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{analysis.aum}</span>
               </div>
               {analysis.riskScore && (
-                <div className="flex justify-between items-center p-3 border-b border-slate-50">
+                <div className="flex justify-between items-center p-3 border-b border-slate-50 dark:border-slate-800">
                   <div className="flex items-center gap-2">
-                    <Activity size={14} className="text-slate-400" />
-                    <span className="text-sm text-slate-500">Risk Score</span>
+                    <Activity size={14} className="text-slate-400 dark:text-slate-400" />
+                    <span className="text-sm text-slate-500 dark:text-slate-300">Risk Score</span>
                   </div>
-                  <span className="text-sm font-bold text-slate-800">{analysis.riskScore != null ? Number(analysis.riskScore).toFixed(1) : 'N/A'}/100</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-100">{analysis.riskScore != null ? Number(analysis.riskScore).toFixed(1) : 'N/A'}/100</span>
                 </div>
               )}
               {analysis.fundManagerName && (
                 <div className="flex justify-between items-center p-3">
                    <div className="flex items-center gap-2">
-                     <User size={14} className="text-slate-400" />
-                     <span className="text-sm text-slate-500">Fund Manager</span>
+                     <User size={14} className="text-slate-400 dark:text-slate-400" />
+                     <span className="text-sm text-slate-500 dark:text-slate-300">Fund Manager</span>
                    </div>
                    <div className="text-right">
-                     <span className="text-sm font-medium text-slate-800 block">{analysis.fundManagerName}</span>
+                     <span className="text-sm font-medium text-slate-800 dark:text-slate-100 block">{analysis.fundManagerName}</span>
                      {analysis.fundManagerTenure && (
-                       <span className="text-[10px] text-slate-400">Tenure: {analysis.fundManagerTenure}</span>
+                       <span className="text-[10px] text-slate-400 dark:text-slate-400">Tenure: {analysis.fundManagerTenure}</span>
                      )}
                    </div>
                  </div>
@@ -318,26 +318,26 @@ export default function FundDetailsPage({ params }: { params: Promise<{ id: stri
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <TrendingUp size={16} className="text-slate-400" />
+              <TrendingUp size={16} className="text-slate-400 dark:text-slate-400" />
               <CardTitle className="text-lg font-semibold font-heading">Top Holdings</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 border-b border-slate-100">
+                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <tr>
-                    <th className="p-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Stock</th>
-                    <th className="p-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Sector</th>
-                    <th className="p-3 text-xs font-sm text-slate-400 uppercase tracking-wider text-right">Allocation</th>
+                    <th className="p-3 text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Stock</th>
+                    <th className="p-3 text-xs font-semibold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Sector</th>
+                    <th className="p-3 text-xs font-sm text-slate-400 dark:text-slate-400 uppercase tracking-wider text-right">Allocation</th>
                   </tr>
                 </thead>
                 <tbody>
                   {analysis.holdings.map((h: any, i: number) => (
-                    <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                      <td className="p-3 text-sm font-medium text-slate-800">{h.stockName}</td>
-                       <td className="p-3 text-sm text-slate-500">{h.sector}</td>
-                       <td className="p-3 text-sm font-mono text-right text-slate-700">{h.allocation?.toFixed(2) ?? 'N/A'}%</td>
+                    <tr key={i} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
+                      <td className="p-3 text-sm font-medium text-slate-800 dark:text-slate-100">{h.stockName}</td>
+                       <td className="p-3 text-sm text-slate-500 dark:text-slate-300">{h.sector}</td>
+                       <td className="p-3 text-sm font-mono text-right text-slate-700 dark:text-slate-200">{h.allocation?.toFixed(2) ?? 'N/A'}%</td>
                     </tr>
                   ))}
                 </tbody>

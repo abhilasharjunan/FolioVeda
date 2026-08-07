@@ -41,7 +41,7 @@ function NumberField({
 }: { label: string; value: number; onChange: (v: number) => void; suffix?: string; min?: number; step?: number }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs font-medium text-slate-500">{label}</label>
+      <label className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
       <div className="relative">
         <Input
           type="number"
@@ -51,7 +51,7 @@ function NumberField({
           onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
           className="pr-12"
         />
-        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">{suffix}</span>}
+        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 dark:text-slate-400">{suffix}</span>}
       </div>
     </div>
   );
@@ -66,8 +66,8 @@ function SliderField({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-slate-500">{label}</label>
-        <span className="text-sm font-semibold text-slate-900 tabular-nums">
+        <label className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
+        <span className="text-sm font-semibold text-slate-900 dark:text-slate-50 tabular-nums">
           {formatValue ? formatValue(value) : value}{suffix}
         </span>
       </div>
@@ -95,7 +95,7 @@ function PresetChips({
           className={`px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${
             value === opt
               ? 'bg-blue-600 border-blue-600 text-white'
-              : 'border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600'
+              : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-blue-300 hover:text-blue-600'
           }`}
         >
           {format(opt)}
@@ -107,9 +107,9 @@ function PresetChips({
 
 function StatTile({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'good' }) {
   return (
-    <Card className="border-none shadow-sm bg-white">
+    <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
       <CardContent className="p-4">
-        <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wide">{label}</p>
+        <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold tracking-wide">{label}</p>
         <p className={`text-xl font-bold mt-0.5 ${tone === 'good' ? 'text-emerald-600' : 'text-slate-900'}`}>{value}</p>
       </CardContent>
     </Card>
@@ -212,7 +212,7 @@ export default function SIPCalculatorPage() {
                   <SliderField label="Expected Annual Return" value={annualReturn} onChange={setAnnualReturn} suffix="%" min={1} max={30} step={0.5} />
                   <SliderField label="Investment Period" value={years} onChange={setYears} suffix=" yrs" min={1} max={40} step={1} />
                   <SliderField label="Annual Step-up" value={stepUp} onChange={setStepUp} suffix="%" min={0} max={25} step={1} />
-                  <p className="text-[10px] text-slate-400 leading-relaxed">Step-up increases your monthly SIP by this % every year — a common way to invest more as income grows.</p>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-400 leading-relaxed">Step-up increases your monthly SIP by this % every year — a common way to invest more as income grows.</p>
                 </CardContent>
               </Card>
 
@@ -246,7 +246,7 @@ export default function SIPCalculatorPage() {
                 </div>
 
                 <Card className="surface-card border-none shadow-sm">
-                  <CardHeader><CardTitle className="text-sm font-semibold text-slate-600 font-heading">Growth Over Time</CardTitle></CardHeader>
+                  <CardHeader><CardTitle className="text-sm font-semibold text-slate-600 dark:text-slate-300 font-heading">Growth Over Time</CardTitle></CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={260}>
                       <AreaChart data={sipResult.yearlyBreakdown}>
@@ -281,7 +281,7 @@ export default function SIPCalculatorPage() {
 
           <TabsContent value="goal">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-none shadow-sm bg-white">
+              <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                 <CardHeader><CardTitle className="text-base font-semibold">Your Goal</CardTitle></CardHeader>
                 <CardContent className="space-y-5">
                   <div className="space-y-2">
@@ -307,7 +307,7 @@ export default function SIPCalculatorPage() {
 
           <TabsContent value="scenario">
             <div className="space-y-6">
-              <Card className="border-none shadow-sm bg-white">
+              <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base font-semibold">Scenarios</CardTitle>
                   <button
@@ -320,7 +320,7 @@ export default function SIPCalculatorPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {scenarios.map((s, idx) => (
-                    <div key={idx} className="grid grid-cols-2 sm:grid-cols-6 gap-2 items-end p-3 bg-slate-50 rounded-lg">
+                    <div key={idx} className="grid grid-cols-2 sm:grid-cols-6 gap-2 items-end p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
                       <div className="flex items-center gap-2 col-span-2 sm:col-span-2">
                         <span
                           className="size-2.5 rounded-full shrink-0 mb-1.5"
@@ -339,7 +339,7 @@ export default function SIPCalculatorPage() {
                       <button
                         onClick={() => removeScenario(idx)}
                         disabled={scenarios.length <= 1}
-                        className="h-9 flex items-center justify-center text-slate-400 hover:text-rose-500 disabled:text-slate-200"
+                        className="h-9 flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-rose-500 disabled:text-slate-200"
                       >
                         <X size={16} />
                       </button>
@@ -348,23 +348,23 @@ export default function SIPCalculatorPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-none shadow-xl bg-white overflow-hidden">
-                <CardHeader className="border-b border-slate-50"><CardTitle className="text-base font-semibold">Comparison</CardTitle></CardHeader>
+              <Card className="border-none shadow-xl bg-white dark:bg-slate-900 overflow-hidden">
+                <CardHeader className="border-b border-slate-50 dark:border-slate-800"><CardTitle className="text-base font-semibold">Comparison</CardTitle></CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                      <thead className="bg-slate-50 border-b border-slate-100">
+                      <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                         <tr>
-                          <th className="p-3 text-xs font-semibold text-slate-500 uppercase">Scenario</th>
-                          <th className="p-3 text-xs font-semibold text-slate-500 uppercase text-right">Invested</th>
-                          <th className="p-3 text-xs font-semibold text-slate-500 uppercase text-right">Gain</th>
-                          <th className="p-3 text-xs font-semibold text-slate-500 uppercase text-right">Future Value</th>
+                          <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Scenario</th>
+                          <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase text-right">Invested</th>
+                          <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase text-right">Gain</th>
+                          <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase text-right">Future Value</th>
                         </tr>
                       </thead>
                       <tbody>
                         {scenarioResults.map((r, i) => (
-                          <tr key={r.label} className="border-b border-slate-50">
-                            <td className="p-3 text-sm font-semibold text-slate-900">
+                          <tr key={r.label} className="border-b border-slate-50 dark:border-slate-800">
+                            <td className="p-3 text-sm font-semibold text-slate-900 dark:text-slate-50">
                               <span className="flex items-center gap-2">
                                 <span
                                   className="size-2.5 rounded-full shrink-0"
@@ -377,9 +377,9 @@ export default function SIPCalculatorPage() {
                                 )}
                               </span>
                             </td>
-                            <td className="p-3 text-sm font-mono text-slate-600 text-right">{fmtCurrency(r.totalInvested)}</td>
+                            <td className="p-3 text-sm font-mono text-slate-600 dark:text-slate-300 text-right">{fmtCurrency(r.totalInvested)}</td>
                             <td className="p-3 text-sm font-mono text-emerald-600 text-right">{fmtCurrency(r.totalGain)}</td>
-                            <td className="p-3 text-sm font-mono font-bold text-slate-900 text-right">{fmtCurrency(r.futureValue)}</td>
+                            <td className="p-3 text-sm font-mono font-bold text-slate-900 dark:text-slate-50 text-right">{fmtCurrency(r.futureValue)}</td>
                           </tr>
                         ))}
                       </tbody>

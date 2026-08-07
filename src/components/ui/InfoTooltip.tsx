@@ -17,7 +17,7 @@ export function InfoTooltip({ children, className }: { children: React.ReactNode
       <TooltipPrimitive.Root>
         <TooltipPrimitive.Trigger
           className={cn(
-            "inline-flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors align-middle cursor-help",
+            "inline-flex items-center justify-center text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-200 transition-colors align-middle cursor-help",
             className
           )}
           aria-label="More information"

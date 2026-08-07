@@ -57,7 +57,7 @@ export function PortfolioHealthGauge({ diversificationScore, riskScore }: Portfo
           <div className="space-y-2">
             {hasDiversification && (
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">
+                <span className="text-slate-500 dark:text-slate-300">
                   <MetricLabel label="Diversification" tooltip={METRIC_EXPLANATIONS.diversificationScore} />
                 </span>
                 <span className="font-semibold text-slate-800 dark:text-slate-100">{diversificationScore}/100</span>
@@ -65,7 +65,7 @@ export function PortfolioHealthGauge({ diversificationScore, riskScore }: Portfo
             )}
             {hasRisk && (
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">
+                <span className="text-slate-500 dark:text-slate-300">
                   <MetricLabel label="Risk Exposure" tooltip={METRIC_EXPLANATIONS.compositeScore} />
                 </span>
                 <span className="font-semibold text-slate-800 dark:text-slate-100">{Math.round(riskScore as number)}/100</span>

@@ -20,8 +20,8 @@ export default async function PortfolioReportPage() {
   if (!analysis) {
     return (
       <div className="p-6 max-w-3xl mx-auto min-h-[50vh] flex flex-col items-center justify-center text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-900">No portfolio to report on yet</h2>
-        <p className="text-slate-500">Add holdings first, then come back here to generate a report.</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">No portfolio to report on yet</h2>
+        <p className="text-slate-500 dark:text-slate-300">Add holdings first, then come back here to generate a report.</p>
       </div>
     );
   }
@@ -37,48 +37,48 @@ export default async function PortfolioReportPage() {
       <div className="flex justify-between items-start print:hidden">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Report</h1>
-          <p className="text-slate-500 text-sm">Print-ready summary of your portfolio, diversification, and risk.</p>
+          <p className="text-slate-500 dark:text-slate-300 text-sm">Print-ready summary of your portfolio, diversification, and risk.</p>
         </div>
         <PrintReportButton />
       </div>
 
       {/* Report content — this is what gets printed */}
       <div className="space-y-6 print:break-inside-avoid">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-          <div className="flex items-center gap-2 font-bold text-xl text-slate-900">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+          <div className="flex items-center gap-2 font-bold text-xl text-slate-900 dark:text-slate-50">
             <TrendingUp className="text-blue-600" size={22} />
             <span>Folio<span className="text-blue-600">Veda</span></span>
           </div>
-          <div className="text-right text-xs text-slate-500">
+          <div className="text-right text-xs text-slate-500 dark:text-slate-300">
             <p>Generated {generatedAt}</p>
           </div>
         </div>
 
         <section className="print:break-inside-avoid">
-          <h2 className="text-lg font-bold text-slate-900 mb-3">Portfolio Summary</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Portfolio Summary</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-3 border border-slate-200 rounded-lg">
-              <p className="text-[10px] text-slate-500 uppercase font-bold">Current Value</p>
-              <p className="text-lg font-bold text-slate-900">{fmtCurrency(analysis.currentMarketValue)}</p>
+            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Current Value</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{fmtCurrency(analysis.currentMarketValue)}</p>
             </div>
-            <div className="p-3 border border-slate-200 rounded-lg">
-              <p className="text-[10px] text-slate-500 uppercase font-bold">Total Invested</p>
-              <p className="text-lg font-bold text-slate-900">{fmtCurrency(analysis.totalInvested)}</p>
+            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Total Invested</p>
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{fmtCurrency(analysis.totalInvested)}</p>
             </div>
-            <div className="p-3 border border-slate-200 rounded-lg">
-              <p className="text-[10px] text-slate-500 uppercase font-bold">Absolute Gain</p>
-              <p className={`text-lg font-bold ${analysis.absoluteGain >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Absolute Gain</p>
+              <p className={`text-lg font-bold ${analysis.absoluteGain >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>
                 {fmtCurrency(analysis.absoluteGain)}
               </p>
             </div>
-            <div className="p-3 border border-slate-200 rounded-lg">
-              <p className="text-[10px] text-slate-500 uppercase font-bold">Overall XIRR</p>
+            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Overall XIRR</p>
               <p className={`text-lg font-bold ${
                 analysis.overallXirr == null
-                  ? 'text-slate-400'
+                  ? 'text-slate-400 dark:text-slate-400'
                   : analysis.overallXirr >= 0
-                  ? 'text-emerald-700'
-                  : 'text-rose-700'
+                  ? 'text-emerald-700 dark:text-emerald-400'
+                  : 'text-rose-700 dark:text-rose-400'
               }`}>
                 {analysis.overallXirr != null ? `${analysis.overallXirr.toFixed(2)}%` : 'N/A'}
               </p>
@@ -88,10 +88,10 @@ export default async function PortfolioReportPage() {
 
         {healthScore != null && (
           <section className="print:break-inside-avoid">
-            <h2 className="text-lg font-bold text-slate-900 mb-3">Portfolio Health</h2>
-            <div className="flex items-center gap-6 p-4 border border-slate-200 rounded-lg">
-              <div className="text-4xl font-bold text-slate-900">{healthScore}<span className="text-lg text-slate-400">/100</span></div>
-              <div className="text-sm text-slate-600 space-y-1">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Portfolio Health</h2>
+            <div className="flex items-center gap-6 p-4 border border-slate-200 dark:border-slate-700 rounded-lg">
+              <div className="text-4xl font-bold text-slate-900 dark:text-slate-50">{healthScore}<span className="text-lg text-slate-400 dark:text-slate-400">/100</span></div>
+              <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
                 <p>Diversification score: <strong>{divScore?.score}/100</strong> ({divScore?.riskLevel})</p>
                 {riskAnalysis && <p>Risk exposure: <strong>{Math.round(riskAnalysis.weightedScore)}/100</strong></p>}
               </div>
@@ -101,19 +101,19 @@ export default async function PortfolioReportPage() {
 
         {divScore?.distribution && divScore.distribution.length > 0 && (
           <section className="print:break-inside-avoid">
-            <h2 className="text-lg font-bold text-slate-900 mb-3">Category Allocation</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Category Allocation</h2>
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="text-left py-2 text-xs font-semibold text-slate-500 uppercase">Category</th>
-                  <th className="text-right py-2 text-xs font-semibold text-slate-500 uppercase">Allocation</th>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="text-left py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Category</th>
+                  <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Allocation</th>
                 </tr>
               </thead>
               <tbody>
                 {divScore.distribution.map((d: any) => (
-                  <tr key={d.name} className="border-b border-slate-100">
-                    <td className="py-2 text-slate-800">{d.name}</td>
-                    <td className="py-2 text-right font-mono text-slate-900">{d.percentage.toFixed(1)}%</td>
+                  <tr key={d.name} className="border-b border-slate-100 dark:border-slate-800">
+                    <td className="py-2 text-slate-800 dark:text-slate-100">{d.name}</td>
+                    <td className="py-2 text-right font-mono text-slate-900 dark:text-slate-50">{d.percentage.toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -122,26 +122,26 @@ export default async function PortfolioReportPage() {
         )}
 
         <section className="print:break-inside-avoid">
-          <h2 className="text-lg font-bold text-slate-900 mb-3">Holdings</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Holdings</h2>
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-b border-slate-200">
-                <th className="text-left py-2 text-xs font-semibold text-slate-500 uppercase">Fund</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 uppercase">Invested</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 uppercase">Current Value</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 uppercase">Gain</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 uppercase">XIRR</th>
+              <tr className="border-b border-slate-200 dark:border-slate-700">
+                <th className="text-left py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Fund</th>
+                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Invested</th>
+                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Current Value</th>
+                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Gain</th>
+                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">XIRR</th>
               </tr>
             </thead>
             <tbody>
               {analysis.holdings.map((h: any, i: number) => (
-                <tr key={i} className="border-b border-slate-100">
-                  <td className="py-2 text-slate-800">{h.schemeName}</td>
-                  <td className="py-2 text-right font-mono text-slate-700">{fmtCurrency(h.invested)}</td>
-                  <td className="py-2 text-right font-mono text-slate-700">{fmtCurrency(h.currentVal)}</td>
-                  <td className={`py-2 text-right font-mono ${h.gain >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{fmtCurrency(h.gain)}</td>
+                <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
+                  <td className="py-2 text-slate-800 dark:text-slate-100">{h.schemeName}</td>
+                  <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.invested)}</td>
+                  <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.currentVal)}</td>
+                  <td className={`py-2 text-right font-mono ${h.gain >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{fmtCurrency(h.gain)}</td>
                   <td className={`py-2 text-right font-mono font-bold ${
-                    h.xirr == null ? 'text-slate-400' : h.xirr >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                    h.xirr == null ? 'text-slate-400 dark:text-slate-400' : h.xirr >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
                   }`}>
                     {h.xirr != null ? `${h.xirr.toFixed(2)}%` : 'N/A'}
                   </td>
@@ -153,25 +153,25 @@ export default async function PortfolioReportPage() {
 
         {riskAnalysis && (
           <section className="print:break-inside-avoid">
-            <h2 className="text-lg font-bold text-slate-900 mb-3">Risk Metrics</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Risk Metrics</h2>
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="p-3 border border-slate-200 rounded-lg">
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Weighted Risk Score</p>
-                <p className="text-lg font-bold text-slate-900">{riskAnalysis.weightedScore.toFixed(1)}/100</p>
+              <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+                <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Weighted Risk Score</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{riskAnalysis.weightedScore.toFixed(1)}/100</p>
               </div>
-              <div className="p-3 border border-slate-200 rounded-lg">
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Annualized Volatility</p>
-                <p className="text-lg font-bold text-slate-900">{(riskAnalysis.weightedVol * 100).toFixed(2)}%</p>
+              <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+                <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Annualized Volatility</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{(riskAnalysis.weightedVol * 100).toFixed(2)}%</p>
               </div>
-              <div className="p-3 border border-slate-200 rounded-lg">
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Concentration (HHI)</p>
-                <p className="text-lg font-bold text-slate-900">{riskAnalysis.hhi.toFixed(4)}</p>
+              <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg">
+                <p className="text-[10px] text-slate-500 dark:text-slate-300 uppercase font-bold">Concentration (HHI)</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-slate-50">{riskAnalysis.hhi.toFixed(4)}</p>
               </div>
             </div>
           </section>
         )}
 
-        <section className="print:break-inside-avoid pt-3 border-t border-slate-200 text-[9px] text-slate-400 leading-snug">
+        <section className="print:break-inside-avoid pt-3 border-t border-slate-200 dark:border-slate-700 text-[9px] text-slate-400 dark:text-slate-400 leading-snug">
           <p>
             Analytics only — not investment advice. Market risks apply. NAV may lag (AMFI/mfapi.in). Generated {generatedAt}.
           </p>

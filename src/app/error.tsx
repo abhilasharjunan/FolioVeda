@@ -17,8 +17,8 @@ export default function ErrorPage({
         <AlertCircle size={48} className="text-red-500" />
       </div>
       <div className="max-w-md">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Something went wrong</h1>
-        <p className="text-slate-500 leading-relaxed">
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-50 mb-2">Something went wrong</h1>
+        <p className="text-slate-500 dark:text-slate-300 leading-relaxed">
           We encountered an unexpected error while processing your portfolio. 
           Our team has been notified.
         </p>

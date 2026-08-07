@@ -89,10 +89,10 @@ export default function TopFundsClient() {
   };
 
   const getReturnColor = (val: number | null) => {
-    if (val === null) return 'text-slate-400';
-    if (val >= 15) return 'text-emerald-600 font-bold';
-    if (val >= 0) return 'text-amber-600';
-    return 'text-rose-600 font-bold';
+    if (val === null) return 'text-slate-400 dark:text-slate-400';
+    if (val >= 15) return 'text-emerald-600 dark:text-emerald-400 font-bold';
+    if (val >= 0) return 'text-amber-600 dark:text-amber-400';
+    return 'text-rose-600 dark:text-rose-400 font-bold';
   };
 
   const formatReturn = (val: number | null | undefined) => {
@@ -115,8 +115,8 @@ export default function TopFundsClient() {
           <div className="p-4 bg-rose-50 text-rose-600 rounded-full">
             <TrendingUp size={32} className="rotate-180" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900">Data fetch failed</h3>
-          <p className="text-slate-500 max-w-md">{error}</p>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50">Data fetch failed</h3>
+          <p className="text-slate-500 dark:text-slate-300 max-w-md">{error}</p>
           <button
             onClick={() => fetchFunds()}
             className="px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-medium hover:bg-slate-800 transition-colors"
@@ -150,19 +150,19 @@ export default function TopFundsClient() {
       <FadeIn>
         <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider">
               <TrendingUp size={16} />
               <span>Market Insights</span>
             </div>
             <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-50 tracking-tight font-heading">Top Performing Funds</h1>
-            <p className="text-slate-500 dark:text-slate-400 max-w-2xl">
+            <p className="text-slate-500 dark:text-slate-300 max-w-2xl">
               Direct Growth plans only · updated daily. Ranked by 3Y CAGR across a curated
               shortlist of well-established funds spanning 9 categories, plus other
               AMFI-listed Direct Growth funds once enough NAV history has accumulated.
             </p>
           </div>
           <div className="flex items-center gap-3 surface-card p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-            <div className="px-3 py-1 text-xs font-medium text-slate-400">Local Time: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+            <div className="px-3 py-1 text-xs font-medium text-slate-400 dark:text-slate-400">Local Time: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
           </div>
         </header>
 
@@ -191,10 +191,10 @@ export default function TopFundsClient() {
             })}
           </div>
           <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" size={16} />
             <Input
               placeholder="Search funds..."
-              className="pl-10 rounded-full bg-white border-slate-200 focus:ring-blue-500"
+              className="pl-10 rounded-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-blue-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -241,12 +241,12 @@ export default function TopFundsClient() {
           <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-6 flex flex-col justify-between h-full">
               <div className="flex justify-between items-start">
-                <div className="p-2 bg-blue-50 dark:bg-blue-950 rounded-lg text-blue-600">
+                <div className="p-2 bg-blue-50 dark:bg-teal-950/40 rounded-lg text-blue-600 dark:text-teal-400">
                   <Sparkles size={20} />
                 </div>
               </div>
               <div className="mt-8">
-                <p className="text-slate-500 text-sm font-medium">Analyzed Schemes</p>
+                <p className="text-slate-500 dark:text-slate-300 text-sm font-medium">Analyzed Schemes</p>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">
                   {Object.values(fundsData).flat().length} Analyzed
                 </h3>
@@ -257,7 +257,7 @@ export default function TopFundsClient() {
 
         <div className="sm:hidden space-y-3">
           {currentFunds.length === 0 ? (
-            <Card className="surface-card border-none shadow-sm p-8 text-center text-slate-400 font-medium">
+            <Card className="surface-card border-none shadow-sm p-8 text-center text-slate-400 dark:text-slate-400 font-medium">
               No funds matching your search or filter.
             </Card>
           ) : (
@@ -271,14 +271,14 @@ export default function TopFundsClient() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{fund.schemeName}</p>
-                        <p className="text-[10px] text-slate-400 uppercase font-medium">{fund.category} · ₹{fund.nav?.toFixed(2) ?? 'N/A'}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-medium">{fund.category} · ₹{fund.nav?.toFixed(2) ?? 'N/A'}</p>
                       </div>
-                      <span className="text-xs font-bold text-slate-400 shrink-0">#{activeCategory === 'All' ? idx + 1 : fund.rank}</span>
+                      <span className="text-xs font-bold text-slate-400 dark:text-slate-400 shrink-0">#{activeCategory === 'All' ? idx + 1 : fund.rank}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 mt-3 text-center">
                       {(['1Y', '3Y', '5Y'] as const).map((k) => (
                         <div key={k}>
-                          <p className="text-[9px] text-slate-400 uppercase font-bold">{k}</p>
+                          <p className="text-[9px] text-slate-400 dark:text-slate-400 uppercase font-bold">{k}</p>
                           <p className={`text-xs font-mono ${getReturnColor(fund.returns[k])}`}>{formatReturn(fund.returns[k])}</p>
                         </div>
                       ))}
@@ -294,32 +294,32 @@ export default function TopFundsClient() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-100">
-                  <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider sticky left-0 bg-slate-50 z-10">Rank</th>
-                  <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Fund Name</th>
-                  <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">NAV</th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('1M')}>
+                <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider sticky left-0 bg-slate-50 dark:bg-slate-800/50 z-10">Rank</th>
+                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Fund Name</th>
+                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">NAV</th>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('1M')}>
                     1M {sortConfig.key === '1M' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('3M')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('3M')}>
                     3M {sortConfig.key === '3M' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('6M')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('6M')}>
                     6M {sortConfig.key === '6M' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('1Y')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('1Y')}>
                     1Y {sortConfig.key === '1Y' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('3Y')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('3Y')}>
                     3Y {sortConfig.key === '3Y' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('5Y')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('5Y')}>
                     5Y {sortConfig.key === '5Y' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                   <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('10Y')}>
+                   <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('10Y')}>
                     10Y {sortConfig.key === '10Y' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer hover:text-blue-600 transition-colors" onClick={() => handleSort('sinceInception')}>
+                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:text-teal-400 transition-colors" onClick={() => handleSort('sinceInception')}>
                       Inception {sortConfig.key === 'sinceInception' && (sortConfig.direction === 'asc' ? <ChevronUp size={12} className="inline ml-1" /> : <ChevronDown size={12} className="inline ml-1" />)}
                     </th>
                 </tr>
@@ -327,7 +327,7 @@ export default function TopFundsClient() {
               <tbody>
                 {currentFunds.length === 0 ? (
                   <tr>
-                    <td colSpan={12} className="p-12 text-center text-slate-400 font-medium">
+                    <td colSpan={12} className="p-12 text-center text-slate-400 dark:text-slate-400 font-medium">
                       No funds matching your search or filter.
                     </td>
                   </tr>
@@ -336,15 +336,15 @@ export default function TopFundsClient() {
                     <tr
                       key={fund.schemeCode}
                       onClick={() => router.push(`/funds/${fund.schemeCode}`)}
-                      className="border-b border-slate-50 hover:bg-slate-50/80 transition-all duration-200 cursor-pointer group"
+                      className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 transition-all duration-200 cursor-pointer group"
                     >
-                      <td className="p-4 text-sm font-bold text-slate-400 sticky left-0 bg-white group-hover:bg-slate-50/80 z-10">
+                      <td className="p-4 text-sm font-bold text-slate-400 dark:text-slate-400 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50/80 dark:group-hover:bg-slate-800/80 z-10">
                         #{activeCategory === 'All' ? idx + 1 : fund.rank}
                       </td>
                       <td className="p-4">
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-slate-800">{fund.schemeName}</span>
-                          <span className="text-[10px] text-slate-400 uppercase font-medium">{fund.category}</span>
+                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fund.schemeName}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-medium">{fund.category}</span>
                         </div>
                       </td>
                       <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">₹{fund.nav?.toFixed(2) ?? 'N/A'}</td>

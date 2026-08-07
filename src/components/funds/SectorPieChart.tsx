@@ -24,7 +24,7 @@ export const SectorPieChart = ({ data }: SectorPieChartProps) => {
 
   if (formattedData.length === 0) {
     return (
-      <div className="flex h-[280px] items-center justify-center text-sm text-slate-400">
+      <div className="flex h-[280px] items-center justify-center text-sm text-slate-400 dark:text-slate-400">
         No sector data available.
       </div>
     );

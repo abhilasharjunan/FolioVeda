@@ -38,11 +38,11 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
         <header className="flex justify-between items-end gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50 font-heading">Portfolio Overview</h1>
-            <p className="text-slate-500 dark:text-slate-400">Live analysis of your mutual fund investments.</p>
+            <p className="text-slate-500 dark:text-slate-300">Live analysis of your mutual fund investments.</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-slate-400">As of</p>
-            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            <p className="text-sm text-slate-400 dark:text-slate-400">As of</p>
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
               {new Date().toLocaleString('en-IN', {
                 timeZone: 'Asia/Kolkata',
                 dateStyle: 'medium',
@@ -60,7 +60,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
             value={analysis.currentMarketValue}
             prefix="₹"
             decimals={0}
-            icon={<Wallet className="text-blue-600" />}
+            icon={<Wallet className="text-blue-600 dark:text-teal-400" />}
             delta={{ value: gainPct, label: '% vs invested' }}
           />
         </StaggerItem>
@@ -81,7 +81,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
               value={analysis.overallXirr}
               suffix="%"
               decimals={2}
-              icon={<PieChart className="text-blue-600" />}
+              icon={<PieChart className="text-blue-600 dark:text-teal-400" />}
               hint="Annualized"
             />
           ) : (
@@ -89,7 +89,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
               label="Overall XIRR"
               value="N/A"
               animate={false}
-              icon={<PieChart className="text-blue-600" />}
+              icon={<PieChart className="text-blue-600 dark:text-teal-400" />}
               hint="Unable to calculate"
             />
           )}
@@ -160,12 +160,12 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                   <StaggerItem key={fund.schemeCode || i}>
                     <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-950 rounded-full flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-950 rounded-full flex items-center justify-center text-blue-600 dark:text-teal-400 font-bold text-xs shrink-0">
                           {i + 1}
                         </div>
                         <div className="min-w-0">
                           <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{fund.schemeName}</p>
-                          <p className="text-[10px] text-slate-400">
+                          <p className="text-[10px] text-slate-400 dark:text-slate-400">
                             Current Value: ₹{fund.currentVal.toLocaleString('en-IN')}
                           </p>
                         </div>
@@ -173,14 +173,14 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                       <div className="text-right shrink-0">
                         <p className={`text-sm font-bold ${
                           fund.xirr == null
-                            ? 'text-slate-400'
+                            ? 'text-slate-400 dark:text-slate-400'
                             : fund.xirr >= 0
-                            ? 'text-emerald-600'
-                            : 'text-rose-600'
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-rose-600 dark:text-rose-400'
                         }`}>
                           {fund.xirr != null ? `${fund.xirr.toFixed(2)}%` : 'N/A'}
                         </p>
-                        <p className="text-[10px] text-slate-400">
+                        <p className="text-[10px] text-slate-400 dark:text-slate-400">
                           {fund.xirr != null ? 'XIRR' : 'Insufficient data'}
                         </p>
                       </div>
@@ -202,7 +202,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-50">Diversification Analysis</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 dark:text-slate-300">
                   {divScore.riskLevel}. {divScore.score < 70
                     ? 'Consider balancing your portfolio across different asset classes.'
                     : 'Your portfolio is well-spread.'}
@@ -227,7 +227,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                   ['/portfolio/report', 'Download Report'],
                   ['/tools/sip-calculator', 'SIP Calculator'],
                 ].map(([href, label]) => (
-                  <a key={href} href={href} className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                  <a key={href} href={href} className="text-xs text-blue-600 dark:text-teal-400 hover:text-blue-800 font-medium flex items-center gap-1">
                     {label} <ArrowRight size={10} />
                   </a>
                 ))}
@@ -242,8 +242,8 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
       </FadeIn>
 
       <FadeIn delay={0.3}>
-        <div className="bg-blue-50 dark:bg-blue-950/40 p-4 rounded-xl border border-blue-100 dark:border-blue-900 flex items-start gap-3">
-          <AlertCircle className="text-blue-600 mt-0.5 shrink-0" size={18} />
+        <div className="bg-blue-50 dark:bg-teal-950/40 p-4 rounded-xl border border-blue-100 dark:border-blue-900 flex items-start gap-3">
+          <AlertCircle className="text-blue-600 dark:text-teal-400 mt-0.5 shrink-0" size={18} />
           <p className="text-xs text-blue-700 dark:text-blue-200 leading-relaxed">
             <strong className="font-semibold">Compliance Note:</strong> Returns calculated using XIRR methodology based on your transaction history and latest available NAV.
             Past performance is not a guarantee of future returns. Please refer to the scheme&apos;s SID for detailed risk factors.

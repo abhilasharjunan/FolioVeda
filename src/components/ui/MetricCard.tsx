@@ -58,7 +58,7 @@ export function MetricCard({
             <p
               className={cn(
                 "mt-1 text-xs font-semibold",
-                deltaPositive ? "text-emerald-600" : "text-rose-600"
+                deltaPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
               )}
             >
               {deltaPositive ? "+" : ""}
@@ -67,7 +67,7 @@ export function MetricCard({
             </p>
           )}
           {hint && !delta && (
-            <p className="mt-1 text-xs font-medium text-slate-400">{hint}</p>
+            <p className="mt-1 text-xs font-medium text-slate-400 dark:text-slate-400">{hint}</p>
           )}
         </CardContent>
       </Card>

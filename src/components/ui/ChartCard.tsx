@@ -27,14 +27,14 @@ export function ChartCard({
   return (
     <Card className={cn("surface-card border-none shadow-sm", className)}>
       <CardHeader>
-        <CardTitle className="text-lg font-semibold font-heading">{title}</CardTitle>
-        {subtitle && <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>}
+        <CardTitle className="text-lg font-semibold font-heading text-slate-900 dark:text-slate-50">{title}</CardTitle>
+        {subtitle && <p className="text-sm text-slate-500 dark:text-slate-300">{subtitle}</p>}
       </CardHeader>
       <CardContent>
         {loading ? (
           <SkeletonChart height="h-64" />
         ) : empty ? (
-          <div className="flex h-48 items-center justify-center text-sm text-slate-400">
+          <div className="flex h-48 items-center justify-center text-sm text-slate-400 dark:text-slate-400">
             {emptyMessage}
           </div>
         ) : (
