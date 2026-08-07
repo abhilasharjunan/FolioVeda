@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { TransactionSchema } from "@/lib/validations";
-import { fetchSchemeDetails } from "@/lib/mfapi";
+import { resolveSchemeForTransaction } from "@/lib/resolve-scheme";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -14,33 +14,32 @@ export async function POST(req: Request) {
     const body = await req.json();
     const validated = TransactionSchema.parse(body);
 
-    let schemeData: any;
+    let resolved;
     try {
-      schemeData = await fetchSchemeDetails(validated.schemeCode);
-    } catch {
+      resolved = await resolveSchemeForTransaction(
+        validated.schemeCode,
+        validated.schemeName
+      );
+    } catch (err) {
       return NextResponse.json({
-        error: "Could not fetch scheme details from mfapi.in. The scheme code may be invalid or the API is temporarily unavailable."
+        error: err instanceof Error
+          ? err.message
+          : "Could not fetch scheme details from mfapi.in. The scheme code may be invalid or the API is temporarily unavailable."
       }, { status: 502 });
     }
-    const meta = schemeData.meta as { scheme_name?: string; scheme_category?: string };
-    const navEntries = schemeData.data as Array<{ date: string; nav: string }>;
-    // mfapi.in returns NAV history newest-first — data[0] is the latest NAV
-    // (same convention used by /api/funds/batch). Using the last element stored
-    // a stale/oldest NAV into SchemeMaster.
-    const latestNav = navEntries.length > 0 ? navEntries[0].nav : "0";
 
     await prisma.schemeMaster.upsert({
       where: { schemeCode: validated.schemeCode },
       create: {
         schemeCode: validated.schemeCode,
-        schemeName: meta?.scheme_name || "Unknown Fund",
-        category: meta?.scheme_category || null,
-        latestNav: latestNav,
+        schemeName: resolved.schemeName,
+        category: resolved.category,
+        latestNav: resolved.latestNav,
       },
       update: {
-        schemeName: meta?.scheme_name || "Unknown Fund",
-        category: meta?.scheme_category || null,
-        latestNav: latestNav,
+        schemeName: resolved.schemeName,
+        category: resolved.category,
+        ...(resolved.latestNav !== "0" ? { latestNav: resolved.latestNav } : {}),
       },
     });
 

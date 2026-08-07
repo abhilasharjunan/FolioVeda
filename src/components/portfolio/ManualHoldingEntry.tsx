@@ -75,6 +75,7 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
 
     const payload = {
       schemeCode: String(selectedFund.schemeCode),
+      schemeName: selectedFund.schemeName,
       units: formData.units,
       amount: formData.amount,
       date: formData.date,
