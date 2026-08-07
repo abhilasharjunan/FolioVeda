@@ -28,6 +28,15 @@ describe('XIRR Calculation Precision', () => {
     expect(calculateXIRR(flows)).toBeNull();
   });
 
+  it('returns null for same-day buy + valuation (not 0%)', () => {
+    const day = new Date('2024-06-15T10:00:00');
+    const flows = [
+      { amount: -10000, date: day },
+      { amount: 12000, date: new Date(day.getTime() + 60 * 60 * 1000) },
+    ];
+    expect(calculateXIRR(flows)).toBeNull();
+  });
+
   it('matches a textbook example (₹1L invested, ₹1.3L after 1 year -> ~30%)', () => {
     const flows = [
       { amount: -100000, date: new Date('2023-01-01') },

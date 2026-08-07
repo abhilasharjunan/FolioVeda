@@ -85,25 +85,30 @@ export const getPortfolioAnalysis = cache(async () => {
 
       const fundCashFlows = holding.transactions.map((tx: any) => ({
         amount: tx.type === "BUY" ? -Number(tx.amount) : Number(tx.amount),
-        date: tx.date,
+        date: new Date(tx.date),
       }));
 
       fundCashFlows.push({ amount: effectiveCurrent, date: new Date() });
       const fundXirr = calculateXIRR(fundCashFlows);
+      // Absolute return when XIRR needs more holding period (e.g. bought today)
+      const absoluteReturnPct =
+        invested > 0 ? ((effectiveCurrent - invested) / invested) * 100 : null;
 
       totalInvested += invested;
       currentMarketValue += effectiveCurrent;
 
       overallCashFlows.push(...holding.transactions.map((tx: any) => ({
         amount: tx.type === "BUY" ? -Number(tx.amount) : Number(tx.amount),
-        date: tx.date,
+        date: new Date(tx.date),
       })));
 
       return {
+        schemeCode: holding.schemeCode,
         schemeName: scheme?.schemeName || "Unknown Fund",
         currentVal: effectiveCurrent,
         invested,
         xirr: fundXirr != null ? fundXirr * 100 : null,
+        absoluteReturnPct,
         gain: effectiveCurrent - invested,
       };
     })

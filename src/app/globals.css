@@ -1,74 +1,82 @@
+/* Soft Graphite fintech theme — deep slate surfaces, emerald growth, indigo primary */
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-/* Soft Graphite + Mist Teal — eye-soothing, professional finance UI */
 :root {
-  --background: 210 18% 94%;
-  --foreground: 222 28% 14%;
-  --card: 210 20% 97%;
-  --card-foreground: 222 28% 14%;
-  --popover: 210 20% 97%;
-  --popover-foreground: 222 28% 14%;
-  --primary: 173 48% 32%;
-  --primary-foreground: 160 40% 98%;
-  --secondary: 210 14% 90%;
-  --secondary-foreground: 222 24% 20%;
-  --muted: 210 14% 90%;
-  --muted-foreground: 215 12% 42%;
-  --accent: 173 28% 90%;
-  --accent-foreground: 173 48% 24%;
-  --destructive: 0 62% 48%;
+  --background: 210 20% 96%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 214 20% 92%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 214 20% 92%;
+  --muted-foreground: 215 16% 40%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 160 84% 10%;
+  --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
-  --border: 210 14% 86%;
-  --input: 210 14% 86%;
-  --ring: 173 48% 32%;
-  --radius: 0.625rem;
-  --success: 152 48% 36%;
-  --danger: 0 62% 48%;
-  --chart-1: 173 48% 36%;
-  --chart-2: 199 55% 42%;
-  --chart-3: 38 70% 48%;
-  --chart-4: 0 62% 52%;
-  --chart-5: 220 35% 48%;
-  --page-gradient: linear-gradient(165deg, #e8eef2 0%, #e4ebe8 42%, #e9eef3 100%);
-  --page-grid: radial-gradient(circle at 1px 1px, rgb(100 116 139 / 0.1) 1px, transparent 0);
-  --surface: hsl(210 20% 97%);
-  --nav-bg: hsl(210 18% 96% / 0.92);
+  --border: 214 20% 88%;
+  --input: 214 20% 88%;
+  --ring: 239 84% 67%;
+  --radius: 0.75rem;
+  --success: 160 84% 39%;
+  --danger: 0 72% 51%;
+  --warning: 38 92% 50%;
+  --chart-1: 160 84% 39%;
+  --chart-2: 239 84% 67%;
+  --chart-3: 38 92% 50%;
+  --chart-4: 0 72% 51%;
+  --chart-5: 199 89% 48%;
+  --page-gradient:
+    radial-gradient(ellipse 80% 50% at 90% -10%, rgb(99 102 241 / 0.08), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgb(16 185 129 / 0.06), transparent 50%),
+    linear-gradient(180deg, #f1f5f9 0%, #eef2f7 100%);
+  --page-grid: none;
+  --surface: hsl(0 0% 100%);
+  --nav-bg: hsl(210 20% 98% / 0.9);
 }
 
 .dark {
-  --background: 222 28% 8%;
-  --foreground: 210 20% 92%;
-  --card: 222 24% 11%;
-  --card-foreground: 210 20% 92%;
-  --popover: 222 24% 11%;
-  --popover-foreground: 210 20% 92%;
-  --primary: 173 42% 48%;
-  --primary-foreground: 168 50% 8%;
-  --secondary: 222 18% 16%;
-  --secondary-foreground: 210 18% 88%;
-  --muted: 222 18% 16%;
-  --muted-foreground: 215 12% 62%;
-  --accent: 173 22% 16%;
-  --accent-foreground: 173 40% 72%;
-  --destructive: 0 55% 42%;
+  --background: 222 47% 7%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 239 84% 67%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 160 84% 96%;
+  --destructive: 0 62% 45%;
   --destructive-foreground: 0 0% 98%;
-  --border: 222 16% 18%;
-  --input: 222 16% 18%;
-  --ring: 173 42% 48%;
-  --success: 152 45% 42%;
-  --danger: 0 58% 52%;
-  --chart-1: 173 42% 52%;
-  --chart-2: 199 55% 55%;
-  --chart-3: 38 70% 55%;
-  --chart-4: 0 58% 58%;
-  --chart-5: 220 40% 62%;
-  --page-gradient: linear-gradient(165deg, #0d1219 0%, #101820 48%, #0e151c 100%);
-  --page-grid: radial-gradient(circle at 1px 1px, rgb(148 163 184 / 0.06) 1px, transparent 0);
-  --surface: hsl(222 24% 11%);
-  --nav-bg: hsl(222 28% 8% / 0.94);
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 239 84% 67%;
+  --success: 160 84% 39%;
+  --danger: 0 72% 55%;
+  --warning: 38 92% 50%;
+  --chart-1: 160 84% 42%;
+  --chart-2: 239 84% 67%;
+  --chart-3: 38 92% 50%;
+  --chart-4: 0 72% 55%;
+  --chart-5: 199 89% 55%;
+  --page-gradient:
+    radial-gradient(ellipse 70% 45% at 92% -8%, rgb(99 102 241 / 0.12), transparent 55%),
+    radial-gradient(ellipse 55% 35% at 0% 100%, rgb(16 185 129 / 0.08), transparent 50%),
+    linear-gradient(180deg, #0f172a 0%, #121826 48%, #0f172a 100%);
+  --page-grid: none;
+  --surface: hsl(222 47% 11%);
+  --nav-bg: hsl(222 47% 7% / 0.92);
 }
 
 @theme inline {
@@ -100,30 +108,30 @@ body {
   color: hsl(var(--foreground));
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-heading {
   font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .page-shell {
   min-height: 100%;
   background-color: hsl(var(--background));
-  background-image: var(--page-grid), var(--page-gradient);
-  background-size: 28px 28px, auto;
-  /* fixed attachment forces continuous layer repaints — major click/scroll lag */
+  background-image: var(--page-gradient);
   background-attachment: scroll;
 }
 
 .surface-card {
-  border: 1px solid hsl(var(--border) / 0.7);
+  border: 1px solid hsl(var(--border) / 0.8);
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
   background: var(--surface);
-  /* no backdrop-filter — blur on many cards tanks interaction latency */
+  border-radius: var(--radius);
 }
 
 .dark .surface-card {
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
 }
 
 .hover-lift {

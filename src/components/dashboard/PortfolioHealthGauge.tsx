@@ -35,7 +35,7 @@ export function PortfolioHealthGauge({ diversificationScore, riskScore }: Portfo
       : (safetyScore as number)
   );
 
-  const color = healthScore >= 70 ? '#16a34a' : healthScore >= 45 ? '#f59e0b' : '#dc2626';
+  const color = healthScore >= 70 ? '#10b981' : healthScore >= 45 ? '#f59e0b' : '#ef4444';
   const verdict =
     healthScore >= 70
       ? 'Healthy — well diversified with manageable risk.'

@@ -12,8 +12,9 @@ export function calculateXIRR(cashFlows: { amount: number; date: Date }[]) {
   const lastDay = cashFlows[cashFlows.length - 1].date.getTime();
   const totalDays = (lastDay - d0) / (1000 * 60 * 60 * 24);
 
-  // XIRR is meaningless if all cash flows are on the same day
-  if (totalDays < 1) return 0;
+  // XIRR is undefined for same-day cash flows — return null (not 0),
+  // so the UI can show "Insufficient data" instead of a fake 0.00%.
+  if (totalDays < 1) return null;
 
   const x0 = 0.1;
   const precision = 1e-6;
