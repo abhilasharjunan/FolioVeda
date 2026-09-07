@@ -17,9 +17,9 @@ const CATEGORIES: FundCategory[] = [
 
 // A single run across all 9 categories does live mfapi.in calls per scheme
 // and can't reliably finish inside Vercel's per-invocation time limit (Hobby
-// caps at 60s). CATEGORY_BATCHES splits the work into smaller cron-triggered
-// chunks (see vercel.json + the `batch` query param on the sync-top-funds
-// route) that each comfortably fit within that budget.
+// caps at 60s). CATEGORY_BATCHES splits the work into smaller chunks (see
+// .github/workflows/scheduled-syncs.yml + the `batch` query param on the
+// sync-top-funds route) that each comfortably fit within that budget.
 export const CATEGORY_BATCHES: FundCategory[][] = [
   ["Large Cap", "Mid Cap", "Small Cap"],
   ["Flexi Cap", "ELSS", "Debt"],

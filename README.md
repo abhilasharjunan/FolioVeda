@@ -56,17 +56,30 @@ A SEBI-aware mutual fund portfolio tracker with XIRR returns, risk analytics, di
 - **Calculations**: Newton-Raphson XIRR with bisection fallback; tested risk metrics
 - **Data**: AMFI NAVAll for daily sync; mfapi.in for historical NAV; finapi for holdings/sectors
 
-## Cron Jobs (Vercel)
-Configured in `vercel.json`:
-- NAV / scheme sync
-- Risk metrics sync
-- Top-funds sync (3 daily batches: `?batch=0|1|2`)
+## Scheduled Jobs
 
-Manual trigger example:
+Driven by GitHub Actions (`.github/workflows/scheduled-syncs.yml`), not Vercel
+cron — the Hobby plan caps cron at ~2 jobs/day, which silently dropped most of
+ours. The workflow curls the `/api/cron/*` routes; each authenticates with
+`Authorization: Bearer $CRON_SECRET`. Add `CRON_SECRET` as a repo Actions secret.
+
+- **NAV** (`sync-nav`, daily ~05:00 IST) — one AMFI `NAVAll.txt` fetch refreshes
+  `SchemeMaster.latestNav`, upserts `SchemeCatalog`, and appends `NavSnapshot`
+  history for the full universe.
+- **Top funds** (`sync-top-funds?batch=0|1|2`, daily) — re-ranks the curated list
+  (Direct Growth only) in three batches to stay under the function time limit.
+- **Risk metrics** (`sync-risk`, weekly Mon).
+
+Manual trigger: use **Run workflow** on the Actions tab, or curl directly:
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" \
-  "https://folioveda.vercel.app/api/cron/sync-top-funds?batch=0"
+  "https://folioveda.vercel.app/api/cron/sync-nav"
 ```
-Repeat for `batch=1` and `batch=2` after deploy so Top Funds cache is rebuilt (Direct Growth only).
 
-`GET /api/cron/sync-nav` with `Authorization: Bearer $CRON_SECRET`
+### One-time NAV history backfill
+`NavSnapshot` only accumulates from the first `sync-nav` run — no historical
+backfill in the normal path. After a fresh deploy, seed it from mfapi.in:
+```bash
+npm run backfill:navs -- --apply          # full history for held + benchmark + tracked schemes
+npm run backfill:navs -- --apply --days=1825   # or cap the depth
+```

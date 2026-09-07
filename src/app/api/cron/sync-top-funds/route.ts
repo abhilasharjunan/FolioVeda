@@ -11,9 +11,9 @@ export async function GET(req: Request) {
   }
 
   // 9 categories of live mfapi.in lookups don't reliably fit in one
-  // invocation under Vercel's time limit, so vercel.json schedules this route
-  // three times a day, once per `batch` index, each covering 3 categories.
-  // Omitting `batch` (e.g. manual/local runs) still processes all of them.
+  // invocation under Vercel's time limit, so the scheduled-syncs workflow
+  // hits this route three times, once per `batch` index, each covering 3
+  // categories. Omitting `batch` (e.g. manual/local runs) processes all.
   const { searchParams } = new URL(req.url);
   const batchParam = searchParams.get("batch");
   const categories = batchParam !== null ? CATEGORY_BATCHES[Number(batchParam)] : undefined;

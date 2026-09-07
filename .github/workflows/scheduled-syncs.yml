@@ -1,0 +1,74 @@
+name: Scheduled syncs
+
+# Drives the app's /api/cron/* endpoints on a schedule, replacing the `crons`
+# block that used to live in vercel.json. The Vercel Hobby plan only runs ~2
+# cron jobs, once per day (see git history: f61843c "change top-funds cron from
+# hourly to daily (Vercel Hobby plan limit)"), so the 6 entries we needed were
+# silently being dropped. GitHub Actions cron is free and unmetered here, gives
+# us retries + logs + failure emails, and needs no plan upgrade.
+#
+# Caveats:
+#  - Scheduled runs can be delayed a few minutes under load and, rarely, skipped
+#    entirely. Fine for a once-daily NAV pull; if it ever isn't, move to
+#    cron-job.org / Upstash QStash (same curl, same secret).
+#  - GitHub disables scheduled workflows after 60 days with no repo activity.
+#  - The routes authenticate with `Authorization: Bearer $CRON_SECRET`
+#    (src/lib/cron-auth.ts). Add CRON_SECRET as a repo Actions secret with the
+#    same value as the Vercel env var.
+
+on:
+  schedule:
+    - cron: '30 23 * * *'   # ~05:00 IST — AMFI NAVAll.txt has published by now
+    - cron: '0 1 * * *'     # ~06:30 IST — top-funds ranking refresh
+    - cron: '0 2 * * 1'     # Mon ~07:30 IST — risk metrics (weekly)
+  workflow_dispatch: {}      # manual "Run workflow" button (runs every job)
+
+concurrency:
+  group: scheduled-syncs
+  cancel-in-progress: false
+
+env:
+  BASE_URL: https://folioveda.vercel.app
+
+jobs:
+  nav:
+    # NAV + SchemeCatalog + NavSnapshot, all from one AMFI bulk fetch
+    # (syncAmfiUniverse). This also covers what the old weekly sync-schemes
+    # cron did, so that one is not scheduled here.
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '30 23 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync NAV / catalog / snapshots
+        run: |
+          curl --fail-with-body -sS \
+            --retry 3 --retry-delay 30 --retry-all-errors --max-time 200 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "$BASE_URL/api/cron/sync-nav"
+
+  top-funds:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 1 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh top-funds cache (3 batches)
+        run: |
+          set -e
+          for b in 0 1 2; do
+            echo "--- batch $b ---"
+            curl --fail-with-body -sS \
+              --retry 3 --retry-delay 30 --retry-all-errors --max-time 120 \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              "$BASE_URL/api/cron/sync-top-funds?batch=$b"
+            echo
+            sleep 15
+          done
+
+  risk:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 2 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync risk metrics
+        run: |
+          curl --fail-with-body -sS \
+            --retry 2 --retry-delay 60 --retry-all-errors --max-time 300 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "$BASE_URL/api/cron/sync-risk"
