@@ -5,8 +5,13 @@
  * Formula: Σ [ CF_i / (1 + rate)^((d_i - d_0)/365) ] = 0
  */
 
-export function calculateXIRR(cashFlows: { amount: number; date: Date }[]) {
-  if (cashFlows.length < 2) return null;
+export function calculateXIRR(rawCashFlows: { amount: number; date: Date }[]) {
+  if (rawCashFlows.length < 2) return null;
+
+  // Callers often build the flow list per-holding, so it can arrive unsorted.
+  // d0 (and the sign of every exponent below) depends on the first entry being
+  // the earliest date — sort defensively rather than trusting the caller.
+  const cashFlows = [...rawCashFlows].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   const d0 = cashFlows[0].date.getTime();
   const lastDay = cashFlows[cashFlows.length - 1].date.getTime();
@@ -55,7 +60,15 @@ export function calculateXIRR(cashFlows: { amount: number; date: Date }[]) {
     if (Math.abs(getNetPresentValue(rate)) < precision) { converged = true; break; }
   }
 
-  if (converged && isFinite(rate) && rate > -1) return rate;
+  // Beyond this, the "rate" is a numerical artefact of pathological inputs
+  // (bad cost basis, a paper gain over a handful of days) rather than a
+  // meaningful annualized return — report it as un-computable, not as
+  // "10,000,000%". Callers should gate on holding period before annualizing.
+  const MAX_PLAUSIBLE_RATE = 100; // 10,000% annualized
+
+  if (converged && isFinite(rate) && rate > -1) {
+    return rate > MAX_PLAUSIBLE_RATE ? null : rate;
+  }
 
   // Newton-Raphson didn't converge cleanly (known failure mode for irregular
   // cash-flow patterns, e.g. a large redemption followed by reinvestment) —
@@ -73,8 +86,9 @@ export function calculateXIRR(cashFlows: { amount: number; date: Date }[]) {
   for (let i = 0; i < 200; i++) {
     const mid = (lo + hi) / 2;
     const npvMid = getNetPresentValue(mid);
-    if (Math.abs(npvMid) < precision) return mid;
+    if (Math.abs(npvMid) < precision) return mid > MAX_PLAUSIBLE_RATE ? null : mid;
     if (Math.sign(npvMid) === Math.sign(npvLo)) lo = mid; else hi = mid;
   }
-  return (lo + hi) / 2;
+  const root = (lo + hi) / 2;
+  return isFinite(root) && root > -1 && root <= MAX_PLAUSIBLE_RATE ? root : null;
 }

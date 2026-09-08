@@ -4,6 +4,22 @@ import { auth } from "@/auth";
 import { cache } from 'react';
 import { ensureSchemeNavs } from "@/lib/ensure-scheme-navs";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Annualized XIRR is only meaningful once a position has roughly a year of
+ * history. Annualizing a two-week paper gain compounds it ~26× and produces
+ * absurd figures (e.g. "10,698,149,471%"), so below this we surface the plain
+ * absolute return instead — same rule calculateCAGR() already uses for <1yr.
+ */
+const MIN_XIRR_DAYS = 365;
+
+function holdingPeriodDays(txns: { date: Date | string }[]): number {
+  if (txns.length === 0) return 0;
+  const earliest = Math.min(...txns.map((t) => new Date(t.date).getTime()));
+  return (Date.now() - earliest) / DAY_MS;
+}
+
 // Use React cache for request memoization within a single render pass
 export const getPortfolioAnalysis = cache(async () => {
   // During build, return mock data to avoid Prisma initialization
@@ -89,7 +105,12 @@ export const getPortfolioAnalysis = cache(async () => {
       }));
 
       fundCashFlows.push({ amount: effectiveCurrent, date: new Date() });
-      const fundXirr = calculateXIRR(fundCashFlows);
+      // Only annualize once the position has ~1yr of history — otherwise the
+      // absolute return below is the honest number to show.
+      const fundXirr =
+        holdingPeriodDays(holding.transactions) >= MIN_XIRR_DAYS
+          ? calculateXIRR(fundCashFlows)
+          : null;
       // Absolute return when XIRR needs more holding period (e.g. bought today)
       const absoluteReturnPct =
         invested > 0 ? ((effectiveCurrent - invested) / invested) * 100 : null;
@@ -115,7 +136,10 @@ export const getPortfolioAnalysis = cache(async () => {
   );
 
   overallCashFlows.push({ amount: currentMarketValue, date: new Date() });
-  const overallXirr = calculateXIRR(overallCashFlows);
+  overallCashFlows.sort((a, b) => a.date.getTime() - b.date.getTime());
+  const allTxns = portfolio.holdings.flatMap((h: any) => h.transactions);
+  const overallXirr =
+    holdingPeriodDays(allTxns) >= MIN_XIRR_DAYS ? calculateXIRR(overallCashFlows) : null;
 
   return {
     totalInvested,

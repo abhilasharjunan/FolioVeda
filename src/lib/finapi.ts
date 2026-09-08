@@ -3,8 +3,18 @@ import { prisma } from "./prisma";
 import redis from "./redis";
 
 /**
- * Holdings / sector factsheets come from FinAPI (ISIN lookup), not mfapi.in.
- * mfapi only has NAV history + scheme meta.
+ * Holdings / sector factsheets come from FinAPI, not mfapi.in (mfapi only has
+ * NAV history + scheme meta).
+ *
+ * FinAPI's public `/mf/isin/{isin}` endpoint only returns NAV/meta — the
+ * security-level holdings moved to `/mf/holdings-history/*`, which is a paid
+ * ("Pro") endpoint requiring an `X-API-Key`. So:
+ *  - With `FINAPI_API_KEY` set, we pull fresh monthly holdings from there.
+ *  - Without it, we serve whatever holdings are already in SectorCache
+ *    (populated when the feed last worked). Stale disclosed holdings are far
+ *    more useful for overlap than nothing, and AMC portfolios only change
+ *    monthly, so we keep serving the cache regardless of age and just try to
+ *    refresh it when a key is available.
  *
  * Persistence:
  * - Redis `fundInsights:v4:*` for hot path (6h)
@@ -12,16 +22,10 @@ import redis from "./redis";
  *   Redis misses without re-hitting FinAPI every time
  */
 const REDIS_INSIGHTS_TTL_SECONDS = 6 * 3600;
-const DB_CACHE_FRESHNESS_HOURS = 24 * 14; // holdings change ~monthly
-
-function getFundManagerFromPeer(peer: any): { name: string; tenure: string; experience: string } | null {
-  if (!peer) return null;
-  const name = peer.fundManagerName || peer.fund_manager_name || peer.fundManager?.name || null;
-  const tenure = peer.fundManagerTenure || peer.fund_manager_tenure || peer.fundManager?.tenure || null;
-  const experience = peer.fundManagerExperience || peer.fund_manager_experience || peer.fundManager?.experience || null;
-  if (name) return { name, tenure: tenure || "N/A", experience: experience || "N/A" };
-  return null;
-}
+/** Below this age we skip the (rate-limited) Pro refetch and trust the cache as-is. */
+const DB_CACHE_FRESH_HOURS = 24 * 25; // AMC disclosures are monthly
+const FINAPI_BASE = "https://finapi.upvaly.com/api";
+const FINAPI_API_KEY = process.env.FINAPI_API_KEY || "";
 
 export interface FundHoldings {
   stockName: string;
@@ -93,23 +97,6 @@ function normalizeHoldings(raw: any[]): FundHoldings[] {
     .slice(0, 40);
 }
 
-function normalizeSectors(raw: any): Record<string, number> {
-  const out: Record<string, number> = {};
-  if (Array.isArray(raw)) {
-    for (const s of raw) {
-      const name = String(s.sector || s.name || "").trim();
-      const w = parseFloat(String(s.weightage ?? s.weight ?? 0).replace(/,/g, ""));
-      if (name && Number.isFinite(w) && w > 0) out[name] = w;
-    }
-  } else if (raw && typeof raw === "object") {
-    for (const [k, v] of Object.entries(raw)) {
-      const w = Number(v);
-      if (Number.isFinite(w) && w > 0) out[k] = w;
-    }
-  }
-  return out;
-}
-
 /** FinAPI historically returned `data: [...]`; current API returns `data: { ... }`. */
 function unwrapFinapiPayload(json: any): any | null {
   const data = json?.data;
@@ -167,12 +154,88 @@ export async function getFundInsights(schemeCode: string): Promise<FundInsights 
   return result;
 }
 
+/** MM-YYYY, the format FinAPI's holdings-history range params expect. */
+function monthParam(d: Date): string {
+  return `${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
+interface FreshHoldings {
+  holdings: FundHoldings[];
+  sectors: Record<string, number>;
+  asOfDate: string | null;
+}
+
+/**
+ * FinAPI Pro: month-wise security-level holdings sourced from AMC factsheets.
+ * Returns the most recent month available, or null when there's no key, the
+ * key isn't Pro (401/403), or no history exists (data starts Jan 2026).
+ */
+async function fetchHoldingsHistory(isin: string): Promise<FreshHoldings | null> {
+  if (!FINAPI_API_KEY) return null;
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - 4, 1);
+  const url =
+    `${FINAPI_BASE}/mf/holdings-history/isin/${encodeURIComponent(isin)}` +
+    `?startMonth=${monthParam(start)}&endMonth=${monthParam(now)}`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      signal: AbortSignal.timeout(15000),
+      headers: { Accept: "application/json", "X-API-Key": FINAPI_API_KEY },
+    });
+  } catch (err) {
+    console.warn(`FinAPI holdings-history network error for ISIN ${isin}:`, err);
+    return null;
+  }
+  if (!res.ok) {
+    console.warn(`FinAPI holdings-history ${res.status} for ISIN ${isin}`);
+    return null;
+  }
+
+  const data = unwrapFinapiPayload(await res.json());
+  const history: any[] = Array.isArray(data?.holdingsHistory) ? data.holdingsHistory : [];
+  if (history.length === 0) return null;
+
+  const monthKey = (h: any) => Number(h.holdingsYear) * 100 + Number(h.holdingsMonth);
+  const latest = history.reduce((best, cur) => (monthKey(cur) > monthKey(best) ? cur : best));
+
+  const holdings = normalizeHoldings(
+    (latest.holdings || []).map((h: any) => ({
+      name: h.displayName || h.name,
+      weightage: h.weightage ?? h.weight,
+      sector: h.sectorClassification?.sector || h.sector,
+    }))
+  );
+  if (!holdings.length) return null;
+
+  // Holdings-history has no top-level sector block — derive a directional one
+  // from the disclosed names (calculateLookThroughSectors renormalizes anyway).
+  const sectors: Record<string, number> = {};
+  for (const h of holdings) {
+    if (!h.sector || h.sector === "Other") continue;
+    sectors[h.sector] = (sectors[h.sector] || 0) + h.allocation;
+  }
+
+  const asOfDate =
+    latest.holdingsAsOf ||
+    (latest.holdingsMonth && latest.holdingsYear
+      ? `${latest.holdingsYear}-${String(latest.holdingsMonth).padStart(2, "0")}`
+      : null);
+
+  return { holdings, sectors, asOfDate };
+}
+
 async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsights | null> {
   try {
     const schemeDetails = await fetchSchemeDetails(schemeCode);
     const schemeName =
       schemeDetails.meta?.scheme_name || schemeDetails.schemeName || `Scheme ${schemeCode}`;
     const fundHouse = schemeDetails.meta?.fund_house || "N/A";
+    const isin =
+      schemeDetails.meta?.isin_growth || schemeDetails.meta?.isin_div_reinvestment || null;
+
     const dbScheme = await prisma.schemeMaster.findUnique({
       where: { schemeCode },
       select: { fundManagerName: true, fundManagerTenure: true },
@@ -183,100 +246,34 @@ async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsigh
       experience: "N/A",
     };
 
+    // 1. Whatever holdings we already have cached, regardless of age.
     let cachedBlob: CachedBlob = { sectors: {}, holdings: [] };
+    let cacheAgeMs = Infinity;
     try {
       const sectorRow = await prisma.sectorCache.findUnique({ where: { schemeCode } });
       if (sectorRow) {
         cachedBlob = parseSectorCacheBlob(sectorRow.sectorData);
-        const ageMs = Date.now() - new Date(sectorRow.fetchedAt).getTime();
-        const fresh = ageMs < DB_CACHE_FRESHNESS_HOURS * 60 * 60 * 1000;
-        if (fresh && (cachedBlob.holdings?.length || 0) > 0) {
-          return partialInsights(
-            schemeCode,
-            schemeName,
-            fundHouse,
-            fallbackManager,
-            cachedBlob.holdings,
-            cachedBlob.sectors || {},
-            cachedBlob.asOfDate || null
-          );
-        }
+        cacheAgeMs = Date.now() - new Date(sectorRow.fetchedAt).getTime();
       }
     } catch {
       // ignore cache read errors
     }
+    const cacheHasHoldings = (cachedBlob.holdings?.length || 0) > 0;
+    const cacheFresh = cacheAgeMs < DB_CACHE_FRESH_HOURS * 60 * 60 * 1000;
 
-    const isin = schemeDetails.meta?.isin_growth || schemeDetails.meta?.isin_div_reinvestment;
-    if (!isin) {
-      console.warn(`No ISIN found for scheme ${schemeCode}`);
-      return partialInsights(
-        schemeCode,
-        schemeName,
-        fundHouse,
-        fallbackManager,
-        cachedBlob.holdings || [],
-        cachedBlob.sectors || {}
-      );
-    }
+    // 2. Refresh from FinAPI Pro only when the cache can't answer (missing or
+    //    stale) — and only if we have a key at all. No key ⇒ cache is it.
+    const fresh =
+      isin && !(cacheHasHoldings && cacheFresh) ? await fetchHoldingsHistory(isin) : null;
 
-    let response: Response;
-    try {
-      response = await fetch(`https://finapi.upvaly.com/api/mf/isin/${encodeURIComponent(isin)}`, {
-        signal: AbortSignal.timeout(15000),
-        headers: { Accept: "application/json" },
-      });
-    } catch (err) {
-      console.warn(`FinAPI network error for ${schemeCode}:`, err);
-      return partialInsights(
-        schemeCode,
-        schemeName,
-        fundHouse,
-        fallbackManager,
-        cachedBlob.holdings || [],
-        cachedBlob.sectors || {}
-      );
-    }
+    const holdings = fresh?.holdings.length ? fresh.holdings : cachedBlob.holdings || [];
+    const sectorAllocation =
+      fresh && Object.keys(fresh.sectors).length ? fresh.sectors : cachedBlob.sectors || {};
+    const asOfDate = fresh?.asOfDate || cachedBlob.asOfDate || null;
 
-    if (!response.ok) {
-      console.warn(`FinAPI error ${response.status} for ${schemeCode} (ISIN ${isin})`);
-      return partialInsights(
-        schemeCode,
-        schemeName,
-        fundHouse,
-        fallbackManager,
-        cachedBlob.holdings || [],
-        cachedBlob.sectors || {}
-      );
-    }
-
-    const json = await response.json();
-    const data = unwrapFinapiPayload(json);
-    if (!data) {
-      console.warn(`FinAPI empty payload for ${schemeCode}`);
-      return partialInsights(
-        schemeCode,
-        schemeName,
-        fundHouse,
-        fallbackManager,
-        cachedBlob.holdings || [],
-        cachedBlob.sectors || {}
-      );
-    }
-
-    const holdings = normalizeHoldings(data.holdings || data.portfolio?.holdings || []);
-    const sectorAllocation = normalizeSectors(data.sectors || data.portfolio?.sectors || {});
-    const asOfDate =
-      data.portfolio?.asOfDate ||
-      data.portfolio?.as_of_date ||
-      data.latestNavDate ||
-      null;
-
-    if (holdings.length || Object.keys(sectorAllocation).length) {
-      const blob: CachedBlob = {
-        sectors: Object.keys(sectorAllocation).length ? sectorAllocation : cachedBlob.sectors,
-        holdings: holdings.length ? holdings : cachedBlob.holdings,
-        asOfDate,
-      };
+    // 3. Persist a successful refresh so the next cold start has it.
+    if (fresh?.holdings.length) {
+      const blob: CachedBlob = { sectors: sectorAllocation, holdings, asOfDate };
       prisma.sectorCache
         .upsert({
           where: { schemeCode },
@@ -286,38 +283,15 @@ async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsigh
         .catch(() => {});
     }
 
-    const currentPeer =
-      (data.peers || []).find((p: any) => String(p.schemeCode) === String(schemeCode)) ||
-      data.peers?.[0];
-    const managers = data.schemeFundManagers || [];
-    const mgrFromList = managers[0]
-      ? {
-          name: managers[0].name || managers[0].fundManagerName || "Not Available",
-          tenure: managers[0].tenure || managers[0].experience || "N/A",
-          experience: managers[0].experience || "N/A",
-        }
-      : null;
-    const fundManager =
-      getFundManagerFromPeer(currentPeer) ||
-      getFundManagerFromPeer(data) ||
-      mgrFromList ||
-      fallbackManager;
-
-    return {
+    return partialInsights(
       schemeCode,
-      schemeName: data.schemeName || schemeName,
-      fundHouse: data.fundHouse || data.companyName || fundHouse,
-      aum: String(currentPeer?.aum ?? data.aum ?? "N/A"),
-      expenseRatio: String(currentPeer?.expenseRatio ?? data.expenseRatio ?? "N/A"),
-      portfolioTurnover: String(currentPeer?.portfolioTurnover ?? data.portfolioTurnover ?? "N/A"),
-      fundManager,
+      schemeName,
+      fundHouse,
+      fallbackManager,
       holdings,
-      sectorAllocation: Object.keys(sectorAllocation).length
-        ? sectorAllocation
-        : cachedBlob.sectors || {},
-      peers: data.peers || [],
-      asOfDate,
-    };
+      sectorAllocation,
+      asOfDate
+    );
   } catch (error) {
     console.error(`Error fetching fund insights for ${schemeCode}:`, error);
     return null;

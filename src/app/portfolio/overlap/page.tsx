@@ -141,6 +141,8 @@ export default function PortfolioOverlapPage() {
     [pairs]
   );
 
+  const hasAnyPairData = useMemo(() => pairs.some((p) => p.dataAvailable), [pairs]);
+
   const sectorChartData = useMemo(
     () => Object.fromEntries(sectors.map((s) => [s.sector, s.weight])),
     [sectors]
@@ -210,6 +212,27 @@ export default function PortfolioOverlapPage() {
           </p>
         </header>
       </FadeIn>
+
+      {insightsAvailable < 2 && (
+        <FadeIn delay={0.03}>
+          <Card className="surface-card border-none shadow-sm border-l-4 border-l-amber-500">
+            <CardContent className="p-4 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+              <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+                <p className="font-semibold text-slate-900 dark:text-slate-50">
+                  Holdings data unavailable for {insightsAvailable === 0 ? 'your funds' : 'most of your funds'}
+                </p>
+                <p>
+                  Overlap and look-through analysis need each fund&apos;s disclosed stock holdings.
+                  We have them for {insightsAvailable} of {funds.length} — at least 2 are required.
+                  Coverage comes from AMC factsheet disclosures; brand-new funds and some index
+                  funds are often missing until their next monthly disclosure.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+      )}
 
       {sectorDiversification && sectors.length > 0 && (
         <FadeIn delay={0.03}>
@@ -303,6 +326,12 @@ export default function PortfolioOverlapPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {!hasAnyPairData ? (
+              <p className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center">
+                No fund pairs have disclosed holdings on both sides yet, so overlap can&apos;t be
+                computed. This fills in as holdings data becomes available for your funds.
+              </p>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {sortedPairs.map((pair) => {
                 const status = overlapStatus(pair.overlapPercentage, pair.dataAvailable);
@@ -343,6 +372,7 @@ export default function PortfolioOverlapPage() {
                 );
               })}
             </div>
+            )}
           </CardContent>
         </Card>
       </FadeIn>

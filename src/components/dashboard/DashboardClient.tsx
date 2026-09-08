@@ -317,7 +317,7 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
         <div className="bg-indigo-50/80 dark:bg-indigo-950/30 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-3">
           <AlertCircle className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" size={18} />
           <p className="text-xs text-indigo-800 dark:text-indigo-200/90 leading-relaxed">
-            <strong className="font-semibold">Compliance Note:</strong> Returns use XIRR when transaction history spans at least one day; otherwise absolute return is shown.
+            <strong className="font-semibold">Compliance Note:</strong> Annualized XIRR is shown once a holding has about a year of history; shorter holdings show absolute (non-annualized) return.
             Past performance is not a guarantee of future returns.
           </p>
         </div>

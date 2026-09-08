@@ -1,12 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { RiskOMeter } from '@/components/funds/RiskOMeter';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
 import { getPortfolioRiskAnalysis } from '@/lib/portfolio-risk';
 import { ShieldCheck, Activity, PieChart, AlertCircle, BarChart3, Download } from 'lucide-react';
 import { FadeIn } from '@/components/animations';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
+import { HoldingsRiskTable } from '@/components/portfolio/HoldingsRiskTable';
 
 export default async function PortfolioRiskPage() {
   const analysis = await getPortfolioRiskAnalysis();
@@ -160,45 +160,7 @@ export default async function PortfolioRiskPage() {
             <CardTitle className="text-lg font-semibold">Holdings Risk Breakdown</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                  <tr>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Fund</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Weight</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Value</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Volatility</th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analysis.holdings.map((h, i) => (
-                    <tr key={i} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/50 transition-colors">
-                      <td className="p-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{h.schemeName}</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase">{h.category}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">
-                        {((h.currentValue / analysis.totalValue) * 100).toFixed(2)}%
-                      </td>
-                      <td className="p-4 text-sm font-mono text-slate-800 dark:text-slate-100 font-medium">
-                        ₹{h.currentValue.toLocaleString('en-IN')}
-                      </td>
-                      <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">
-                        {(h.volatility * 100).toFixed(2)}%
-                      </td>
-                      <td className="p-4">
-                        <Badge variant="outline" className="text-slate-700 dark:text-slate-200 font-bold">
-                          {h.riskScore.toFixed(1)}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <HoldingsRiskTable holdings={analysis.holdings} totalValue={analysis.totalValue} />
           </CardContent>
         </Card>
       </FadeIn>
