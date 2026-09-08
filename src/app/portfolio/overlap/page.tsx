@@ -332,8 +332,9 @@ export default function PortfolioOverlapPage() {
                 computed. This fills in as holdings data becomes available for your funds.
               </p>
             ) : (
+            <>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {sortedPairs.map((pair) => {
+              {sortedPairs.filter((p) => p.dataAvailable).map((pair) => {
                 const status = overlapStatus(pair.overlapPercentage, pair.dataAvailable);
                 const active =
                   selectedPair?.schemeCodeA === pair.schemeCodeA &&
@@ -372,6 +373,14 @@ export default function PortfolioOverlapPage() {
                 );
               })}
             </div>
+            {sortedPairs.some((p) => !p.dataAvailable) && (
+              <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-400">
+                {sortedPairs.filter((p) => !p.dataAvailable).length} pair
+                {sortedPairs.filter((p) => !p.dataAvailable).length === 1 ? '' : 's'} hidden — one
+                or both funds have no disclosed holdings available.
+              </p>
+            )}
+            </>
             )}
           </CardContent>
         </Card>
