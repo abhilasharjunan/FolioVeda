@@ -10,6 +10,15 @@ import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
   {
+    version: '1.4.0',
+    date: 'Oct 2026',
+    items: [
+      'Tap any fund name to open a detail slide-over: holdings, sector mix, and multi-period returns',
+      'Returns compared side-by-side with UTI Nifty 50 Index Fund (alpha per period)',
+      'Fund manager tenure and brief history when available from scheme data',
+    ],
+  },
+  {
     version: '1.3.6',
     date: 'Aug 2026',
     items: [

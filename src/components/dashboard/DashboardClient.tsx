@@ -13,6 +13,7 @@ import PortfolioSectorChart from '@/components/portfolio/PortfolioSectorChart';
 import { PortfolioHealthGauge } from '@/components/dashboard/PortfolioHealthGauge';
 import { ChartCard } from '@/components/ui/ChartCard';
 import { AnimatedNumber } from '@/components/animations';
+import { FundNameLink } from '@/components/funds/FundNameLink';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#64748b'];
 
@@ -209,7 +210,15 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
                             {i + 1}
                           </div>
                           <div className="min-w-0">
-                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{fund.schemeName}</p>
+                            <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                              {fund.schemeCode ? (
+                                <FundNameLink schemeCode={fund.schemeCode} className="truncate">
+                                  {fund.schemeName}
+                                </FundNameLink>
+                              ) : (
+                                fund.schemeName
+                              )}
+                            </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                               Current Value: ₹{Number(fund.currentVal).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                             </p>

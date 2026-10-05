@@ -8,6 +8,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
 import { Layers, AlertTriangle, ShieldCheck, PieChart } from 'lucide-react';
+import { FundNameLink } from '@/components/funds/FundNameLink';
 
 interface FundEntry {
   schemeCode: string;
@@ -351,9 +352,17 @@ export default function PortfolioOverlapPage() {
                     }`}
                   >
                     <div className="flex justify-between items-start gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                      <span className="truncate" title={pair.schemeNameA}>{shortName(pair.schemeNameA, 22)}</span>
+                      <span className="truncate" title={pair.schemeNameA}>
+                        <FundNameLink schemeCode={pair.schemeCodeA} className="truncate" stopPropagation={false}>
+                          {shortName(pair.schemeNameA, 22)}
+                        </FundNameLink>
+                      </span>
                       <span className="text-slate-400 shrink-0">vs</span>
-                      <span className="truncate text-right" title={pair.schemeNameB}>{shortName(pair.schemeNameB, 22)}</span>
+                      <span className="truncate text-right" title={pair.schemeNameB}>
+                        <FundNameLink schemeCode={pair.schemeCodeB} className="truncate" stopPropagation={false}>
+                          {shortName(pair.schemeNameB, 22)}
+                        </FundNameLink>
+                      </span>
                     </div>
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="text-2xl font-bold text-slate-900 dark:text-slate-50 tabular-nums">
@@ -497,7 +506,9 @@ export default function PortfolioOverlapPage() {
                                 className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-normal"
                                 title={`${f.weightInFund.toFixed(1)}% of fund · ${f.contribution.toFixed(2)}% of portfolio`}
                               >
-                                {shortName(f.schemeName, 18)}
+                                <FundNameLink schemeCode={f.schemeCode} className="text-[10px]">
+                                  {shortName(f.schemeName, 18)}
+                                </FundNameLink>
                               </Badge>
                             ))}
                           </div>

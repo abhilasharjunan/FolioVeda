@@ -2,6 +2,7 @@ import { getPortfolioAnalysis } from "@/lib/analysis";
 import { getPortfolioDiversification } from "@/lib/diversification";
 import { getPortfolioRiskAnalysis } from "@/lib/portfolio-risk";
 import { PrintReportButton } from "@/components/portfolio/PrintReportButton";
+import { ReportFundCell } from "@/components/portfolio/ReportFundCell";
 import { TrendingUp } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -136,7 +137,9 @@ export default async function PortfolioReportPage() {
             <tbody>
               {analysis.holdings.map((h: any, i: number) => (
                 <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
-                  <td className="py-2 text-slate-800 dark:text-slate-100">{h.schemeName}</td>
+                  <td className="py-2 text-slate-800 dark:text-slate-100">
+                    <ReportFundCell schemeCode={h.schemeCode} schemeName={h.schemeName} />
+                  </td>
                   <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.invested)}</td>
                   <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.currentVal)}</td>
                   <td className={`py-2 text-right font-mono ${h.gain >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{fmtCurrency(h.gain)}</td>

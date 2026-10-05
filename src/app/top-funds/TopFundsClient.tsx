@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { TrendingUp, Search, ChevronUp, ChevronDown, Award, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,8 @@ import { motion } from 'framer-motion';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/animations';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { downloadCSV } from '@/lib/export';
+import { useOpenFundDetail } from '@/components/funds/FundDetailContext';
+import { FundNameLink } from '@/components/funds/FundNameLink';
 
 type FundCategory =
   | "Large Cap" | "Mid Cap" | "Small Cap" | "Flexi Cap"
@@ -31,7 +32,7 @@ const CATEGORIES: FundCategory[] = [
 ];
 
 export default function TopFundsClient() {
-  const router = useRouter();
+  const openFund = useOpenFundDetail();
   const [fundsData, setFundsData] = useState<Record<string, FundData[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -266,7 +267,7 @@ export default function TopFundsClient() {
                 <StaggerItem key={fund.schemeCode}>
                   <Card
                     className="surface-card border-none shadow-sm p-4 cursor-pointer active:bg-slate-50 dark:active:bg-slate-800"
-                    onClick={() => router.push(`/funds/${fund.schemeCode}`)}
+                    onClick={() => openFund(fund.schemeCode)}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
@@ -335,7 +336,7 @@ export default function TopFundsClient() {
                   currentFunds.map((fund: any, idx: number) => (
                     <tr
                       key={fund.schemeCode}
-                      onClick={() => router.push(`/funds/${fund.schemeCode}`)}
+                      onClick={() => openFund(fund.schemeCode)}
                       className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50/80 transition-all duration-200 cursor-pointer group"
                     >
                       <td className="p-4 text-sm font-bold text-slate-400 dark:text-slate-400 sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50/80 dark:group-hover:bg-slate-800/80 z-10">
@@ -343,7 +344,11 @@ export default function TopFundsClient() {
                       </td>
                       <td className="p-4">
                         <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fund.schemeName}</span>
+                          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                            <FundNameLink schemeCode={fund.schemeCode} stopPropagation={false}>
+                              {fund.schemeName}
+                            </FundNameLink>
+                          </span>
                           <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-medium">{fund.category}</span>
                         </div>
                       </td>

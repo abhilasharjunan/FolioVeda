@@ -14,6 +14,8 @@ import { VolatilityChart } from '@/components/funds/VolatilityChart';
 import { SkeletonCard, SkeletonText, SkeletonChart } from '@/components/ui/skeletons';
 import { downloadCSV } from '@/lib/export';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
+import { FundNameLink } from '@/components/funds/FundNameLink';
+import { useOpenFundDetail } from '@/components/funds/FundDetailContext';
 
 type FundCategory = 
   | "Large Cap" | "Mid Cap" | "Small Cap" | "Flexi Cap" 
@@ -48,6 +50,7 @@ const CATEGORIES: FundCategory[] = [
 ];
 
 export default function RiskAnalysisPage() {
+  const openFund = useOpenFundDetail();
   const [data, setData] = useState<Record<string, FundRiskData[]> | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<FundCategory | 'All'>('All');
@@ -119,7 +122,7 @@ export default function RiskAnalysisPage() {
 
   const handleFundClick = async (fund: FundRiskData) => {
     setSelectedFund(fund);
-    // In a real app, we'd trigger a loading state for the detailed panel
+    openFund(fund.schemeCode);
   };
 
   if (loading) {
@@ -301,7 +304,11 @@ export default function RiskAnalysisPage() {
                       >
                         <td className="p-4">
                           <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{fund.schemeName}</span>
+                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                              <FundNameLink schemeCode={fund.schemeCode} stopPropagation={false}>
+                                {fund.schemeName}
+                              </FundNameLink>
+                            </span>
                             <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase font-medium">{fund.category}</span>
                           </div>
                         </td>

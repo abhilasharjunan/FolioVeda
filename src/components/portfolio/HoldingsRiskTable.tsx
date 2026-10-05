@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { FundNameLink } from "@/components/funds/FundNameLink";
 
 export interface HoldingRisk {
   schemeName: string;
@@ -117,7 +118,9 @@ export function HoldingsRiskTable({
             >
               <td className="p-4">
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{h.schemeName}</span>
+                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                    <FundNameLink schemeCode={h.schemeCode}>{h.schemeName}</FundNameLink>
+                  </span>
                   <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase">{h.category}</span>
                 </div>
               </td>

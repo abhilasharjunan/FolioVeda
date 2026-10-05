@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFundInsights } from "@/lib/finapi";
-import { getHistoricalNav, calculateCAGR } from "@/lib/funds";
-import { prisma } from "@/lib/prisma";
+import { getFundDetail } from "@/lib/fund-detail";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -13,68 +11,30 @@ export async function GET(
       return NextResponse.json({ error: "Scheme ID is required" }, { status: 400 });
     }
 
-    const [insights, scheme] = await Promise.all([
-      getFundInsights(id),
-      prisma.schemeMaster.findUnique({ where: { schemeCode: id } }),
-    ]);
-
-    if (!insights && !scheme) {
-      return NextResponse.json({ error: "Fund insights not found" }, { status: 404 });
+    const detail = await getFundDetail(id);
+    if (!detail) {
+      return NextResponse.json({ error: "Fund not found" }, { status: 404 });
     }
 
-    // Calculate CAGR returns for 1Y, 3Y, 5Y (non-fatal if fails)
-    let cagrReturns: Record<string, number | null> = {};
-    try {
-      const currentNav = await getHistoricalNav(id, 0);
-      const pastNav1Y = currentNav ? await getHistoricalNav(id, 365) : null;
-      const pastNav3Y = currentNav ? await getHistoricalNav(id, 1095) : null;
-      const pastNav5Y = currentNav ? await getHistoricalNav(id, 1825) : null;
-
-      cagrReturns = {
-        '1Y': currentNav && pastNav1Y ? calculateCAGR(currentNav, pastNav1Y, 365) : null,
-        '3Y': currentNav && pastNav3Y ? calculateCAGR(currentNav, pastNav3Y, 1095) : null,
-        '5Y': currentNav && pastNav5Y ? calculateCAGR(currentNav, pastNav5Y, 1825) : null,
-      };
-    } catch (cagrError) {
-      console.warn(`CAGR calculation failed for ${id}:`, cagrError);
-    }
-
-    const riskLevelMappings: Record<string, string> = {
-      'Low': 'Low',
-      'Low to Moderate': 'Low to Moderate',
-      'Moderate': 'Moderate',
-      'Moderate to High': 'Moderate to High',
-      'High': 'High',
-      'Very High': 'Very High',
-    };
-
+    // Backward-compatible aliases used by older clients
     return NextResponse.json({
-      ...insights,
-      cagrReturns,
-      schemeCode: scheme?.schemeCode || id,
-      schemeName: scheme?.schemeName || insights?.schemeName || 'Unknown Fund',
-      category: scheme?.category || null,
-      fundHouse: scheme?.fundHouse || insights?.fundHouse || 'N/A',
-      latestNav: scheme?.latestNav || null,
-      lastUpdated: scheme?.lastUpdated || null,
-      riskLevel: riskLevelMappings[scheme?.riskLevel || ''] || null,
-      riskScore: scheme?.riskScore || null,
-      volatility: scheme?.volatility || null,
-      sharpeRatio: scheme?.sharpeRatio || null,
-      sortinoRatio: scheme?.sortinoRatio || null,
-      maxDrawdown: scheme?.maxDrawdown || null,
-      maxDrawdownDuration: scheme?.maxDrawdownDuration || null,
-      alpha: scheme?.alpha || null,
-      beta: scheme?.beta || null,
-      rSquared: scheme?.rSquared || null,
-      treynorRatio: scheme?.treynorRatio || null,
-      fundManagerName: scheme?.fundManagerName || insights?.fundManager?.name || null,
-      fundManagerTenure: scheme?.fundManagerTenure || insights?.fundManager?.tenure || null,
-      aum: insights?.aum || 'N/A',
-      expenseRatio: insights?.expenseRatio || 'N/A',
-      portfolioTurnover: insights?.portfolioTurnover || 'N/A',
-      holdings: insights?.holdings || [],
-      sectorAllocation: insights?.sectorAllocation || {},
+      ...detail,
+      cagrReturns: {
+        "1Y": detail.periodReturns["1Y"] ?? null,
+        "3Y": detail.periodReturns["3Y"] ?? null,
+        "5Y": detail.periodReturns["5Y"] ?? null,
+      },
+      fundManagerName: detail.fundManager?.name ?? null,
+      fundManagerTenure: detail.fundManager?.tenure ?? null,
+      volatility: null,
+      sharpeRatio: null,
+      sortinoRatio: null,
+      maxDrawdown: null,
+      maxDrawdownDuration: null,
+      alpha: null,
+      beta: null,
+      rSquared: null,
+      treynorRatio: null,
     });
   } catch (error) {
     console.error("Fund Insights API Error:", error);

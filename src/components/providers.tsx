@@ -3,6 +3,7 @@
 import { ThemeProvider } from "next-themes";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
+import { FundDetailProvider } from "@/components/funds/FundDetailContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -13,8 +14,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem={false}
         disableTransitionOnChange
       >
-        {children}
-        <Toaster richColors position="top-right" />
+        <FundDetailProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </FundDetailProvider>
       </ThemeProvider>
     </SessionProvider>
   );

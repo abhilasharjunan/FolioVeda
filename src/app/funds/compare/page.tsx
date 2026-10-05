@@ -12,6 +12,7 @@ import { ProgressCircle } from '@/components/ui/ProgressCircle';
 import { createProgressTracker } from '@/lib/progressTracker';
 import { TrendingUp, Search, X, Loader2, BarChart3, Download } from 'lucide-react';
 import { downloadCSV } from '@/lib/export';
+import { FundNameLink } from '@/components/funds/FundNameLink';
 
 interface FundCardData {
   schemeCode: string;
@@ -285,7 +286,9 @@ export default function FundComparePage() {
                     {isLowestExpense && <Badge className="bg-blue-50 dark:bg-teal-950/40 text-blue-700 border-blue-200 text-[10px]">Lowest expense</Badge>}
                   </div>
                   <CardTitle className="text-md font-bold text-slate-900 dark:text-slate-50 pr-6 line-clamp-2 font-heading">
-                    {fund.schemeName}
+                    <FundNameLink schemeCode={fund.schemeCode}>
+                      {fund.schemeName}
+                    </FundNameLink>
                   </CardTitle>
                   <p className="text-xs text-slate-500 dark:text-slate-300 font-medium">{fund.fundHouse}</p>
                 </CardHeader>

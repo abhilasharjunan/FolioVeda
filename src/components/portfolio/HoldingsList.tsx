@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { AnimatedNumber, StaggerChildren, StaggerItem } from '@/components/animations';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from 'sonner';
+import { FundNameLink } from '@/components/funds/FundNameLink';
 
 interface Transaction {
   id: string;
@@ -176,7 +177,11 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
                 <motion.div layout className="border border-slate-100 dark:border-slate-800 rounded-xl overflow-hidden">
                   <div className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{meta.name}</p>
+                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
+                        <FundNameLink schemeCode={h.schemeCode} className="truncate">
+                          {meta.name}
+                        </FundNameLink>
+                      </p>
                       <p className="text-xs text-slate-400 dark:text-slate-400">{h.units.toFixed(4)} units · ₹{invested.toLocaleString('en-IN')} invested</p>
                     </div>
                     <div className="flex items-center gap-2">
