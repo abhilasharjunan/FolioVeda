@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { isAdminEmail } from "@/lib/admin";
 
 const signupSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         consentGiven: true,
         consentDate: new Date(),
+        role: isAdminEmail(email) ? "ADMIN" : "USER",
       },
     });
 

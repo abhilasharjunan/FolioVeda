@@ -6,6 +6,8 @@ import { SEBIFooter } from '@/components/shared/SEBIFooter';
 import { Providers } from '@/components/providers';
 import { Plus_Jakarta_Sans, Outfit } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -43,6 +45,8 @@ export default function RootLayout({
           </main>
           <SEBIFooter />
         </Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import crypto from "crypto";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { issuePasswordResetEmail } from "@/lib/password-reset";
 
 export async function POST(req: Request) {
   try {
     const { email } = await req.json();
-    if (!email || typeof email !== 'string') {
+    if (!email || typeof email !== "string") {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
@@ -15,15 +14,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "If that email exists, a reset link was sent." });
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 3600000);
+    if (user.disabledAt) {
+      // Same generic message — do not reveal account status.
+      return NextResponse.json({ message: "If that email exists, a reset link was sent." });
+    }
 
-    await prisma.passwordResetToken.create({
-      data: { email, token, expiresAt },
-    });
-
-    const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}`;
-    await sendPasswordResetEmail(email, resetUrl);
+    await issuePasswordResetEmail(email);
 
     return NextResponse.json({ message: "If that email exists, a reset link was sent." });
   } catch (error) {

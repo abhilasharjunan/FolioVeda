@@ -18,6 +18,8 @@ const primaryLinks = [
   { href: "/about", label: "About" },
 ];
 
+const adminLink = { href: "/admin", label: "Admin" };
+
 const publicLinks = [
   { href: "/tools/sip-calculator", label: "SIP Calculator" },
   { href: "/academy", label: "MF Academy" },
@@ -74,7 +76,12 @@ export default function Navbar() {
   if (pathname === "/" || pathname.startsWith("/auth")) return null;
 
   const isAuthenticated = status === "authenticated" && !!session;
-  const links = isAuthenticated ? primaryLinks : publicLinks;
+  const isAdmin = isAuthenticated && (session?.user as { role?: string } | undefined)?.role === "ADMIN";
+  const links = isAuthenticated
+    ? isAdmin
+      ? [...primaryLinks, adminLink]
+      : primaryLinks
+    : publicLinks;
   const activePrimary = getActiveHref(
     pathname,
     links.map((l) => l.href)

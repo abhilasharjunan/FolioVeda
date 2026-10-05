@@ -5,6 +5,11 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id            String    @id @default(uuid())
   name          String?
@@ -12,6 +17,12 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+
+  role            UserRole  @default(USER)
+  disabledAt      DateTime?
+  lastLoginAt     DateTime?
+  /// Bumped on disable / revoke sessions so JWT sessions become invalid.
+  sessionVersion  Int       @default(0)
   
   // Compliance
   consentGiven  Boolean   @default(false)
@@ -20,9 +31,25 @@ model User {
   portfolios    Portfolio[]
   accounts      Account[]
   sessions      Session[]
+  adminAuditLogs AdminAuditLog[] @relation("AdminActor")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model AdminAuditLog {
+  id           String   @id @default(uuid())
+  actorId      String
+  action       String
+  targetUserId String?
+  meta         Json?
+  createdAt    DateTime @default(now())
+
+  actor User @relation("AdminActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([targetUserId])
 }
 
 model Account {
