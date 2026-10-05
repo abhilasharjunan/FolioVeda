@@ -26,6 +26,25 @@ export function AuthShell({
           {subtitle && (
             <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
           )}
+          <ul className="mt-4 text-left text-xs text-slate-400 space-y-1.5 max-w-sm mx-auto">
+            <li className="flex gap-2">
+              <span className="text-teal-500 shrink-0" aria-hidden>✓</span>
+              <span>True cash-flow XIRR with your transaction dates</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-teal-500 shrink-0" aria-hidden>✓</span>
+              <span>Look-through overlap and sector concentration</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-teal-500 shrink-0" aria-hidden>✓</span>
+              <span>Printable portfolio report and fund compare</span>
+            </li>
+          </ul>
+          <p className="mt-3 text-xs">
+            <Link href="/#features" className="text-teal-400 hover:text-teal-300 font-medium">
+              See what&apos;s inside →
+            </Link>
+          </p>
         </div>
         {children}
         <nav className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">

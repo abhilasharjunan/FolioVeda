@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 
 vi.mock('@/components/animations', () => ({
   FadeIn: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -12,7 +12,18 @@ vi.mock('@/components/animations', () => ({
     <div className={className}>{children}</div>
   ),
   StaggerItem: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AnimatedNumber: ({ value, suffix = '' }: { value: number; suffix?: string; format?: (n: number) => string; decimals?: number }) => (
+    <span>{value}{suffix}</span>
+  ),
 }));
+
+vi.mock('framer-motion', async () => {
+  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+  return {
+    ...actual,
+    useReducedMotion: () => true,
+  };
+});
 
 vi.mock('@/components/ui/ThemeToggle', () => ({
   ThemeToggle: () => <button type="button" aria-label="Toggle theme">Theme</button>,
@@ -21,6 +32,8 @@ vi.mock('@/components/ui/ThemeToggle', () => ({
 import LandingPage from './page';
 
 describe('LandingPage', () => {
+  afterEach(() => cleanup());
+
   it('renders without crashing', () => {
     expect(() => render(<LandingPage />)).not.toThrow();
   });
@@ -35,5 +48,12 @@ describe('LandingPage', () => {
     render(<LandingPage />);
     expect(screen.getAllByText('Login').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Get Started').length).toBeGreaterThan(0);
+  });
+
+  it('includes feature showcase section', () => {
+    render(<LandingPage />);
+    expect(document.getElementById('features')).toBeTruthy();
+    expect(screen.getAllByText('Inside FolioVeda').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Hidden duplication across funds/i).length).toBeGreaterThan(0);
   });
 });

@@ -49,7 +49,7 @@ export default function AuthPage() {
           setError('Signed in, but navigation is taking too long. Open /dashboard manually or retry.');
         }, LOGIN_NAV_FALLBACK_MS);
         try {
-          router.push('/dashboard');
+          router.push('/dashboard?welcome=1');
           router.refresh();
         } catch {
           if (navFallbackRef.current) clearTimeout(navFallbackRef.current);

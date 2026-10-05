@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -14,6 +14,8 @@ import { PortfolioHealthGauge } from '@/components/dashboard/PortfolioHealthGaug
 import { ChartCard } from '@/components/ui/ChartCard';
 import { AnimatedNumber } from '@/components/animations';
 import { FundNameLink } from '@/components/funds/FundNameLink';
+import { OnboardingDashboardTip } from '@/components/onboarding/OnboardingDashboardTip';
+import { markHoldingsOnboardingComplete } from '@/components/onboarding/OnboardingChecklist';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#64748b'];
 
@@ -36,7 +38,15 @@ function formatReturn(fund: {
   return null;
 }
 
-export default function DashboardClient({ analysis, divScore, riskAnalysis }: DashboardClientProps) {
+export default function DashboardClient({
+  analysis,
+  divScore,
+  riskAnalysis,
+}: DashboardClientProps) {
+  useEffect(() => {
+    markHoldingsOnboardingComplete();
+  }, []);
+
   const allocationData = divScore?.distribution?.length
     ? divScore.distribution.map((d: any) => ({ name: d.name, value: d.percentage }))
     : [];
@@ -53,6 +63,9 @@ export default function DashboardClient({ analysis, divScore, riskAnalysis }: Da
 
   return (
     <div className="px-4 py-6 sm:p-6 space-y-6 max-w-7xl mx-auto">
+      <FadeIn delay={0.02}>
+        <OnboardingDashboardTip />
+      </FadeIn>
       <FadeIn>
         <header className="flex justify-between items-end gap-4">
           <div className="min-w-0">

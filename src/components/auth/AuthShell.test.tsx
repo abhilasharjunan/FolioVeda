@@ -24,5 +24,8 @@ describe("AuthShell", () => {
     expect(screen.getByRole("link", { name: "SIP Calculator" }).getAttribute("href")).toBe(
       "/tools/sip-calculator"
     );
+    expect(screen.getByRole("link", { name: /See what's inside/i }).getAttribute("href")).toBe(
+      "/#features"
+    );
   });
 });

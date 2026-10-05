@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { TransactionSchema } from "@/lib/validations";
 import { resolveSchemeForTransaction } from "@/lib/resolve-scheme";
-
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) {

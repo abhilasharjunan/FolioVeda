@@ -14,6 +14,7 @@ import {
   type LandingPersonaId,
 } from "@/lib/landing-demo";
 import { calculateSIPFutureValue } from "@/lib/sip-calculator";
+import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
 
 function formatInr(n: number) {
   return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -124,6 +125,13 @@ export default function LandingPage() {
 
           <div className="hidden md:flex gap-2 lg:gap-3 items-center">
             <ThemeToggle />
+            <button
+              type="button"
+              onClick={() => scrollTo("features")}
+              className={cn(buttonVariants({ variant: "ghost" }), "text-slate-300 hover:text-white hover:bg-slate-800/60")}
+            >
+              Features
+            </button>
             <Link
               href="/tools/sip-calculator"
               prefetch
@@ -178,21 +186,36 @@ export default function LandingPage() {
         {menuOpen && (
           <div className="md:hidden mt-3 rounded-xl border border-slate-700/80 bg-slate-900/95 p-2 space-y-1">
             {[
+              { href: "#features", label: "Features", onNav: () => scrollTo("features") },
               { href: "/tools/sip-calculator", label: "SIP Calculator" },
               { href: "/academy", label: "MF Academy" },
               { href: "/about", label: "About" },
               { href: "/auth/signin", label: "Login" },
-            ].map((l) => (
-              <Link
-                key={l.href + l.label}
-                href={l.href}
-                prefetch
-                onClick={() => setMenuOpen(false)}
-                className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800/80"
-              >
-                {l.label}
-              </Link>
-            ))}
+            ].map((l) =>
+              "onNav" in l && l.onNav ? (
+                <button
+                  key={l.label}
+                  type="button"
+                  onClick={() => {
+                    l.onNav!();
+                    setMenuOpen(false);
+                  }}
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800/80 text-left"
+                >
+                  {l.label}
+                </button>
+              ) : (
+                <Link
+                  key={l.href + l.label}
+                  href={l.href}
+                  prefetch
+                  onClick={() => setMenuOpen(false)}
+                  className="flex w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-200 hover:bg-slate-800/80"
+                >
+                  {l.label}
+                </Link>
+              )
+            )}
             <Link
               href="/auth/signin"
               prefetch
@@ -249,6 +272,19 @@ export default function LandingPage() {
           </FadeIn>
         </div>
       </section>
+
+      {/* Feature showcase */}
+      <PageSection id="features" className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24 scroll-mt-24">
+        <FadeIn>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-50 font-heading">Inside FolioVeda</h2>
+            <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
+              A quick tour of what unlocks after you sign up — overlap, risk, compare, and more.
+            </p>
+          </div>
+        </FadeIn>
+        <FeatureShowcase />
+      </PageSection>
 
       {/* Sample portfolio */}
       <PageSection id="sample" className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24 scroll-mt-24">
