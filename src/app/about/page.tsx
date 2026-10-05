@@ -10,18 +10,12 @@ import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
   {
-    version: '1.6.5',
-    date: 'Oct 2026',
+    version: '1.3.6',
+    date: 'Aug 2026',
     items: [
       'Privacy-scoped Admin dashboard: signup funnel, empty-portfolio counts, user directory (name/email only)',
       'Light ops for admins: disable/enable accounts, force password-reset email, revoke sessions — with audit log',
       'Traffic & geography via Vercel Web Analytics (not stored in FolioVeda DB); no passwords or holdings visible to admin',
-    ],
-  },
-  {
-    version: '1.3.6',
-    date: 'Aug 2026',
-    items: [
       'Fixed stock overlap: holdings are cached correctly (no more empty N/A heatmap)',
       'Look-through concentration shows your true aggregated stock exposure across funds',
       'Pairwise overlap cards with weighted MIN methodology and stock-level detail',
