@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, Loader2, TrendingUp, User, Building2, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FundSheetSectorBlock } from "@/components/funds/FundSheetSectorBlock";
+import { formatCacheTimestamp, formatFactsheetAsOf } from "@/lib/format-holdings-date";
 
 type FundDetail = {
   schemeCode: string;
@@ -25,6 +26,7 @@ type FundDetail = {
   holdingsCount?: number;
   sectorAllocation: Record<string, number>;
   asOfDate: string | null;
+  holdingsCachedAt?: string | null;
   periodReturns: Record<string, number | null>;
   sinceInception: number | null;
   benchmark: { schemeName: string };
@@ -288,11 +290,25 @@ export function FundDetailSheet({
                     <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
                       Top stock holdings
                     </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                      {data.holdingsCount != null && data.holdingsCount > data.holdings.length
-                        ? `Showing top ${data.holdings.length} of ${data.holdingsCount} disclosed names.`
-                        : `Top ${data.holdings.length} by weight.`}
-                      {data.asOfDate ? ` As of ${data.asOfDate}.` : ""}
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed space-y-1">
+                      <span className="block">
+                        {data.holdingsCount != null && data.holdingsCount > data.holdings.length
+                          ? `Top ${data.holdings.length} of ${data.holdingsCount} names from the stored factsheet (monthly AMC disclosure).`
+                          : `Top ${data.holdings.length} by weight from the stored factsheet (monthly AMC disclosure).`}
+                      </span>
+                      {formatFactsheetAsOf(data.asOfDate) && (
+                        <span className="block text-slate-600 dark:text-slate-300">
+                          Portfolio disclosed as of{" "}
+                          <span className="font-medium">{formatFactsheetAsOf(data.asOfDate)}</span>
+                          {" — "}
+                          weights are not live; many funds share the same month when data was bulk-synced.
+                        </span>
+                      )}
+                      {formatCacheTimestamp(data.holdingsCachedAt) && (
+                        <span className="block text-slate-400 dark:text-slate-500">
+                          Snapshot loaded in FolioVeda on {formatCacheTimestamp(data.holdingsCachedAt)}.
+                        </span>
+                      )}
                     </p>
                   </div>
                   <div className="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">

@@ -52,6 +52,7 @@ export interface FundInsights {
   sectorAllocation: Record<string, number>;
   peers: any[];
   asOfDate?: string | null;
+  holdingsCachedAt?: string | null;
 }
 
 type CachedBlob = {
@@ -113,7 +114,8 @@ function partialInsights(
   fundManager: FundManager,
   holdings: FundHoldings[] = [],
   sectorAllocation: Record<string, number> = {},
-  asOfDate: string | null = null
+  asOfDate: string | null = null,
+  holdingsCachedAt: string | null = null
 ): FundInsights {
   return {
     schemeCode,
@@ -127,6 +129,7 @@ function partialInsights(
     sectorAllocation,
     peers: [],
     asOfDate,
+    holdingsCachedAt,
   };
 }
 
@@ -249,10 +252,12 @@ async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsigh
     // 1. Whatever holdings we already have cached, regardless of age.
     let cachedBlob: CachedBlob = { sectors: {}, holdings: [] };
     let cacheAgeMs = Infinity;
+    let cacheFetchedAt: Date | null = null;
     try {
       const sectorRow = await prisma.sectorCache.findUnique({ where: { schemeCode } });
       if (sectorRow) {
         cachedBlob = parseSectorCacheBlob(sectorRow.sectorData);
+        cacheFetchedAt = sectorRow.fetchedAt;
         cacheAgeMs = Date.now() - new Date(sectorRow.fetchedAt).getTime();
       }
     } catch {
@@ -270,6 +275,11 @@ async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsigh
     const sectorAllocation =
       fresh && Object.keys(fresh.sectors).length ? fresh.sectors : cachedBlob.sectors || {};
     const asOfDate = fresh?.asOfDate || cachedBlob.asOfDate || null;
+    const holdingsCachedAt = fresh?.holdings.length
+      ? new Date().toISOString()
+      : cacheFetchedAt
+        ? cacheFetchedAt.toISOString()
+        : null;
 
     // 3. Persist a successful refresh so the next cold start has it.
     if (fresh?.holdings.length) {
@@ -290,7 +300,8 @@ async function fetchFundInsightsUncached(schemeCode: string): Promise<FundInsigh
       fallbackManager,
       holdings,
       sectorAllocation,
-      asOfDate
+      asOfDate,
+      holdingsCachedAt
     );
   } catch (error) {
     console.error(`Error fetching fund insights for ${schemeCode}:`, error);

@@ -48,6 +48,7 @@ export type FundDetailPayload = {
   holdingsCount: number;
   sectorAllocation: Record<string, number>;
   asOfDate: string | null;
+  holdingsCachedAt: string | null;
   periodReturns: PeriodReturns;
   sinceInception: number | null;
   benchmark: {
@@ -168,6 +169,7 @@ export async function getFundDetail(schemeCode: string): Promise<FundDetailPaylo
     holdingsCount: allHoldings.length,
     sectorAllocation,
     asOfDate: insights?.asOfDate || null,
+    holdingsCachedAt: insights?.holdingsCachedAt || null,
     periodReturns,
     sinceInception,
     benchmark: {
