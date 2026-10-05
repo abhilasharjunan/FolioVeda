@@ -1,4 +1,5 @@
 import { getFundInsights } from "@/lib/finapi";
+import { resolveSectorAllocation, topHoldings } from "@/lib/fund-sectors";
 import { computePeriodReturnsFromMfapi } from "@/lib/funds";
 import { prisma } from "@/lib/prisma";
 
@@ -43,6 +44,8 @@ export type FundDetailPayload = {
     allocation: number;
     sector: string;
   }>;
+  /** Total disclosed holdings before top-N trim (for UI footnote). */
+  holdingsCount: number;
   sectorAllocation: Record<string, number>;
   asOfDate: string | null;
   periodReturns: PeriodReturns;
@@ -139,8 +142,12 @@ export async function getFundDetail(schemeCode: string): Promise<FundDetailPaylo
   const niftyPeriod: PeriodReturns = niftyReturns?.returns || {};
   const niftySi = niftyReturns?.sinceInception ?? null;
 
-  const holdings = (insights?.holdings || []).filter((h) => h.stockName && h.allocation > 0);
-  const sectorAllocation = insights?.sectorAllocation || {};
+  const allHoldings = (insights?.holdings || []).filter((h) => h.stockName && h.allocation > 0);
+  const holdings = topHoldings(allHoldings);
+  const sectorAllocation = resolveSectorAllocation(
+    insights?.sectorAllocation || {},
+    allHoldings
+  );
 
   return {
     schemeCode: scheme?.schemeCode || schemeCode,
@@ -158,6 +165,7 @@ export async function getFundDetail(schemeCode: string): Promise<FundDetailPaylo
     portfolioTurnover: insights?.portfolioTurnover || "N/A",
     fundManager,
     holdings,
+    holdingsCount: allHoldings.length,
     sectorAllocation,
     asOfDate: insights?.asOfDate || null,
     periodReturns,

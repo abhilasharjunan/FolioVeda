@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { X, Loader2, TrendingUp, User, Building2, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { SectorPieChart } from "@/components/funds/SectorPieChart";
+import { FundSheetSectorBlock } from "@/components/funds/FundSheetSectorBlock";
 
 type FundDetail = {
   schemeCode: string;
@@ -22,6 +22,7 @@ type FundDetail = {
     history: string | null;
   } | null;
   holdings: Array<{ stockName: string; sector: string; allocation: number }>;
+  holdingsCount?: number;
   sectorAllocation: Record<string, number>;
   asOfDate: string | null;
   periodReturns: Record<string, number | null>;
@@ -121,7 +122,7 @@ export function FundDetailSheet({
             <p className="text-[10px] uppercase tracking-wider font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1">
               <TrendingUp size={12} /> Fund details
             </p>
-            <h2 className="text-base font-bold text-slate-900 dark:text-slate-50 font-heading leading-snug mt-0.5 truncate">
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-50 font-heading leading-snug mt-0.5 line-clamp-2 pr-1">
               {data?.schemeName || (loading ? "Loading…" : "Fund")}
             </h2>
             {data && (
@@ -147,7 +148,7 @@ export function FundDetailSheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-5 space-y-7">
           {loading && (
             <div className="flex items-center justify-center gap-2 py-16 text-slate-500 text-sm">
               <Loader2 className="animate-spin" size={18} /> Loading fund…
@@ -162,7 +163,7 @@ export function FundDetailSheet({
 
           {data && !loading && (
             <>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-slate-50 dark:bg-slate-900/60 px-3 py-2.5">
                   <p className="text-[10px] uppercase text-slate-400 font-semibold">NAV</p>
                   <p className="text-lg font-bold text-slate-900 dark:text-slate-50 font-heading">
@@ -201,21 +202,27 @@ export function FundDetailSheet({
               </div>
 
               {hasComparison && (
-                <section>
-                  <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50 mb-2">
+                <section className="space-y-2.5">
+                  <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
                     Returns vs Nifty 50
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                     Compared with {data.benchmark.schemeName}. Alpha = fund − index.
                   </p>
                   <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
-                    <table className="w-full text-left text-xs">
+                    <table className="w-full text-left text-xs table-fixed min-w-[280px]">
+                      <colgroup>
+                        <col className="w-[22%]" />
+                        <col className="w-[26%]" />
+                        <col className="w-[26%]" />
+                        <col className="w-[26%]" />
+                      </colgroup>
                       <thead className="bg-slate-50 dark:bg-slate-900/80">
                         <tr>
-                          <th className="p-2 font-semibold text-slate-500">Period</th>
-                          <th className="p-2 font-semibold text-slate-500 text-right">Fund</th>
-                          <th className="p-2 font-semibold text-slate-500 text-right">Nifty 50</th>
-                          <th className="p-2 font-semibold text-slate-500 text-right">Alpha</th>
+                          <th className="px-2.5 py-2.5 font-semibold text-slate-500">Period</th>
+                          <th className="px-2 py-2.5 font-semibold text-slate-500 text-right">Fund</th>
+                          <th className="px-2 py-2.5 font-semibold text-slate-500 text-right">Nifty</th>
+                          <th className="px-2 py-2.5 font-semibold text-slate-500 text-right">Alpha</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -224,16 +231,16 @@ export function FundDetailSheet({
                             key={row.period}
                             className="border-t border-slate-100 dark:border-slate-800"
                           >
-                            <td className="p-2 font-medium text-slate-700 dark:text-slate-200">
+                            <td className="px-2.5 py-2 font-medium text-slate-700 dark:text-slate-200">
                               {row.period}
                             </td>
-                            <td className={`p-2 text-right font-mono ${returnClass(row.fund)}`}>
+                            <td className={`px-2 py-2 text-right font-mono tabular-nums ${returnClass(row.fund)}`}>
                               {formatReturn(row.fund)}
                             </td>
-                            <td className={`p-2 text-right font-mono ${returnClass(row.nifty50)}`}>
+                            <td className={`px-2 py-2 text-right font-mono tabular-nums ${returnClass(row.nifty50)}`}>
                               {formatReturn(row.nifty50)}
                             </td>
-                            <td className={`p-2 text-right font-mono ${returnClass(row.alpha)}`}>
+                            <td className={`px-2 py-2 text-right font-mono tabular-nums ${returnClass(row.alpha)}`}>
                               {formatReturn(row.alpha)}
                             </td>
                           </tr>
@@ -267,44 +274,58 @@ export function FundDetailSheet({
               )}
 
               {hasSectors && (
-                <section>
-                  <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50 mb-2">
+                <section className="space-y-3 rounded-lg border border-slate-200 dark:border-slate-800 p-3.5">
+                  <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
                     Sector allocation
                   </h3>
-                  <div className="h-[220px]">
-                    <SectorPieChart data={data.sectorAllocation} />
-                  </div>
+                  <FundSheetSectorBlock data={data.sectorAllocation} />
                 </section>
               )}
 
               {hasHoldings && (
-                <section>
-                  <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50 mb-1">
-                    Stock holdings
-                  </h3>
-                  {data.asOfDate && (
-                    <p className="text-[11px] text-slate-400 mb-2">As of {data.asOfDate}</p>
-                  )}
-                  <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
-                    <table className="w-full text-left text-xs">
+                <section className="space-y-2.5">
+                  <div>
+                    <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
+                      Top stock holdings
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                      {data.holdingsCount != null && data.holdingsCount > data.holdings.length
+                        ? `Showing top ${data.holdings.length} of ${data.holdingsCount} disclosed names.`
+                        : `Top ${data.holdings.length} by weight.`}
+                      {data.asOfDate ? ` As of ${data.asOfDate}.` : ""}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <table className="w-full text-left text-xs table-fixed">
+                      <colgroup>
+                        <col className="w-[46%]" />
+                        <col className="w-[34%]" />
+                        <col className="w-[20%]" />
+                      </colgroup>
                       <thead className="bg-slate-50 dark:bg-slate-900/80">
                         <tr>
-                          <th className="p-2 font-semibold text-slate-500">Stock</th>
-                          <th className="p-2 font-semibold text-slate-500">Sector</th>
-                          <th className="p-2 font-semibold text-slate-500 text-right">Weight</th>
+                          <th className="px-3 py-2.5 font-semibold text-slate-500 align-bottom">Stock</th>
+                          <th className="px-2 py-2.5 font-semibold text-slate-500 align-bottom">Sector</th>
+                          <th className="px-3 py-2.5 font-semibold text-slate-500 text-right align-bottom">Weight</th>
                         </tr>
                       </thead>
                       <tbody>
                         {data.holdings.map((h, i) => (
                           <tr
                             key={`${h.stockName}-${i}`}
-                            className="border-t border-slate-100 dark:border-slate-800"
+                            className="border-t border-slate-100 dark:border-slate-800 align-top"
                           >
-                            <td className="p-2 font-medium text-slate-800 dark:text-slate-100">
-                              {h.stockName}
+                            <td className="px-3 py-2.5 font-medium text-slate-800 dark:text-slate-100 leading-snug">
+                              <span className="line-clamp-2 break-words" title={h.stockName}>
+                                {h.stockName}
+                              </span>
                             </td>
-                            <td className="p-2 text-slate-500">{h.sector}</td>
-                            <td className="p-2 text-right font-mono text-slate-700 dark:text-slate-200">
+                            <td className="px-2 py-2.5 text-slate-500 leading-snug">
+                              <span className="line-clamp-2 break-words" title={h.sector}>
+                                {h.sector}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 text-right font-mono tabular-nums text-slate-700 dark:text-slate-200 whitespace-nowrap">
                               {h.allocation.toFixed(2)}%
                             </td>
                           </tr>

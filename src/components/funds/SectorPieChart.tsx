@@ -7,14 +7,14 @@ interface SectorPieChartProps {
 }
 
 const COLORS = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))',
-  'hsl(var(--chart-3))',
-  'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
-  '#0ea5e9',
-  '#64748b',
-  '#94a3b8',
+  "hsl(160 84% 39%)",
+  "hsl(239 84% 67%)",
+  "hsl(38 92% 50%)",
+  "hsl(0 72% 51%)",
+  "hsl(199 89% 48%)",
+  "#64748b",
+  "#94a3b8",
+  "#0ea5e9",
 ];
 
 export const SectorPieChart = ({ data }: SectorPieChartProps) => {
@@ -59,7 +59,12 @@ export const SectorPieChart = ({ data }: SectorPieChartProps) => {
               color: 'hsl(var(--card-foreground))',
             }}
           />
-          <Legend verticalAlign="bottom" height={36} iconType="circle" />
+          <Legend
+            verticalAlign="bottom"
+            height={56}
+            iconType="circle"
+            wrapperStyle={{ fontSize: "11px", lineHeight: "1.35", paddingTop: "8px" }}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>
