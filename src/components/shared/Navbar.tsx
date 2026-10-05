@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp, LogOut, Menu, X } from "lucide-react";
+import { TrendingUp, LogOut, Menu, X, UserRound } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
@@ -82,6 +82,11 @@ export default function Navbar() {
       ? [...primaryLinks, adminLink]
       : primaryLinks
     : publicLinks;
+  const displayName =
+    session?.user?.name?.trim() ||
+    session?.user?.email?.split("@")[0] ||
+    "Account";
+  const accountActive = pathname === "/account" || pathname.startsWith("/account/");
   const activePrimary = getActiveHref(
     pathname,
     links.map((l) => l.href)
@@ -130,14 +135,25 @@ export default function Navbar() {
           ))}
           <ThemeToggle />
           {isAuthenticated ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors ml-1"
-            >
-              <LogOut size={14} />
-              <span>Logout</span>
-            </button>
+            <>
+              <Link
+                href="/account"
+                prefetch
+                title={session?.user?.email ?? "Account"}
+                className={`ml-1 max-w-[10rem] truncate ${navLinkClass(accountActive)}`}
+              >
+                <UserRound size={14} className="mr-1 shrink-0" />
+                <span className="truncate">{displayName}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors"
+              >
+                <LogOut size={14} />
+                <span>Logout</span>
+              </button>
+            </>
           ) : (
             <Link
               href="/auth/signin"
@@ -220,16 +236,33 @@ export default function Navbar() {
               </div>
             )}
 
-            <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800">
+            <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
               {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-                >
-                  <LogOut size={16} />
-                  Logout
-                </button>
+                <>
+                  <div className="px-3 py-1.5 text-xs text-slate-500 dark:text-slate-400 truncate">
+                    Signed in as{" "}
+                    <span className="font-medium text-slate-700 dark:text-slate-200">
+                      {session?.user?.email || displayName}
+                    </span>
+                  </div>
+                  <Link
+                    href="/account"
+                    prefetch
+                    onClick={() => setMenuOpen(false)}
+                    className={navLinkClass(accountActive, true)}
+                  >
+                    <UserRound size={16} className="mr-2" />
+                    Account
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </>
               ) : (
                 <Link
                   href="/auth/signin"
