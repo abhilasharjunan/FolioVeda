@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "verify": "npm run build && npm test",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "seed": "tsx prisma/seed.ts",

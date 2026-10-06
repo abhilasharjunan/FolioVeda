@@ -28,7 +28,9 @@
 
 # local agent / editor tooling (do not publish)
 .claude/
-.cursor/
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
 graphify-out/
 
 # debug

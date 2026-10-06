@@ -32,6 +32,7 @@ A SEBI-aware mutual fund portfolio tracker with XIRR returns, risk analytics, di
 - `npm run dev` — local development server
 - `npm run build` / `npm start` — production build & serve
 - `npm test` — Vitest unit tests
+- `npm run verify` — **mandatory gate**: production build + unit tests (run before commit/push)
 - `npm run test:e2e` — Playwright e2e tests
 - `npm run seed` — seed scheme data
 - `npm run repair:holdings` — merge duplicate holdings before unique-constraint migrations

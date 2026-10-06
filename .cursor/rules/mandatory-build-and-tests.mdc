@@ -1,0 +1,23 @@
+---
+description: Mandatory build + unit test checkpoint before done/commit/push
+alwaysApply: true
+---
+
+# Mandatory verification checkpoint
+
+Before marking any code change as done, committing, pushing, or telling the user the work is ready:
+
+1. Run **`npm run verify`** from the app root (runs `build` then unit `test`).
+2. It must **exit 0**. If it fails, **fix first** and re-run until green.
+3. Do **not** claim success, open a PR, or push while verify is red.
+4. Report the checkpoint result briefly (pass/fail + what failed if any).
+
+## Scope
+
+Applies to **every** change that can affect TypeScript, React, Next.js routes, middleware, Prisma, or shared UI — including “small” layout/copy/auth gates.
+
+Skip only for pure docs/config that cannot affect `next build` or unit tests (e.g. markdown-only). When unsure, **run verify**.
+
+## Why
+
+A TypeScript build failure previously shipped to `main` and blocked production deploys while the live site stayed on an old version. `npm run verify` is the project gate; CI mirrors the same checks.

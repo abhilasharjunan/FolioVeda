@@ -3,7 +3,8 @@
 import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Sparkles, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { OnboardingChecklist, dismissWelcomeBanner } from "./OnboardingChecklist";
 import { OnboardingProductPreview } from "./OnboardingProductPreview";
 import { readOnboardingState } from "@/lib/onboarding";
@@ -57,9 +58,15 @@ export function FirstRunGuide({ showWelcome = false }: FirstRunGuideProps) {
               Browse the sample preview below, then add your mutual funds — overlap, XIRR, and reports use your real data.
             </p>
           </div>
-          <Button asChild className="bg-teal-600 hover:bg-teal-500 text-white shrink-0 w-full sm:w-auto">
-            <Link href="/portfolio">Add or import holdings</Link>
-          </Button>
+          <Link
+            href="/portfolio"
+            className={cn(
+              buttonVariants(),
+              "bg-teal-600 hover:bg-teal-500 text-white shrink-0 w-full sm:w-auto"
+            )}
+          >
+            Add or import holdings
+          </Link>
         </div>
         <OnboardingProductPreview />
       </div>
