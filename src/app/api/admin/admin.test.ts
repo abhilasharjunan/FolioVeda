@@ -16,6 +16,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       count: vi.fn(),
       update: vi.fn(),
+      delete: vi.fn(),
     },
     adminAuditLog: {
       findMany: vi.fn(),
@@ -26,6 +27,7 @@ vi.mock("@/lib/prisma", () => ({
     },
     passwordResetToken: {
       updateMany: vi.fn(),
+      deleteMany: vi.fn(),
       create: vi.fn(),
     },
   },
@@ -150,5 +152,69 @@ describe("admin APIs", () => {
       { params: Promise.resolve({ id: "admin-1" }) }
     );
     expect(res.status).toBe(400);
+  });
+
+  it("delete removes a non-admin user and blocks self-delete", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: { id: "admin-1", email: "a@x.com", name: "A", role: "ADMIN" },
+    });
+
+    const self = await postUserOp(
+      new Request("http://localhost/api/admin/users/admin-1", {
+        method: "POST",
+        body: JSON.stringify({ action: "delete" }),
+      }),
+      { params: Promise.resolve({ id: "admin-1" }) }
+    );
+    expect(self.status).toBe(400);
+
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: "u2",
+      email: "user@x.com",
+      role: "USER",
+      disabledAt: null,
+    } as any);
+    vi.mocked(prisma.user.delete).mockResolvedValue({} as any);
+    vi.mocked(prisma.passwordResetToken.deleteMany).mockResolvedValue({ count: 0 });
+
+    const res = await postUserOp(
+      new Request("http://localhost/api/admin/users/u2", {
+        method: "POST",
+        body: JSON.stringify({ action: "delete" }),
+      }),
+      { params: Promise.resolve({ id: "u2" }) }
+    );
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.deleted).toBe(true);
+    expect(body.user).toBeNull();
+    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: "u2" } });
+    expect(prisma.passwordResetToken.deleteMany).toHaveBeenCalledWith({
+      where: { email: "user@x.com" },
+    });
+  });
+
+  it("delete blocks deleting another admin", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: { id: "admin-1", email: "a@x.com", name: "A", role: "ADMIN" },
+    });
+    vi.mocked(prisma.user.findUnique).mockResolvedValue({
+      id: "admin-2",
+      email: "b@x.com",
+      role: "ADMIN",
+      disabledAt: null,
+    } as any);
+
+    const res = await postUserOp(
+      new Request("http://localhost/api/admin/users/admin-2", {
+        method: "POST",
+        body: JSON.stringify({ action: "delete" }),
+      }),
+      { params: Promise.resolve({ id: "admin-2" }) }
+    );
+    expect(res.status).toBe(400);
+    expect(prisma.user.delete).not.toHaveBeenCalled();
   });
 });

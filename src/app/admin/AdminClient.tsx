@@ -15,6 +15,7 @@ import {
   CheckCircle,
   KeyRound,
   LogOut,
+  Trash2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -121,7 +122,7 @@ export default function AdminClient() {
 
   const runOp = async (
     userId: string,
-    action: "disable" | "enable" | "force_password_reset" | "revoke_sessions",
+    action: "disable" | "enable" | "force_password_reset" | "revoke_sessions" | "delete",
     confirmMsg: string
   ) => {
     if (!confirm(confirmMsg)) return;
@@ -135,7 +136,9 @@ export default function AdminClient() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Action failed");
       toast.success(`Done: ${action.replace(/_/g, " ")}`);
-      if (data.user) {
+      if (action === "delete" || data.deleted) {
+        setUsers((prev) => prev.filter((u) => u.id !== userId));
+      } else if (data.user) {
         setUsers((prev) => prev.map((u) => (u.id === userId ? data.user : u)));
       }
       const mRes = await fetch("/api/admin/metrics");
@@ -403,6 +406,23 @@ export default function AdminClient() {
                       >
                         <LogOut size={12} className="mr-1" /> Sessions
                       </Button>
+                      {u.role !== "ADMIN" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-rose-600 border-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                          disabled={busyId === u.id}
+                          onClick={() =>
+                            runOp(
+                              u.id,
+                              "delete",
+                              `Permanently delete ${u.email} and all their portfolio data? This cannot be undone.`
+                            )
+                          }
+                        >
+                          <Trash2 size={12} className="mr-1" /> Delete
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

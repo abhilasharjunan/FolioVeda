@@ -10,7 +10,7 @@ import { issuePasswordResetEmail } from "@/lib/password-reset";
 import { z } from "zod";
 
 const bodySchema = z.object({
-  action: z.enum(["disable", "enable", "force_password_reset", "revoke_sessions"]),
+  action: z.enum(["disable", "enable", "force_password_reset", "revoke_sessions", "delete"]),
 });
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -29,9 +29,12 @@ export async function POST(req: Request, ctx: Ctx) {
 
   const { action } = parsed.data;
 
-  if (targetUserId === gate.user.id && (action === "disable" || action === "revoke_sessions")) {
+  if (
+    targetUserId === gate.user.id &&
+    (action === "disable" || action === "revoke_sessions" || action === "delete")
+  ) {
     return NextResponse.json(
-      { error: "Cannot disable or revoke your own admin session this way." },
+      { error: "Cannot disable, revoke, or delete your own admin account this way." },
       { status: 400 }
     );
   }
@@ -42,6 +45,27 @@ export async function POST(req: Request, ctx: Ctx) {
   });
   if (!target) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  if (action === "delete") {
+    if (target.role === "ADMIN") {
+      return NextResponse.json(
+        { error: "Cannot delete another admin account. Demote or disable first if needed." },
+        { status: 400 }
+      );
+    }
+
+    await prisma.passwordResetToken.deleteMany({ where: { email: target.email } });
+    await prisma.user.delete({ where: { id: targetUserId } });
+
+    await writeAdminAudit({
+      actorId: gate.user.id,
+      action: "delete",
+      targetUserId,
+      meta: { targetEmail: target.email },
+    });
+
+    return NextResponse.json({ ok: true, user: null, deleted: true });
   }
 
   if (action === "disable") {

@@ -16,6 +16,7 @@ const CHANGELOG = [
       'Dashboard labels absolute return clearly when holdings are too new for annualized XIRR',
       'Asset allocation pie merges noisy AMFI category names into short buckets (Flexi Cap, Mid Cap, Index, …)',
       'Onboarding tip copy adapts once you already have holdings',
+      'Admin: permanently delete user accounts (and cascaded portfolio data) from the users table',
     ],
   },
   {
