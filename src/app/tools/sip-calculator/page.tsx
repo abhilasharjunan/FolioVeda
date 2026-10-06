@@ -193,8 +193,8 @@ export default function SIPCalculatorPage() {
           </p>
         </header>
 
-        <Tabs defaultValue="sip" className="w-full">
-          <TabsList className="mb-6 h-auto min-h-10 w-full max-w-full flex flex-wrap justify-start gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+        <Tabs defaultValue="sip" className="w-full max-w-full">
+          <TabsList className="mb-6 h-auto min-h-10 w-full flex flex-wrap justify-start gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
             <TabsTrigger value="sip" className="rounded-lg data-active:shadow-sm"><Calculator size={14} className="mr-1.5" />SIP Calculator</TabsTrigger>
             <TabsTrigger value="goal" className="rounded-lg data-active:shadow-sm"><Target size={14} className="mr-1.5" />Goal Planner</TabsTrigger>
             <TabsTrigger value="scenario" className="rounded-lg data-active:shadow-sm"><GitCompare size={14} className="mr-1.5" />Scenario Comparison</TabsTrigger>
@@ -368,7 +368,7 @@ export default function SIPCalculatorPage() {
                   {scenarios.map((s, idx) => (
                     <div
                       key={idx}
-                      className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))_auto] gap-2 items-end p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
+                      className="space-y-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800"
                     >
                       <div className="flex items-center gap-2 min-w-0">
                         <span
@@ -379,19 +379,23 @@ export default function SIPCalculatorPage() {
                         <Input
                           value={s.label}
                           onChange={(e) => updateScenario(idx, { label: e.target.value })}
-                          className="text-xs font-semibold"
+                          className="text-xs font-semibold flex-1 min-w-0"
                         />
+                        <button
+                          type="button"
+                          onClick={() => removeScenario(idx)}
+                          disabled={scenarios.length <= 1}
+                          className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-40"
+                          aria-label={`Remove ${s.label}`}
+                        >
+                          <X size={16} />
+                        </button>
                       </div>
-                      <NumberField label="₹/month" value={s.monthlyAmount} onChange={(v) => updateScenario(idx, { monthlyAmount: v })} step={500} />
-                      <NumberField label="Return %" value={s.annualReturnPercent} onChange={(v) => updateScenario(idx, { annualReturnPercent: v })} step={0.5} />
-                      <NumberField label="Years" value={s.years} onChange={(v) => updateScenario(idx, { years: v })} min={1} />
-                      <button
-                        onClick={() => removeScenario(idx)}
-                        disabled={scenarios.length <= 1}
-                        className="h-9 flex items-center justify-center text-slate-400 dark:text-slate-400 hover:text-rose-500 disabled:text-slate-200"
-                      >
-                        <X size={16} />
-                      </button>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <NumberField label="₹/month" value={s.monthlyAmount} onChange={(v) => updateScenario(idx, { monthlyAmount: v })} step={500} />
+                        <NumberField label="Return %" value={s.annualReturnPercent} onChange={(v) => updateScenario(idx, { annualReturnPercent: v })} step={0.5} />
+                        <NumberField label="Years" value={s.years} onChange={(v) => updateScenario(idx, { years: v })} min={1} />
+                      </div>
                     </div>
                   ))}
                 </CardContent>

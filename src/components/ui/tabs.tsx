@@ -18,7 +18,7 @@ function Tabs({
         // Always stack list above panels. Base UI sets data-orientation="horizontal",
         // which does not match Tailwind's data-horizontal: variant — without flex-col,
         // tab panels sit beside the list (content jammed to the right).
-        "group/tabs flex flex-col gap-2 data-[orientation=vertical]:flex-row",
+        "group/tabs flex w-full flex-col items-stretch gap-2 data-[orientation=vertical]:flex-row",
         className
       )}
       {...props}
@@ -76,7 +76,7 @@ function TabsContent({ className, ...props }: TabsPrimitive.Panel.Props) {
   return (
     <TabsPrimitive.Panel
       data-slot="tabs-content"
-      className={cn("flex-1 text-sm outline-none", className)}
+      className={cn("w-full min-w-0 max-w-full text-sm outline-none", className)}
       {...props}
     />
   )
