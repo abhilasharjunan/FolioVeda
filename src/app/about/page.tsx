@@ -10,6 +10,34 @@ import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
   {
+    version: '1.6.3',
+    date: 'Oct 2026',
+    items: [
+      'Dashboard labels absolute return clearly when holdings are too new for annualized XIRR',
+      'Asset allocation pie merges noisy AMFI category names into short buckets (Flexi Cap, Mid Cap, Index, …)',
+      'Onboarding tip copy adapts once you already have holdings',
+    ],
+  },
+  {
+    version: '1.6.0',
+    date: 'Oct 2026',
+    items: [
+      'Homepage “Inside FolioVeda” autoplay tour: dashboard, holdings, overlap, risk, diversification, compare, SIP, and report',
+      'Illustrative sample portfolio snapshot (no live account data) with SEBI-style disclaimer',
+      'Fixed login crash (React max update depth) from the onboarding checklist store',
+      'Mandatory local gate: npm run verify (production build + unit tests) before shipping',
+    ],
+  },
+  {
+    version: '1.5.0',
+    date: 'Oct 2026',
+    items: [
+      'Landing feature tour and first-run guide for new accounts (preview without a stored demo portfolio)',
+      'SIP Calculator and What’s New require sign-in; public nav keeps MF Academy',
+      'SIP Scenario Comparison layout stacks fields under each scenario instead of drifting right',
+    ],
+  },
+  {
     version: '1.4.0',
     date: 'Oct 2026',
     items: [
@@ -32,7 +60,7 @@ const CHANGELOG = [
     date: 'Aug 2026',
     items: [
       'Dashboard KPI ribbon with Portfolio Health and Asset Allocation side by side',
-      'XIRR shows absolute return when holding period is under one day (no fake 0%)',
+      'XIRR shows absolute return when holding period is under ~1 year (no misleading annualized %)',
       'SIP Calculator: flat vs step-up comparison and balanced input/results layout',
       'Refined deep-slate theme, indigo accents, and clearer typography hierarchy',
     ],
@@ -193,9 +221,9 @@ export default function AboutPage() {
             </CardHeader>
             <CardContent className="text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
               <p>
-                <strong className="text-slate-800 dark:text-slate-100">XIRR</strong> needs at least one full
-                day between the first cash flow and valuation. Same-day buys show absolute return instead
-                of a misleading 0%.
+                <strong className="text-slate-800 dark:text-slate-100">XIRR</strong> is annualized only
+                after roughly a year of cash-flow history. Newer holdings show absolute return instead
+                of a misleading compounded figure.
               </p>
               <p>
                 Top Funds and Fund Ratings use Direct Growth plans where available; NAV data from AMFI/mfapi.in

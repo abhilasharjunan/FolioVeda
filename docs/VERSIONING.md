@@ -51,8 +51,11 @@ git commit -m "BREAKING CHANGE: remove legacy fund search endpoint"
 ## Viewing the Version
 
 ### In the UI
-- Visit `/about` page to see the current version
-- The version is displayed in the About page card
+- Visit `/about` (What’s New) to see the current version and release notes
+- Footer and Auth screens also show `v{version}` from `package.json` via `NEXT_PUBLIC_APP_VERSION`
+
+### Keeping What’s New current
+When you ship **user-visible** changes, add a new entry (or extend the current minor) at the top of `CHANGELOG` in [`src/app/about/page.tsx`](../src/app/about/page.tsx). Match the top entry’s `version` to `package.json` so the “current” badge highlights correctly. Skip pure chore version-bump commits.
 
 ### In Code
 ```typescript
