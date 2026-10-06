@@ -2,6 +2,7 @@
 
 import React from "react";
 import { FeatureSceneGrid } from "@/components/landing/FeatureSceneGrid";
+import { LANDING_TOUR_DISCLAIMER } from "@/lib/landing-tour-snapshot";
 
 /** Read-only product preview — illustrative UI, not the user's portfolio. */
 export function OnboardingProductPreview() {
@@ -20,7 +21,7 @@ export function OnboardingProductPreview() {
         taglineClassName="text-slate-600 dark:text-slate-400"
       />
       <p className="text-[10px] text-center sm:text-left text-slate-500 dark:text-slate-500 leading-relaxed">
-        Illustrative only. Past performance is not indicative of future results.
+        {LANDING_TOUR_DISCLAIMER}
       </p>
     </div>
   );

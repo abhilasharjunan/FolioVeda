@@ -15,6 +15,7 @@ import {
 } from "@/lib/landing-demo";
 import { calculateSIPFutureValue } from "@/lib/sip-calculator";
 import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
+import { LANDING_TOUR_DISCLAIMER } from "@/lib/landing-tour-snapshot";
 
 function formatInr(n: number) {
   return n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -243,9 +244,9 @@ export default function LandingPage() {
                 size="lg"
                 variant="outline"
                 className="px-8 py-5 text-base border-slate-600 bg-slate-900/40 text-slate-200 hover:bg-slate-800/60"
-                onClick={() => scrollTo("sample")}
+                onClick={() => scrollTo("features")}
               >
-                Try a sample portfolio
+                See capabilities
               </Button>
             </div>
             <p className="mt-4 text-xs text-slate-500">Direct plans · true XIRR · overlap & sector look-through</p>
@@ -263,7 +264,10 @@ export default function LandingPage() {
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-50 font-heading">Inside FolioVeda</h2>
             <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
-              A quick tour of what unlocks after you sign up — overlap, risk, compare, and more.
+              A quick tour of what unlocks after you sign up — holdings, overlap, risk, compare, SIP, and reports.
+            </p>
+            <p className="text-[11px] text-slate-500 mt-3 max-w-lg mx-auto leading-relaxed">
+              {LANDING_TOUR_DISCLAIMER}
             </p>
           </div>
         </FadeIn>

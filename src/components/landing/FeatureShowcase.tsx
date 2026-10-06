@@ -10,7 +10,7 @@ import { LANDING_FEATURE_SCENES } from "@/lib/landing-feature-scenes";
 import { FeatureSceneVisual } from "./FeatureSceneVisual";
 import { FeatureSceneGrid } from "./FeatureSceneGrid";
 
-const SCENE_MS = 9000;
+const SCENE_MS = 7000;
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
 export function FeatureShowcase() {
@@ -40,10 +40,6 @@ export function FeatureShowcase() {
       className="relative"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false);
-      }}
     >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
         <div className="relative min-h-[280px] sm:min-h-[300px]">
@@ -61,7 +57,7 @@ export function FeatureShowcase() {
         </div>
 
         <div className="space-y-5">
-          <div>
+          <div aria-live="polite" aria-atomic="true">
             <p className="text-[10px] uppercase tracking-wider text-teal-400/90 font-semibold mb-2">
               {scene.title}
             </p>
@@ -134,7 +130,7 @@ export function FeatureShowcase() {
             </button>
           </div>
           <p className="text-[10px] text-slate-600 text-center sm:text-left">
-            Auto-advances every {SCENE_MS / 1000}s · hover or focus to pause
+            Auto-advances every {SCENE_MS / 1000}s · hover to pause
           </p>
         </div>
       </div>

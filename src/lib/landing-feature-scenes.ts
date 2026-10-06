@@ -1,8 +1,13 @@
+import { LANDING_TOUR_SNAPSHOT } from "@/lib/landing-tour-snapshot";
+
 export type LandingFeatureSceneId =
   | "dashboard"
+  | "holdings"
   | "overlap"
   | "risk"
+  | "diversify"
   | "compare"
+  | "sip"
   | "report";
 
 export interface LandingFeatureScene {
@@ -21,6 +26,12 @@ export const LANDING_FEATURE_SCENES: LandingFeatureScene[] = [
     tagline: "True cash-flow XIRR, live value, and a health score — not vanity CAGR.",
   },
   {
+    id: "holdings",
+    title: "Holdings & import",
+    headline: "Add funds or import CSV",
+    tagline: "Track units and transactions across your schemes in one place.",
+  },
+  {
     id: "overlap",
     title: "Look-through overlap",
     headline: "Hidden duplication across funds",
@@ -33,10 +44,22 @@ export const LANDING_FEATURE_SCENES: LandingFeatureScene[] = [
     tagline: "Fund-level risk views aligned with how Indian investors read labels.",
   },
   {
+    id: "diversify",
+    title: "Diversification",
+    headline: "Category mix at a glance",
+    tagline: "See whether you are over-tilted to one style or cap bucket.",
+  },
+  {
     id: "compare",
     title: "Compare & top funds",
     headline: "Side-by-side fund decisions",
     tagline: "Benchmark peers in your category before you add the next SIP.",
+  },
+  {
+    id: "sip",
+    title: "SIP & planning",
+    headline: "Forward projections for goals",
+    tagline: "Model monthly SIPs, step-ups, and scenarios — planning, not a promise.",
   },
   {
     id: "report",
@@ -46,25 +69,14 @@ export const LANDING_FEATURE_SCENES: LandingFeatureScene[] = [
   },
 ];
 
-/** Static mock metrics for landing visuals — illustrative only. */
+/** @deprecated Use LANDING_TOUR_SNAPSHOT — kept for any residual imports */
 export const LANDING_MOCK_DASHBOARD = {
-  portfolioValue: 7_20_000,
-  invested: 5_40_000,
-  xirr: 12.6,
-  healthScore: 78,
+  portfolioValue: LANDING_TOUR_SNAPSHOT.portfolioValue,
+  invested: LANDING_TOUR_SNAPSHOT.invested,
+  xirr: LANDING_TOUR_SNAPSHOT.xirr,
+  healthScore: LANDING_TOUR_SNAPSHOT.healthScore,
 };
 
-export const LANDING_MOCK_OVERLAP = {
-  pairs: [
-    { a: "Flexi Cap A", b: "Flexi Cap B", overlapPct: 34 },
-    { a: "Large Cap", b: "Flexi Cap A", overlapPct: 22 },
-  ],
-  topStock: { name: "Reliance", combinedPct: 8.4 },
-};
+export const LANDING_MOCK_OVERLAP = LANDING_TOUR_SNAPSHOT.overlap;
 
-export const LANDING_MOCK_COMPARE = {
-  funds: [
-    { name: "Parag Parikh Flexi Cap", xirr: 14.2, category: "Flexi Cap" },
-    { name: "HDFC Flexi Cap", xirr: 11.8, category: "Flexi Cap" },
-  ],
-};
+export const LANDING_MOCK_COMPARE = LANDING_TOUR_SNAPSHOT.compare;

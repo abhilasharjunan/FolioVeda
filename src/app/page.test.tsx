@@ -55,5 +55,15 @@ describe('LandingPage', () => {
     expect(document.getElementById('features')).toBeTruthy();
     expect(screen.getAllByText('Inside FolioVeda').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Hidden duplication across funds/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Illustrative sample portfolio/i).length).toBeGreaterThan(0);
+  });
+
+  it('covers core product capabilities in the feature tour', () => {
+    render(<LandingPage />);
+    expect(screen.getAllByText(/Add funds or import CSV/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/SEBI-aware risk context/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Category mix at a glance/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Forward projections for goals/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Shareable snapshot/i).length).toBeGreaterThan(0);
   });
 });
