@@ -33,7 +33,7 @@ export function OnboardingDashboardTip() {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left text-sm font-semibold text-indigo-900 dark:text-indigo-100"
       >
-        <span>New here? Explore all tools</span>
+        <span>{state.completed.holdings ? "Continue exploring tools" : "New here? Explore all tools"}</span>
         {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
       {open && (

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { computeHHI } from "@/lib/risk-calculations";
 import { ensureSchemeNavs } from "@/lib/ensure-scheme-navs";
+import { normalizeSchemeCategory } from "@/lib/scheme-filters";
 
 export async function getPortfolioRiskAnalysis() {
   const session = await auth();
@@ -60,14 +61,14 @@ export async function getPortfolioRiskAnalysis() {
 
     totalValue += currentValue;
 
-    const category = scheme.category || 'Uncategorized';
+    const category = normalizeSchemeCategory(scheme.category);
     categoryAllocation[category] = (categoryAllocation[category] || 0) + currentValue;
 
     const risk = riskMap.get(holding.schemeCode);
     holdingRisks.push({
       schemeName: scheme.schemeName,
       schemeCode: holding.schemeCode,
-      category: scheme.category,
+      category,
       currentValue,
       volatility: Number(risk?.volatility || 0),
       riskScore: Number(risk?.riskScore || 0),
@@ -90,11 +91,13 @@ export async function getPortfolioRiskAnalysis() {
     holdingRisks.map((h) => ({ allocation: h.currentValue / totalValue }))
   );
 
-  const categories = Object.entries(categoryAllocation).map(([name, value]) => ({
-    name,
-    percentage: (value / totalValue) * 100,
-    value,
-  }));
+  const categories = Object.entries(categoryAllocation)
+    .map(([name, value]) => ({
+      name,
+      percentage: (value / totalValue) * 100,
+      value,
+    }))
+    .sort((a, b) => b.percentage - a.percentage);
 
   return {
     totalValue,

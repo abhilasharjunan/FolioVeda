@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isDirectGrowthScheme } from './scheme-filters';
+import { isDirectGrowthScheme, normalizeSchemeCategory } from './scheme-filters';
 
 describe('isDirectGrowthScheme', () => {
   it('accepts Direct Growth plan names', () => {
@@ -25,5 +25,26 @@ describe('isDirectGrowthScheme', () => {
   it('rejects empty and whitespace-only names', () => {
     expect(isDirectGrowthScheme('')).toBe(false);
     expect(isDirectGrowthScheme('   ')).toBe(false);
+  });
+});
+
+describe('normalizeSchemeCategory', () => {
+  it('collapses AMFI-style long labels into short buckets', () => {
+    expect(normalizeSchemeCategory('Equity Scheme - Flexi Cap Fund')).toBe('Flexi Cap');
+    expect(normalizeSchemeCategory('Equity Schemes - Flexi Cap Fund')).toBe('Flexi Cap');
+    expect(normalizeSchemeCategory('Equity Scheme - Mid Cap Fund')).toBe('Mid Cap');
+    expect(normalizeSchemeCategory('Other Scheme - Index Funds')).toBe('Index');
+    expect(normalizeSchemeCategory('Index Funds - Equity Funds')).toBe('Index');
+  });
+
+  it('keeps short SEBI-style labels', () => {
+    expect(normalizeSchemeCategory('Large Cap')).toBe('Large Cap');
+    expect(normalizeSchemeCategory('Debt')).toBe('Debt');
+    expect(normalizeSchemeCategory('Small Cap')).toBe('Small Cap');
+  });
+
+  it('handles empty input', () => {
+    expect(normalizeSchemeCategory(null)).toBe('Other');
+    expect(normalizeSchemeCategory('')).toBe('Other');
   });
 });

@@ -115,7 +115,9 @@ export default function DashboardClient({
               <div className="p-5 sm:p-6">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                   <PieChart size={16} className="text-indigo-500" />
-                  <p className="text-xs font-semibold uppercase tracking-wide">Overall XIRR</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {analysis.overallXirr != null ? 'Overall XIRR' : 'Overall return'}
+                  </p>
                 </div>
                 {analysis.overallXirr != null ? (
                   <>
@@ -130,7 +132,7 @@ export default function DashboardClient({
                       {overallAbsPct != null ? `${overallAbsPct >= 0 ? '+' : ''}${overallAbsPct.toFixed(2)}%` : 'N/A'}
                     </p>
                     <p className="mt-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-                      {overallAbsPct != null ? 'Abs. return · hold longer for XIRR' : 'Unable to calculate'}
+                      {overallAbsPct != null ? 'Absolute · hold ~1yr for XIRR' : 'Unable to calculate'}
                     </p>
                   </>
                 )}

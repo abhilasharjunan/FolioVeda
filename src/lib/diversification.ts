@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { computeHHI } from "@/lib/risk-calculations";
 import { ensureSchemeNavs } from "@/lib/ensure-scheme-navs";
+import { normalizeSchemeCategory } from "@/lib/scheme-filters";
 
 export async function getPortfolioDiversification() {
   // During build, return mock data to avoid Prisma initialization
@@ -37,7 +38,7 @@ export async function getPortfolioDiversification() {
 
   holdings.forEach((h) => {
     const scheme = schemeMap.get(h.schemeCode);
-    const cat = scheme?.category || "Unknown";
+    const cat = normalizeSchemeCategory(scheme?.category);
     let value = Number(h.units) * Number(scheme?.latestNav || 0);
     if (value <= 0) {
       value = h.transactions.reduce((sum, tx) => {
@@ -51,10 +52,12 @@ export async function getPortfolioDiversification() {
 
   if (totalValue <= 0) return null;
 
-  const distribution = Object.entries(categoryMap).map(([name, value]) => ({
-    name,
-    percentage: (value / totalValue) * 100
-  }));
+  const distribution = Object.entries(categoryMap)
+    .map(([name, value]) => ({
+      name,
+      percentage: (value / totalValue) * 100
+    }))
+    .sort((a, b) => b.percentage - a.percentage);
 
   const hhi = computeHHI(distribution.map(d => ({ allocation: d.percentage / 100 })));
   const score = Math.round((1 - hhi) * 100);
