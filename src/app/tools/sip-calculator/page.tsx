@@ -194,13 +194,13 @@ export default function SIPCalculatorPage() {
         </header>
 
         <Tabs defaultValue="sip" className="w-full">
-          <TabsList className="mb-6 h-10 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+          <TabsList className="mb-6 h-auto min-h-10 w-full max-w-full flex flex-wrap justify-start gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
             <TabsTrigger value="sip" className="rounded-lg data-active:shadow-sm"><Calculator size={14} className="mr-1.5" />SIP Calculator</TabsTrigger>
             <TabsTrigger value="goal" className="rounded-lg data-active:shadow-sm"><Target size={14} className="mr-1.5" />Goal Planner</TabsTrigger>
             <TabsTrigger value="scenario" className="rounded-lg data-active:shadow-sm"><GitCompare size={14} className="mr-1.5" />Scenario Comparison</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sip">
+          <TabsContent value="sip" className="w-full mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <Card className="surface-card border-none shadow-sm lg:col-span-5">
                 <CardHeader><CardTitle className="text-base font-semibold font-heading">Inputs</CardTitle></CardHeader>
@@ -325,7 +325,7 @@ export default function SIPCalculatorPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="goal">
+          <TabsContent value="goal" className="w-full mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                 <CardHeader><CardTitle className="text-base font-semibold">Your Goal</CardTitle></CardHeader>
@@ -351,8 +351,8 @@ export default function SIPCalculatorPage() {
             </div>
           </TabsContent>
 
-          <TabsContent value="scenario">
-            <div className="space-y-6">
+          <TabsContent value="scenario" className="w-full mt-0">
+            <div className="space-y-6 w-full">
               <Card className="border-none shadow-sm bg-white dark:bg-slate-900">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base font-semibold">Scenarios</CardTitle>
@@ -366,10 +366,13 @@ export default function SIPCalculatorPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {scenarios.map((s, idx) => (
-                    <div key={idx} className="grid grid-cols-2 sm:grid-cols-6 gap-2 items-end p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                      <div className="flex items-center gap-2 col-span-2 sm:col-span-2">
+                    <div
+                      key={idx}
+                      className="grid grid-cols-1 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))_auto] gap-2 items-end p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
                         <span
-                          className="size-2.5 rounded-full shrink-0 mb-1.5"
+                          className="size-2.5 rounded-full shrink-0"
                           style={{ backgroundColor: SCENARIO_COLORS[idx % SCENARIO_COLORS.length] }}
                           aria-hidden
                         />

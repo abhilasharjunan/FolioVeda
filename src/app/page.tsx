@@ -133,25 +133,11 @@ export default function LandingPage() {
               Features
             </button>
             <Link
-              href="/tools/sip-calculator"
-              prefetch
-              className={cn(buttonVariants({ variant: "ghost" }), "text-slate-300 hover:text-white hover:bg-slate-800/60")}
-            >
-              SIP Calculator
-            </Link>
-            <Link
               href="/academy"
               prefetch
               className={cn(buttonVariants({ variant: "ghost" }), "text-slate-300 hover:text-white hover:bg-slate-800/60")}
             >
               MF Academy
-            </Link>
-            <Link
-              href="/about"
-              prefetch
-              className={cn(buttonVariants({ variant: "ghost" }), "text-slate-300 hover:text-white hover:bg-slate-800/60")}
-            >
-              About
             </Link>
             <Link
               href="/auth/signin"
@@ -187,9 +173,7 @@ export default function LandingPage() {
           <div className="md:hidden mt-3 rounded-xl border border-slate-700/80 bg-slate-900/95 p-2 space-y-1">
             {[
               { href: "#features", label: "Features", onNav: () => scrollTo("features") },
-              { href: "/tools/sip-calculator", label: "SIP Calculator" },
               { href: "/academy", label: "MF Academy" },
-              { href: "/about", label: "About" },
               { href: "/auth/signin", label: "Login" },
             ].map((l) =>
               "onNav" in l && l.onNav ? (
@@ -363,8 +347,8 @@ export default function LandingPage() {
               icon: Layers,
               title: "Spot overlap",
               desc: "Look-through stock and sector concentration across funds you thought were diversified.",
-              href: "/tools/sip-calculator",
-              linkLabel: "Try SIP math",
+              href: "/auth/signin",
+              linkLabel: "Get started",
             },
           ].map((step) => (
             <StaggerItem key={step.title}>
@@ -448,14 +432,14 @@ export default function LandingPage() {
                   </p>
                 </div>
                 <Link
-                  href="/tools/sip-calculator"
+                  href="/auth/signin"
                   prefetch
                   className={cn(
                     buttonVariants({ variant: "outline" }),
                     "w-full sm:w-auto border-slate-600 text-slate-200 hover:bg-slate-800/60 gap-2"
                   )}
                 >
-                  Open full SIP Calculator <ArrowRight size={14} />
+                  Sign in for full SIP Calculator <ArrowRight size={14} />
                 </Link>
               </div>
             </div>

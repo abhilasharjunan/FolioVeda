@@ -87,14 +87,22 @@ describe('Navbar', () => {
 
   it('shows public links and Sign in when unauthenticated', () => {
     mockUseSession.mockReturnValue(guestSession as ReturnType<typeof useSession>);
-    mockUsePathname.mockReturnValue('/about');
+    mockUsePathname.mockReturnValue('/academy');
     const { container } = render(<Navbar />);
-    expect(within(container).getByText('About')).toBeTruthy();
-    expect(within(container).getByText('SIP Calculator')).toBeTruthy();
     expect(within(container).getByText('MF Academy')).toBeTruthy();
     expect(within(container).getByText('Sign in')).toBeTruthy();
+    expect(within(container).queryByText('SIP Calculator')).toBeNull();
+    expect(within(container).queryByText("What's New")).toBeNull();
+    expect(within(container).queryByText('About')).toBeNull();
     expect(within(container).queryByText('Dashboard')).toBeNull();
     expect(within(container).queryByText('Logout')).toBeNull();
+  });
+
+  it('shows SIP Calculator and What\'s New only when authenticated', () => {
+    mockUsePathname.mockReturnValue('/dashboard');
+    const { container } = render(<Navbar />);
+    expect(within(container).getByText('SIP Calculator')).toBeTruthy();
+    expect(within(container).getByText("What's New")).toBeTruthy();
   });
 
   it('shows MF Academy in authenticated primary nav', () => {

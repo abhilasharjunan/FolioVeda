@@ -12,6 +12,8 @@ export default async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/funds") ||
     request.nextUrl.pathname.startsWith("/top-funds") ||
     request.nextUrl.pathname.startsWith("/risk-analysis") ||
+    request.nextUrl.pathname.startsWith("/tools") ||
+    request.nextUrl.pathname.startsWith("/about") ||
     request.nextUrl.pathname.startsWith("/account") ||
     request.nextUrl.pathname.startsWith("/admin");
 
@@ -33,6 +35,9 @@ export const config = {
     "/funds/:path*",
     "/top-funds/:path*",
     "/risk-analysis/:path*",
+    "/tools/:path*",
+    "/about",
+    "/about/:path*",
     "/account/:path*",
     "/admin/:path*",
     "/auth/:path*",

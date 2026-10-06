@@ -15,15 +15,13 @@ const primaryLinks = [
   { href: "/risk-analysis", label: "Fund Ratings" },
   { href: "/tools/sip-calculator", label: "SIP Calculator" },
   { href: "/academy", label: "MF Academy" },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "What's New" },
 ];
 
 const adminLink = { href: "/admin", label: "Admin" };
 
 const publicLinks = [
-  { href: "/tools/sip-calculator", label: "SIP Calculator" },
   { href: "/academy", label: "MF Academy" },
-  { href: "/about", label: "About" },
 ];
 
 const portfolioSubLinks = [

@@ -13,7 +13,7 @@ vi.mock("@/components/ui/ThemeToggle", () => ({
 import { AuthShell } from "./AuthShell";
 
 describe("AuthShell", () => {
-  it("links Home, MF Academy, and SIP Calculator", () => {
+  it("links Home and MF Academy", () => {
     render(
       <AuthShell>
         <div>form</div>
@@ -21,9 +21,7 @@ describe("AuthShell", () => {
     );
     expect(screen.getByRole("link", { name: "Home" }).getAttribute("href")).toBe("/");
     expect(screen.getByRole("link", { name: "MF Academy" }).getAttribute("href")).toBe("/academy");
-    expect(screen.getByRole("link", { name: "SIP Calculator" }).getAttribute("href")).toBe(
-      "/tools/sip-calculator"
-    );
+    expect(screen.queryByRole("link", { name: "SIP Calculator" })).toBeNull();
     expect(screen.getByRole("link", { name: /See what's inside/i }).getAttribute("href")).toBe(
       "/#features"
     );

@@ -54,14 +54,9 @@ export function AuthShell({
           <Link href="/academy" className="hover:text-teal-400 transition-colors">
             MF Academy
           </Link>
-          <Link href="/tools/sip-calculator" className="hover:text-teal-400 transition-colors">
-            SIP Calculator
-          </Link>
         </nav>
-        <p className="mt-3 text-center text-xs text-slate-500">
-          <Link href="/about" className="font-mono hover:text-slate-300 transition-colors">
-            v{process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown"}
-          </Link>
+        <p className="mt-3 text-center text-xs text-slate-500 font-mono">
+          v{process.env.NEXT_PUBLIC_APP_VERSION ?? "unknown"}
         </p>
       </FadeIn>
     </div>
