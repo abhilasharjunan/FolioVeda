@@ -7,7 +7,7 @@ import {
   dismissOnboardingChecklist,
   isOnboardingFullyComplete,
 } from "./OnboardingChecklist";
-import { readOnboardingState } from "@/lib/onboarding";
+import { readOnboardingState, getServerOnboardingSnapshot } from "@/lib/onboarding";
 
 function subscribe(onStoreChange: () => void) {
   window.addEventListener("folioveda-onboarding", onStoreChange);
@@ -20,7 +20,7 @@ function subscribe(onStoreChange: () => void) {
 
 export function OnboardingDashboardTip() {
   const [open, setOpen] = useState(false);
-  const state = useSyncExternalStore(subscribe, () => readOnboardingState(), () => readOnboardingState());
+  const state = useSyncExternalStore(subscribe, readOnboardingState, getServerOnboardingSnapshot);
 
   if (isOnboardingFullyComplete() || state.checklistDismissed) {
     return null;

@@ -13,39 +13,67 @@ export type OnboardingState = {
   checklistDismissed: boolean;
 };
 
-const DEFAULT_STATE: OnboardingState = {
+export const DEFAULT_ONBOARDING_STATE: OnboardingState = {
   completed: {},
   welcomeDismissed: false,
   checklistDismissed: false,
 };
 
-export function readOnboardingState(): OnboardingState {
-  if (typeof window === "undefined") return DEFAULT_STATE;
+/** Stable snapshot for useSyncExternalStore — new object refs cause infinite re-renders. */
+let cachedRaw: string | null | undefined = undefined;
+let cachedState: OnboardingState = DEFAULT_ONBOARDING_STATE;
+
+function parseOnboardingState(raw: string | null): OnboardingState {
+  if (!raw) return DEFAULT_ONBOARDING_STATE;
   try {
-    const raw = localStorage.getItem(ONBOARDING_STORAGE_KEY);
-    if (!raw) return DEFAULT_STATE;
     const parsed = JSON.parse(raw) as Partial<OnboardingState>;
     return {
-      ...DEFAULT_STATE,
+      ...DEFAULT_ONBOARDING_STATE,
       ...parsed,
-      completed: { ...DEFAULT_STATE.completed, ...parsed.completed },
+      completed: { ...DEFAULT_ONBOARDING_STATE.completed, ...parsed.completed },
     };
   } catch {
-    return DEFAULT_STATE;
+    return DEFAULT_ONBOARDING_STATE;
   }
+}
+
+export function readOnboardingState(): OnboardingState {
+  if (typeof window === "undefined") return DEFAULT_ONBOARDING_STATE;
+  try {
+    const raw = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+    if (raw === cachedRaw) return cachedState;
+    cachedRaw = raw;
+    cachedState = parseOnboardingState(raw);
+    return cachedState;
+  } catch {
+    cachedRaw = undefined;
+    cachedState = DEFAULT_ONBOARDING_STATE;
+    return DEFAULT_ONBOARDING_STATE;
+  }
+}
+
+export function getServerOnboardingSnapshot(): OnboardingState {
+  return DEFAULT_ONBOARDING_STATE;
 }
 
 export function writeOnboardingState(next: OnboardingState) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(ONBOARDING_STORAGE_KEY, JSON.stringify(next));
+  const serialized = JSON.stringify(next);
+  localStorage.setItem(ONBOARDING_STORAGE_KEY, serialized);
+  cachedRaw = serialized;
+  cachedState = next;
 }
 
 export function markOnboardingStep(step: OnboardingStepId) {
   const current = readOnboardingState();
+  if (current.completed[step]) return;
   writeOnboardingState({
     ...current,
     completed: { ...current.completed, [step]: true },
   });
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("folioveda-onboarding"));
+  }
 }
 
 export function onboardingProgress(state: OnboardingState): { done: number; total: number } {

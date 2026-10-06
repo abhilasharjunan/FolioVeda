@@ -8,6 +8,7 @@ import {
   readOnboardingState,
   writeOnboardingState,
   onboardingProgress,
+  getServerOnboardingSnapshot,
   type OnboardingStepId,
 } from "@/lib/onboarding";
 
@@ -51,7 +52,7 @@ type OnboardingChecklistProps = {
 };
 
 export function OnboardingChecklist({ compact = false, className }: OnboardingChecklistProps) {
-  const state = useSyncExternalStore(subscribe, getSnapshot, () => readOnboardingState());
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerOnboardingSnapshot);
   const { done, total } = onboardingProgress(state);
 
   return (

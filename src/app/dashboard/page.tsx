@@ -4,7 +4,7 @@ import { getPortfolioRiskAnalysis } from "@/lib/portfolio-risk";
 import DashboardClient from "@/components/dashboard/DashboardClient";
 import { FirstRunGuide } from "@/components/onboarding/FirstRunGuide";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
   searchParams,
@@ -12,11 +12,21 @@ export default async function DashboardPage({
   searchParams: Promise<{ welcome?: string }>;
 }) {
   const { welcome } = await searchParams;
-  const [analysis, divScore, riskAnalysis] = await Promise.all([
-    getPortfolioAnalysis(),
-    getPortfolioDiversification(),
-    getPortfolioRiskAnalysis(),
-  ]);
+
+  let analysis = null;
+  let divScore = null;
+  let riskAnalysis = null;
+
+  try {
+    [analysis, divScore, riskAnalysis] = await Promise.all([
+      getPortfolioAnalysis(),
+      getPortfolioDiversification(),
+      getPortfolioRiskAnalysis(),
+    ]);
+  } catch (err) {
+    console.error("[dashboard] portfolio load failed", err);
+    return <FirstRunGuide showWelcome={welcome === "1"} />;
+  }
 
   if (!analysis) {
     return <FirstRunGuide showWelcome={welcome === "1"} />;

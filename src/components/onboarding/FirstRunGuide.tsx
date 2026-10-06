@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { OnboardingChecklist, dismissWelcomeBanner } from "./OnboardingChecklist";
 import { OnboardingProductPreview } from "./OnboardingProductPreview";
-import { readOnboardingState } from "@/lib/onboarding";
+import { readOnboardingState, getServerOnboardingSnapshot } from "@/lib/onboarding";
 
 type FirstRunGuideProps = {
   showWelcome?: boolean;
@@ -23,7 +23,7 @@ function subscribe(onStoreChange: () => void) {
 }
 
 export function FirstRunGuide({ showWelcome = false }: FirstRunGuideProps) {
-  const onboarding = useSyncExternalStore(subscribe, () => readOnboardingState(), () => readOnboardingState());
+  const onboarding = useSyncExternalStore(subscribe, readOnboardingState, getServerOnboardingSnapshot);
 
   const welcomeVisible = showWelcome || !onboarding.welcomeDismissed;
 
