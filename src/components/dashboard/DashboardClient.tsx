@@ -302,6 +302,7 @@ export default function DashboardClient({
                 { href: '/funds/compare', label: 'Compare', icon: GitCompare },
                 { href: '/portfolio/report', label: 'Report', icon: FileText },
                 { href: '/tools/sip-calculator', label: 'SIP Planner', icon: Calculator },
+                { href: '/tools/swp-calculator', label: 'SWP Planner', icon: Wallet },
               ].map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}

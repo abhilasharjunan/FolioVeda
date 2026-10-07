@@ -92,6 +92,7 @@ describe('Navbar', () => {
     expect(within(container).getByText('MF Academy')).toBeTruthy();
     expect(within(container).getByText('Sign in')).toBeTruthy();
     expect(within(container).queryByText('SIP Calculator')).toBeNull();
+    expect(within(container).queryByText('SWP Calculator')).toBeNull();
     expect(within(container).queryByText("What's New")).toBeNull();
     expect(within(container).queryByText('About')).toBeNull();
     expect(within(container).queryByText('Dashboard')).toBeNull();
@@ -102,6 +103,7 @@ describe('Navbar', () => {
     mockUsePathname.mockReturnValue('/dashboard');
     const { container } = render(<Navbar />);
     expect(within(container).getByText('SIP Calculator')).toBeTruthy();
+    expect(within(container).getByText('SWP Calculator')).toBeTruthy();
     expect(within(container).getByText("What's New")).toBeTruthy();
   });
 

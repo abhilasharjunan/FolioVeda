@@ -434,19 +434,31 @@ export default function AcademyPage() {
             Ready to test your wealth growth numbers?
           </h3>
           <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl mx-auto">
-            Use FolioVeda&apos;s SIP Calculator and Scenario Comparison to simulate compounding across
-            5, 10, and 15 years — including step-up SIPs.
+            Use FolioVeda&apos;s SIP and SWP Calculators with Scenario Comparison to simulate
+            compounding and withdrawals across 5, 10, and 15 years — including step-ups.
           </p>
-          <Link
-            href="/tools/sip-calculator"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "bg-indigo-600 hover:bg-indigo-500 text-white font-semibold gap-2 inline-flex"
-            )}
-          >
-            Open SIP Calculator
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/tools/sip-calculator"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "bg-indigo-600 hover:bg-indigo-500 text-white font-semibold gap-2 inline-flex"
+              )}
+            >
+              Open SIP Calculator
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/tools/swp-calculator"
+              className={cn(
+                buttonVariants({ size: "lg", variant: "outline" }),
+                "font-semibold gap-2 inline-flex"
+              )}
+            >
+              Open SWP Calculator
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </FadeIn>
     </div>

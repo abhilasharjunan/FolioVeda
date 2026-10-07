@@ -10,6 +10,14 @@ import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
   {
+    version: '1.7.0',
+    date: 'Oct 2026',
+    items: [
+      'SWP Calculator: plan withdrawals, find a sustainable monthly SWP, and compare scenarios (sign-in required)',
+      'Dashboard quick action and nav link for SWP Planner alongside SIP',
+    ],
+  },
+  {
     version: '1.6.3',
     date: 'Oct 2026',
     items: [
