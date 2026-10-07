@@ -1,0 +1,89 @@
+[
+  {
+    "version": "1.9.5",
+    "date": "Oct 2026",
+    "items": [
+      "On-demand risk backfill for empty categories (e.g. Momentum Index Funds)",
+      "Rename Market Funds to Top Funds across nav and page shell",
+      "Populate Momentum Index Funds in Returns rankings (NSE strategy indices)",
+      "Combine Fund Ratings and Top Funds into one page with Returns | Risk",
+      "Interactive user feedback with admin triage",
+      "Club SIP and SWP planners into one tools page",
+      "Stop search overlapping category filters on fund pages"
+    ]
+  },
+  {
+    "version": "1.8.1",
+    "date": "Oct 2026",
+    "items": [
+      "SWP Calculator: plan withdrawals, find a sustainable monthly SWP, and compare scenarios (sign-in required)",
+      "Dashboard quick action and nav link for SWP Planner alongside SIP",
+      "About page: nav labeled About; Version History collapsed by default"
+    ]
+  },
+  {
+    "version": "1.6.3",
+    "date": "Oct 2026",
+    "items": [
+      "Dashboard labels absolute return clearly when holdings are too new for annualized XIRR",
+      "Asset allocation pie merges noisy AMFI category names into short buckets (Flexi Cap, Mid Cap, Index, …)",
+      "Onboarding tip copy adapts once you already have holdings",
+      "Admin: permanently delete user accounts (and cascaded portfolio data) from the users table"
+    ]
+  },
+  {
+    "version": "1.6.0",
+    "date": "Oct 2026",
+    "items": [
+      "Homepage “Inside FolioVeda” autoplay tour: dashboard, holdings, overlap, risk, diversification, compare, SIP, and report",
+      "Illustrative sample portfolio snapshot (no live account data) with SEBI-style disclaimer",
+      "Fixed login crash (React max update depth) from the onboarding checklist store",
+      "Mandatory local gate: npm run verify (production build + unit tests) before shipping"
+    ]
+  },
+  {
+    "version": "1.5.0",
+    "date": "Oct 2026",
+    "items": [
+      "Landing feature tour and first-run guide for new accounts (preview without a stored demo portfolio)",
+      "SIP Calculator and About require sign-in; public nav keeps MF Academy",
+      "SIP Scenario Comparison layout stacks fields under each scenario instead of drifting right"
+    ]
+  },
+  {
+    "version": "1.4.0",
+    "date": "Oct 2026",
+    "items": [
+      "Tap any fund name to open a detail slide-over: holdings, sector mix, and multi-period returns",
+      "Returns compared side-by-side with UTI Nifty 50 Index Fund (alpha per period)",
+      "Fund manager tenure and brief history when available from scheme data"
+    ]
+  },
+  {
+    "version": "1.3.6",
+    "date": "Aug 2026",
+    "items": [
+      "Fixed stock overlap: holdings are cached correctly (no more empty N/A heatmap)",
+      "Look-through concentration shows your true aggregated stock exposure across funds",
+      "Pairwise overlap cards with weighted MIN methodology and stock-level detail"
+    ]
+  },
+  {
+    "version": "1.3.5",
+    "date": "Aug 2026",
+    "items": [
+      "Dashboard KPI ribbon with Portfolio Health and Asset Allocation side by side",
+      "XIRR shows absolute return when holding period is under ~1 year (no misleading annualized %)",
+      "SIP Calculator: flat vs step-up comparison and balanced input/results layout",
+      "Refined deep-slate theme, teal accents, and clearer typography hierarchy"
+    ]
+  },
+  {
+    "version": "1.3.3",
+    "date": "Aug 2026",
+    "items": [
+      "Dark-mode contrast fixes across Top Funds, Risk, Overlap, Report, and SIP",
+      "Restored Index Funds rankings with corrected Direct Growth scheme codes"
+    ]
+  }
+]

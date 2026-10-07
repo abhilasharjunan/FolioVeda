@@ -20,11 +20,12 @@ The version bumps automatically based on conventional commit prefixes:
 
 ## How It Works
 
-1. **Git Hook**: A `prepare-commit-msg` hook runs before each commit
+1. **Git Hook**: A `prepare-commit-msg` hook runs before each commit (install with `npm run prepare` / `node scripts/install-git-hooks.mjs`)
 2. **Message Parsing**: The hook reads your commit message
 3. **Version Detection**: Based on the conventional commit prefix, the appropriate version increment is applied
-4. **Auto-Update**: `package.json` is automatically updated with the new version
-5. **Auto-Staging**: The updated `package.json` is automatically staged
+4. **Auto-Update**: `package.json` is updated with the new version
+5. **Version History**: A release note is prepended to [`src/lib/changelog-data.json`](../src/lib/changelog-data.json) (shown on `/about`) from the commit subject, skipping pure `chore:`/`docs:` version-bump commits
+6. **Auto-Staging**: `package.json` and `changelog-data.json` are staged for the same commit
 
 ## Examples
 
@@ -55,7 +56,7 @@ git commit -m "BREAKING CHANGE: remove legacy fund search endpoint"
 - Footer and Auth screens also show `v{version}` from `package.json` via `NEXT_PUBLIC_APP_VERSION`
 
 ### Keeping What’s New current
-When you ship **user-visible** changes, add a new entry (or extend the current minor) at the top of `CHANGELOG` in [`src/app/about/page.tsx`](../src/app/about/page.tsx). Match the top entry’s `version` to `package.json` so the “current” badge highlights correctly. Skip pure chore version-bump commits.
+Version History updates automatically on each conventional commit via the prepare-commit-msg hook. Prefer clear `feat:` / `fix:` subjects — that text becomes the release bullet. You can still hand-edit [`src/lib/changelog-data.json`](../src/lib/changelog-data.json) to polish wording or group bullets. The top entry’s `version` should match `package.json` so the “current” badge highlights correctly.
 
 ### In Code
 ```typescript
