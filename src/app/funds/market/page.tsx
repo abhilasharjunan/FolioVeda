@@ -10,13 +10,13 @@ import { cn } from "@/lib/utils";
 import { FUND_CATEGORIES, type FundCategory } from "@/lib/funds";
 import {
   ReturnsPanel,
-  type MarketPanelHandle,
+  type TopFundsPanelHandle,
 } from "@/components/funds/ReturnsPanel";
 import { RiskPanel } from "@/components/funds/RiskPanel";
 
-export type MarketMode = "returns" | "risk";
+export type TopFundsMode = "returns" | "risk";
 
-function parseMode(raw: string | null): MarketMode {
+function parseMode(raw: string | null): TopFundsMode {
   return raw === "risk" ? "risk" : "returns";
 }
 
@@ -27,19 +27,19 @@ function parseCategory(raw: string | null): FundCategory | "All" {
     : "All";
 }
 
-function MarketFundsInner() {
+function TopFundsPageInner() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const reduceMotion = useReducedMotion();
-  const panelRef = useRef<MarketPanelHandle>(null);
+  const panelRef = useRef<TopFundsPanelHandle>(null);
 
   const mode = parseMode(searchParams.get("mode"));
   const category = parseCategory(searchParams.get("category"));
   const searchQuery = searchParams.get("q") ?? "";
 
   const replaceQuery = useCallback(
-    (patch: { mode?: MarketMode; category?: FundCategory | "All"; q?: string }) => {
+    (patch: { mode?: TopFundsMode; category?: FundCategory | "All"; q?: string }) => {
       const params = new URLSearchParams();
       const nextMode = patch.mode ?? mode;
       const nextCat = patch.category ?? category;
@@ -95,7 +95,7 @@ function MarketFundsInner() {
             )}
           >
             <HeroIcon size={16} />
-            <span>Market Insights · {hero.eyebrow}</span>
+            <span>Top Funds · {hero.eyebrow}</span>
           </div>
           <h1 className="relative text-3xl sm:text-4xl font-bold tracking-tight mt-2 font-heading">
             {hero.title}
@@ -214,16 +214,16 @@ function MarketFundsInner() {
   );
 }
 
-export default function MarketFundsPage() {
+export default function TopFundsPage() {
   return (
     <Suspense
       fallback={
         <div className="px-4 py-6 sm:p-6 max-w-7xl mx-auto text-sm text-slate-500">
-          Loading market funds…
+          Loading top funds…
         </div>
       }
     >
-      <MarketFundsInner />
+      <TopFundsPageInner />
     </Suspense>
   );
 }

@@ -26,7 +26,7 @@ import { MetricLabel, METRIC_EXPLANATIONS } from "@/components/ui/InfoTooltip";
 import { FundNameLink } from "@/components/funds/FundNameLink";
 import { useOpenFundDetail } from "@/components/funds/FundDetailContext";
 import type { FundCategory } from "@/lib/funds";
-import type { MarketPanelHandle } from "@/components/funds/ReturnsPanel";
+import type { TopFundsPanelHandle } from "@/components/funds/ReturnsPanel";
 
 interface RiskMetrics {
   volatility: number;
@@ -57,7 +57,7 @@ type RiskPanelProps = {
   searchQuery: string;
 };
 
-export const RiskPanel = forwardRef<MarketPanelHandle, RiskPanelProps>(
+export const RiskPanel = forwardRef<TopFundsPanelHandle, RiskPanelProps>(
   function RiskPanel({ activeCategory, searchQuery }, ref) {
     const openFund = useOpenFundDetail();
     const [data, setData] = useState<Record<string, FundRiskData[]> | null>(null);

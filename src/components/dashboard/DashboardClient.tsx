@@ -298,7 +298,7 @@ export default function DashboardClient({
               {[
                 { href: '/portfolio/risk', label: 'Risk X-Ray', icon: Activity },
                 { href: '/portfolio/overlap', label: 'Fund Overlap', icon: Layers },
-                { href: '/funds/market?mode=risk', label: 'Market Funds', icon: BarChart3 },
+                { href: '/funds/market?mode=risk', label: 'Top Funds', icon: BarChart3 },
                 { href: '/funds/compare', label: 'Compare', icon: GitCompare },
                 { href: '/portfolio/report', label: 'Report', icon: FileText },
                 { href: '/tools/sip-swp', label: 'SIP / SWP', icon: Calculator },

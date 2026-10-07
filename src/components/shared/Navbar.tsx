@@ -11,7 +11,7 @@ const primaryLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/funds/compare", label: "Compare" },
-  { href: "/funds/market", label: "Market Funds" },
+  { href: "/funds/market", label: "Top Funds" },
   { href: "/tools/sip-swp", label: "SIP / SWP" },
   { href: "/academy", label: "MF Academy" },
   { href: "/feedback", label: "Feedback" },

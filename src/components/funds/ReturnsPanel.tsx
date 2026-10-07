@@ -27,7 +27,7 @@ interface FundData {
   rank: number;
 }
 
-export type MarketPanelHandle = {
+export type TopFundsPanelHandle = {
   exportCsv: () => void;
 };
 
@@ -36,7 +36,7 @@ type ReturnsPanelProps = {
   searchQuery: string;
 };
 
-export const ReturnsPanel = forwardRef<MarketPanelHandle, ReturnsPanelProps>(
+export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
   function ReturnsPanel({ activeCategory, searchQuery }, ref) {
     const openFund = useOpenFundDetail();
     const [fundsData, setFundsData] = useState<Record<string, FundData[]>>({});

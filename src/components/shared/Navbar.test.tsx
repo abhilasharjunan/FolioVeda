@@ -70,7 +70,7 @@ describe('Navbar', () => {
     expect(within(container).getByText('Overlap')).toBeTruthy();
     expect(within(container).getByText('Report')).toBeTruthy();
     expect(within(container).getByText('Compare')).toBeTruthy();
-    expect(within(container).getByRole('link', { name: 'Market Funds' }).getAttribute('href')).toBe(
+    expect(within(container).getByRole('link', { name: 'Top Funds' }).getAttribute('href')).toBe(
       '/funds/market'
     );
   });
