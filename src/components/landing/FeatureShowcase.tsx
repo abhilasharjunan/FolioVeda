@@ -41,8 +41,8 @@ export function FeatureShowcase() {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-        <div className="relative min-h-[280px] sm:min-h-[300px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-12 items-center">
+        <div className="relative min-h-[220px] sm:min-h-[300px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={scene.id}

@@ -118,9 +118,9 @@ export default function LandingPage() {
       <div className="landing-ambient absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_#1a3a3633_0%,_transparent_55%),linear-gradient(180deg,#0d1219_0%,#101820_50%,#0e151c_100%)]" />
       <div className="absolute inset-0 -z-10 opacity-30 [background-image:radial-gradient(circle_at_1px_1px,rgb(148_163_184_/_0.12)_1px,transparent_0)] [background-size:28px_28px]" />
 
-      <nav className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 py-4">
+      <nav className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div className="flex justify-between items-center gap-3">
-          <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-100 tracking-tight font-heading shrink-0">
+          <div className="text-xl sm:text-3xl md:text-4xl font-bold text-slate-100 tracking-tight font-heading shrink-0">
             Folio<span className="text-teal-400">Veda</span>
           </div>
 
@@ -213,29 +213,29 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* Hero */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+      {/* Hero — compact on mobile so "Inside FolioVeda" lands in the first viewport */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pt-3 sm:pt-12 pb-3 sm:pb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-14 items-center">
           <FadeIn>
-            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-teal-400/90 mb-4">
+            <p className="text-[10px] sm:text-sm font-semibold uppercase tracking-[0.2em] text-teal-400/90 mb-2 sm:mb-4">
               Mutual fund portfolio analyzer
             </p>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-50 mb-4 tracking-tight font-heading leading-[1.05]">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-slate-50 mb-2 sm:mb-4 tracking-tight font-heading leading-[1.05]">
               Folio<span className="text-teal-400">Veda</span>
             </h1>
-            <p className="text-lg sm:text-xl font-medium text-slate-200 mb-3">
+            <p className="text-base sm:text-xl font-medium text-slate-200 mb-2 sm:mb-3">
               See what your funds are actually doing.
             </p>
-            <p className="text-sm sm:text-base text-slate-400 max-w-xl mb-8 leading-relaxed">
+            <p className="hidden sm:block text-sm sm:text-base text-slate-400 max-w-xl mb-8 leading-relaxed">
               XIRR that respects transaction dates, look-through overlap, and SEBI-aware risk — built for Indian Direct Growth investors.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 mt-3 sm:mt-0">
               <Link
                 href="/auth/signin"
                 prefetch
                 className={cn(
                   buttonVariants({ variant: "default", size: "lg" }),
-                  "bg-teal-600 hover:bg-teal-500 text-white px-8 py-5 text-base"
+                  "bg-teal-600 hover:bg-teal-500 text-white px-6 sm:px-8 py-4 sm:py-5 text-sm sm:text-base"
                 )}
               >
                 Start Analyzing Free
@@ -243,30 +243,31 @@ export default function LandingPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="px-8 py-5 text-base border-slate-600 bg-slate-900/40 text-slate-200 hover:bg-slate-800/60"
+                className="hidden sm:inline-flex px-8 py-5 text-base border-slate-600 bg-slate-900/40 text-slate-200 hover:bg-slate-800/60"
                 onClick={() => scrollTo("features")}
               >
                 See capabilities
               </Button>
             </div>
-            <p className="mt-4 text-xs text-slate-500">Direct plans · true XIRR · overlap & sector look-through</p>
+            <p className="hidden sm:block mt-4 text-xs text-slate-500">Direct plans · true XIRR · overlap & sector look-through</p>
           </FadeIn>
 
-          <FadeIn delay={0.08} className="lg:justify-self-end w-full max-w-md mx-auto lg:mx-0">
+          {/* Preview takes too much vertical space on phones — keep desktop only */}
+          <FadeIn delay={0.08} className="hidden lg:block lg:justify-self-end w-full max-w-md">
             <PortfolioPreview persona={LANDING_HERO_PREVIEW} />
           </FadeIn>
         </div>
       </section>
 
-      {/* Feature showcase */}
-      <PageSection id="features" className="max-w-7xl mx-auto px-4 sm:px-6 pb-20 sm:pb-24 scroll-mt-24">
+      {/* Feature showcase — first content block after hero on mobile */}
+      <PageSection id="features" className="max-w-7xl mx-auto px-4 sm:px-6 pt-1 sm:pt-4 pb-16 sm:pb-24 scroll-mt-20 sm:scroll-mt-24">
         <FadeIn>
-          <div className="text-center mb-10">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-50 font-heading">Inside FolioVeda</h2>
-            <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-xl mx-auto">
+          <div className="text-center mb-5 sm:mb-10">
+            <h2 className="text-xl sm:text-3xl font-bold text-slate-50 font-heading">Inside FolioVeda</h2>
+            <p className="text-slate-400 mt-1.5 sm:mt-2 text-xs sm:text-base max-w-xl mx-auto">
               A quick tour of what unlocks after you sign up — holdings, overlap, risk, compare, SIP, and reports.
             </p>
-            <p className="text-[11px] text-slate-500 mt-3 max-w-lg mx-auto leading-relaxed">
+            <p className="hidden sm:block text-[11px] text-slate-500 mt-3 max-w-lg mx-auto leading-relaxed">
               {LANDING_TOUR_DISCLAIMER}
             </p>
           </div>
