@@ -218,21 +218,21 @@ export default function RiskAnalysisPage() {
           </Card>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between py-4">
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar w-full md:w-auto">
-            <button 
+        <div className="flex flex-col gap-3 py-4">
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar w-full min-w-0">
+            <button
               onClick={() => setActiveCategory('All')}
-              className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+              className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                 activeCategory === 'All' ? 'bg-slate-900 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
               }`}
             >
               All Categories
             </button>
             {CATEGORIES.map(cat => (
-              <button 
+              <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                 activeCategory === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200 dark:border-slate-700'
               }`}
               >
@@ -240,37 +240,39 @@ export default function RiskAnalysisPage() {
               </button>
             ))}
           </div>
-          <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" size={16} />
-            <Input 
-              placeholder="Search funds..." 
-              className="pl-10 rounded-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-rose-500"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center sm:justify-end w-full shrink-0">
+            <div className="relative w-full sm:w-72 sm:max-w-xs shrink-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 pointer-events-none z-10" size={16} />
+              <Input
+                placeholder="Search funds..."
+                className="pl-10 rounded-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 focus:ring-rose-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button
+              onClick={() => {
+                const csvData = currentFunds.map(f => ({
+                  'Scheme Name': f.schemeName,
+                  'Category': f.category,
+                  'Risk Score': f.metrics.compositeScore.toFixed(2),
+                  'Volatility': (f.metrics.volatility * 100).toFixed(2) + '%',
+                  'Sharpe Ratio': f.metrics.sharpeRatio.toFixed(2),
+                  'Sortino Ratio': f.metrics.sortinoRatio.toFixed(2),
+                  'Max DD': (f.metrics.maxDrawdown * 100).toFixed(2) + '%',
+                  'Max DD Duration (months)': f.metrics.maxDrawdownDuration,
+                  'Alpha': (f.metrics.alpha * 100).toFixed(2) + '%',
+                  'Beta': f.metrics.beta.toFixed(2),
+                  'R-Squared': (f.metrics.rSquared * 100).toFixed(2) + '%',
+                  'Treynor Ratio': f.metrics.treynorRatio.toFixed(2),
+                }));
+                downloadCSV(csvData, 'fund-risk-analysis');
+              }}
+              className="shrink-0 px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              Export CSV
+            </button>
           </div>
-          <button
-            onClick={() => {
-              const csvData = currentFunds.map(f => ({
-                'Scheme Name': f.schemeName,
-                'Category': f.category,
-                'Risk Score': f.metrics.compositeScore.toFixed(2),
-                'Volatility': (f.metrics.volatility * 100).toFixed(2) + '%',
-                'Sharpe Ratio': f.metrics.sharpeRatio.toFixed(2),
-                'Sortino Ratio': f.metrics.sortinoRatio.toFixed(2),
-                'Max DD': (f.metrics.maxDrawdown * 100).toFixed(2) + '%',
-                'Max DD Duration (months)': f.metrics.maxDrawdownDuration,
-                'Alpha': (f.metrics.alpha * 100).toFixed(2) + '%',
-                'Beta': f.metrics.beta.toFixed(2),
-                'R-Squared': (f.metrics.rSquared * 100).toFixed(2) + '%',
-                'Treynor Ratio': f.metrics.treynorRatio.toFixed(2),
-              }));
-              downloadCSV(csvData, 'fund-risk-analysis');
-            }}
-            className="px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-2"
-          >
-            Export CSV
-          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
