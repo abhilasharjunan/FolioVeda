@@ -122,7 +122,8 @@ export const BENCHMARK_SCHEMES: BenchmarkScheme[] = [
   { schemeCode: "150754", schemeName: "Nippon India Nifty AAA PSU Bond Plus SDL Index Fund", category: "Index Funds" },
   { schemeCode: "148945", schemeName: "SBI Nifty Next 50 Index Fund", category: "Index Funds" },
   { schemeCode: "151157", schemeName: "HSBC Nifty 50 Index Fund", category: "Index Funds" },
-  // Momentum Index Funds (Direct Growth — curated + name-match elsewhere)
+  // Momentum Index Funds — NSE strategy indices (Direct Growth / FoF tracking ETFs)
+  // Pure: Nifty200 Momentum 30
   { schemeCode: "149800", schemeName: "Motilal Oswal Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
   { schemeCode: "148703", schemeName: "UTI Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
   { schemeCode: "150452", schemeName: "ICICI Prudential Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
@@ -130,9 +131,28 @@ export const BENCHMARK_SCHEMES: BenchmarkScheme[] = [
   { schemeCode: "151781", schemeName: "Kotak Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
   { schemeCode: "152430", schemeName: "HDFC Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
   { schemeCode: "153662", schemeName: "SBI Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152931", schemeName: "Baroda BNP Paribas Nifty200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  // Pure: Nifty Midcap150 Momentum 50
   { schemeCode: "150738", schemeName: "Tata Nifty Midcap 150 Momentum 50 Index Fund", category: "Momentum Index Funds" },
   { schemeCode: "150902", schemeName: "Edelweiss Nifty Midcap 150 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152916", schemeName: "Kotak Nifty Midcap 150 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  // Pure: Nifty500 Momentum 50
   { schemeCode: "152875", schemeName: "Motilal Oswal Nifty 500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152881", schemeName: "Nippon India Nifty 500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153003", schemeName: "Bandhan Nifty 500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153244", schemeName: "Axis Nifty500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "154032", schemeName: "Kotak Nifty500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153453", schemeName: "Groww Nifty 500 Momentum 50 ETF FOF", category: "Momentum Index Funds" },
+  // Multi-factor: Momentum + Quality
+  { schemeCode: "154383", schemeName: "Groww Nifty Smallcap 250 Momentum Quality 100 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153362", schemeName: "Navi Nifty Smallcap250 Momentum Quality 100 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152459", schemeName: "Mirae Asset Nifty Smallcap 250 Momentum Quality 100 ETF Fund of Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153272", schemeName: "UTI Nifty Midsmallcap 400 Momentum Quality 100 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152645", schemeName: "Mirae Asset Nifty MidSmallcap400 Momentum Quality 100 ETF Fund of Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152985", schemeName: "Edelweiss Nifty500 Multicap Momentum Quality 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153956", schemeName: "Angel One Nifty Total Market Momentum Quality 50 Index Fund", category: "Momentum Index Funds" },
+  // Midcap momentum FoF
+  { schemeCode: "154526", schemeName: "SBI Nifty Midcap 150 Momentum 50 ETF FOF", category: "Momentum Index Funds" },
   // International Funds (10 - all Direct Growth)
   { schemeCode: "149170", schemeName: "Mirae Asset S&P 500 Top 50 ETF FOF", category: "International Funds" },
   { schemeCode: "140274", schemeName: "Edelweiss US Value Equity Offshore Fund", category: "International Funds" },

@@ -172,13 +172,12 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
   const schemes =
     cat === "Momentum Index Funds"
       ? await prisma.schemeCatalog.findMany({
+          // Name match across catalog — many momentum index schemes are still
+          // tagged Index Funds (or uncategorized) until AMFI re-sync.
           where: {
             OR: [
               { category: "Momentum Index Funds" },
-              {
-                category: "Index Funds",
-                schemeName: { contains: "Momentum", mode: "insensitive" },
-              },
+              { schemeName: { contains: "Momentum", mode: "insensitive" } },
             ],
           },
           select: { schemeCode: true, schemeName: true, fundHouse: true },

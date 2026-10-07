@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import redis from "@/lib/redis";
-import { FundCategory } from "@/lib/funds";
+import { FUND_CATEGORIES, FundCategory } from "@/lib/funds";
 import { syncTopFundsCache } from "@/lib/sync-top-funds";
 import {
   TOP_FUNDS_REDIS_KEY,
@@ -10,10 +10,7 @@ import {
   setTopFundsRedisPayload,
 } from "@/lib/top-funds-cache";
 
-const EXPECTED_CATEGORIES: FundCategory[] = [
-  "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap",
-  "ELSS", "Debt", "Hybrid", "Index Funds", "International Funds",
-];
+const EXPECTED_CATEGORIES: FundCategory[] = FUND_CATEGORIES;
 const TARGET_PER_CATEGORY = 10;
 
 // Allow a short on-demand refill when a category is empty (e.g. after bad
