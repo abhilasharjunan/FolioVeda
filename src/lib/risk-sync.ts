@@ -7,10 +7,11 @@ import {
   type BenchmarkScheme,
 } from "./funds";
 
+/** Accepts Prisma Decimal | number | null — we only null-check these fields. */
 type SchemeRiskRow = {
   schemeCode: string;
-  riskScore: number | null;
-  sharpeRatio: number | null;
+  riskScore: unknown;
+  sharpeRatio: unknown;
 };
 
 /** Benchmark schemes with no persisted risk metrics yet (new category rows, cron lag). */
