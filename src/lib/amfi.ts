@@ -7,6 +7,10 @@ import { FundCategory } from "./funds";
  * per-scheme mfapi.in calls used elsewhere (fetchSchemeDetails/getHistoricalNav)
  * which only cover the ~90-scheme curated BENCHMARK_SCHEMES list.
  *
+ * Column layout (as of 2026): Scheme Code; ISIN Growth; ISIN Reinvest; Scheme
+ * Name; Plan; Option; NAV; Date. Older dumps omitted Plan/Option — the parser
+ * accepts both.
+ *
  * This is what powers: (1) full-universe autocomplete/search via SchemeCatalog,
  * and (2) a much cheaper daily latestNav refresh for SchemeMaster — one bulk
  * fetch + DB writes, instead of one external API call per held scheme.
@@ -104,9 +108,32 @@ export function mapAmfiCategoryToFundCategory(
 
 function parseAmfiLine(line: string): { schemeCode: string; isinGrowth: string | null; isinReinvestment: string | null; schemeName: string; nav: number; date: string } | null {
   const parts = line.split(";");
+  // Legacy (6 cols): Code;ISIN Growth;ISIN Reinvest;Name;NAV;Date
+  // Current (8 cols): Code;ISIN Growth;ISIN Reinvest;Name;Plan;Option;NAV;Date
+  // AMFI inserted Plan/Option in 2026; reading the old layout treats Plan as NAV
+  // and drops every row, which is why NavSnapshot stopped updating.
   if (parts.length < 6) return null;
 
-  const [schemeCodeRaw, isinGrowthRaw, isinReinvestmentRaw, schemeNameRaw, navRaw, dateRaw] = parts;
+  const schemeCodeRaw = parts[0];
+  const isinGrowthRaw = parts[1];
+  const isinReinvestmentRaw = parts[2];
+  const schemeNameRaw = parts[3];
+  let navRaw: string;
+  let dateRaw: string;
+  let schemeName: string;
+
+  if (parts.length >= 8) {
+    const plan = parts[4].trim();
+    const option = parts[5].trim();
+    navRaw = parts[6];
+    dateRaw = parts[7];
+    schemeName = [schemeNameRaw.trim(), plan, option].filter(Boolean).join(" - ");
+  } else {
+    navRaw = parts[4];
+    dateRaw = parts[5];
+    schemeName = schemeNameRaw.trim();
+  }
+
   const schemeCode = schemeCodeRaw.trim();
   if (!schemeCode || !/^\d+$/.test(schemeCode)) return null;
 
@@ -122,7 +149,7 @@ function parseAmfiLine(line: string): { schemeCode: string; isinGrowth: string |
     schemeCode,
     isinGrowth: clean(isinGrowthRaw),
     isinReinvestment: clean(isinReinvestmentRaw),
-    schemeName: schemeNameRaw.trim(),
+    schemeName,
     nav,
     date: dateRaw.trim(),
   };

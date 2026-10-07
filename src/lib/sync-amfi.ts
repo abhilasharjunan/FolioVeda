@@ -14,10 +14,20 @@ function chunk<T>(items: T[], size: number): T[][] {
   return out;
 }
 
+const AMFI_MONTHS: Record<string, number> = {
+  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
+};
+
 function parseAmfiDate(dateStr: string): Date | null {
-  // AMFI dates look like "09-Jul-2026"
-  const d = new Date(dateStr);
-  return isFinite(d.getTime()) ? d : null;
+  // AMFI dates look like "09-Jul-2026". Parse as UTC midnight so
+  // toISOString().slice(0, 10) keeps the published calendar day in IST.
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(dateStr.trim());
+  if (!m) return null;
+  const month = AMFI_MONTHS[m[2]];
+  if (month === undefined) return null;
+  const d = new Date(Date.UTC(Number(m[3]), month, Number(m[1])));
+  return Number.isFinite(d.getTime()) ? d : null;
 }
 
 async function bulkUpsertSchemeCatalog(records: AmfiSchemeRecord[]): Promise<number> {

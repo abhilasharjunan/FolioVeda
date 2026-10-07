@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.9.10",
+    "date": "Oct 2026",
+    "items": [
+      "Fix AMFI NAV parser for Plan/Option columns."
+    ]
+  },
+  {
     "version": "1.9.9",
     "date": "Oct 2026",
     "items": [

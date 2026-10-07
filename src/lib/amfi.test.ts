@@ -9,7 +9,8 @@ import {
 // header row, blank-line-separated sections, category headers, AMC name
 // headers, and semicolon-delimited data rows (some with "-" for a missing
 // reinvestment ISIN, which is common for growth-only plans).
-const SAMPLE = `Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
+// Pre-2026 layout (6 columns, no Plan/Option).
+const SAMPLE_LEGACY = `Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Net Asset Value;Date
 
 Open Ended Schemes(Large Cap Fund)
 
@@ -29,6 +30,29 @@ Open Ended Schemes(Overnight Fund)
 Aditya Birla Sun Life Mutual Fund
 
 103360;INF209K01UP7;INF209K01UQ5;Aditya Birla Sun Life Overnight Fund - Direct Plan-Growth;1279.5678;09-Jul-2026
+`;
+
+// Current AMFI layout (8 columns with Plan;Option before NAV;Date).
+const SAMPLE = `Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date
+
+Open Ended Schemes(Large Cap Fund)
+
+Franklin Templeton Mutual Fund
+
+118531;INF090I01239;-;Franklin India Large Cap Fund;Direct Plan;Growth;187.4500;07-Oct-2026
+118530;INF090I01221;INF090I01AB1;Franklin India Large Cap Fund;Regular Plan;Growth;150.1200;07-Oct-2026
+
+Open Ended Schemes(ELSS)
+
+HDFC Mutual Fund
+
+119060;INF179K01BE0;-;HDFC ELSS Tax saver;Direct Plan;Growth Option;900.1234;07-Oct-2026
+
+Open Ended Schemes(Overnight Fund)
+
+Aditya Birla Sun Life Mutual Fund
+
+103360;INF209K01UP7;INF209K01UQ5;Aditya Birla Sun Life Overnight Fund;Direct Plan;Growth;1279.5678;07-Oct-2026
 `;
 
 describe('parseAmfiNavAll', () => {
@@ -53,11 +77,22 @@ describe('parseAmfiNavAll', () => {
     const records = parseAmfiNavAll(SAMPLE);
     const franklin = records.find((r) => r.schemeCode === '118531')!;
     expect(franklin.nav).toBeCloseTo(187.45, 4);
+    expect(franklin.date).toBe('07-Oct-2026');
+    expect(franklin.schemeName).toBe('Franklin India Large Cap Fund - Direct Plan - Growth');
     expect(franklin.isinReinvestment).toBeNull();
     expect(franklin.isinGrowth).toBe('INF090I01239');
 
     const growthAndReinvestment = records.find((r) => r.schemeCode === '118530')!;
     expect(growthAndReinvestment.isinReinvestment).toBe('INF090I01AB1');
+  });
+
+  it('still parses the legacy 6-column AMFI layout', () => {
+    const records = parseAmfiNavAll(SAMPLE_LEGACY);
+    expect(records).toHaveLength(4);
+    const franklin = records.find((r) => r.schemeCode === '118531')!;
+    expect(franklin.nav).toBeCloseTo(187.45, 4);
+    expect(franklin.date).toBe('09-Jul-2026');
+    expect(franklin.schemeName).toBe('Franklin India Large Cap Fund - Direct Plan-Growth');
   });
 
   it('maps recognized categories to the app taxonomy', () => {
