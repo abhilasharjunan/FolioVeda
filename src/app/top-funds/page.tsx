@@ -1,8 +1,6 @@
-import React from 'react';
-import TopFundsClient from './TopFundsClient';
+import { redirect } from "next/navigation";
 
-export const dynamic = 'force-dynamic';
-
-export default function TopFundsPage() {
-  return <TopFundsClient />;
+/** Legacy route — see next.config redirects and /funds/market */
+export default function TopFundsRedirectPage() {
+  redirect("/funds/market?mode=returns");
 }

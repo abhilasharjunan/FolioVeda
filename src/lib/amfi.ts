@@ -35,13 +35,35 @@ export interface AmfiSchemeRecord {
 const CATEGORY_HEADER_RE = /^(Open|Close|Interval)\s+Ended\s+Schemes?\s*\(/i;
 
 /**
- * Best-effort mapping from AMFI's granular scheme categories (dozens of them)
- * down to the app's 9-category taxonomy. Ordered by specificity — first match
- * wins. Anything not matched (sectoral/thematic, solution-oriented, FoF
- * domestic, close-ended, etc.) returns null rather than a guess.
+ * Momentum index / ETF schemes are not a clean AMFI header — detect from
+ * category text or scheme name. Requires "momentum" plus an index/ETF cue so
+ * active "Momentum" equity funds are not misclassified.
  */
-export function mapAmfiCategoryToFundCategory(amfiCategory: string): FundCategory | null {
+export function isMomentumIndexText(...parts: Array<string | null | undefined>): boolean {
+  const t = parts.filter(Boolean).join(" ").toLowerCase();
+  if (!t.includes("momentum")) return false;
+  return (
+    t.includes("index") ||
+    t.includes("etf") ||
+    t.includes("momentum 30") ||
+    t.includes("momentum 50") ||
+    t.includes("momentum quality")
+  );
+}
+
+/**
+ * Best-effort mapping from AMFI's granular scheme categories (dozens of them)
+ * down to the app's taxonomy. Ordered by specificity — first match wins.
+ * Pass `schemeName` when available so momentum index products are split out
+ * of generic Index Funds. Anything not matched returns null rather than a guess.
+ */
+export function mapAmfiCategoryToFundCategory(
+  amfiCategory: string,
+  schemeName?: string | null
+): FundCategory | null {
   const c = amfiCategory.toLowerCase();
+
+  if (isMomentumIndexText(amfiCategory, schemeName)) return "Momentum Index Funds";
 
   if (c.includes("elss")) return "ELSS";
   if (c.includes("large cap")) return "Large Cap";
@@ -123,7 +145,7 @@ export function parseAmfiNavAll(raw: string): AmfiSchemeRecord[] {
         ...parsed,
         amcName: currentAmcName,
         amfiCategory: currentAmfiCategory,
-        category: mapAmfiCategoryToFundCategory(currentAmfiCategory),
+        category: mapAmfiCategoryToFundCategory(currentAmfiCategory, parsed.schemeName),
       });
       continue;
     }

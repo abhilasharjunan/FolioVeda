@@ -11,10 +11,10 @@ const primaryLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/funds/compare", label: "Compare" },
-  { href: "/top-funds", label: "Top Funds" },
-  { href: "/risk-analysis", label: "Fund Ratings" },
+  { href: "/funds/market", label: "Market Funds" },
   { href: "/tools/sip-swp", label: "SIP / SWP" },
   { href: "/academy", label: "MF Academy" },
+  { href: "/feedback", label: "Feedback" },
   { href: "/about", label: "About" },
 ];
 

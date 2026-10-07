@@ -15,6 +15,26 @@ const nextConfig: NextConfig = {
         destination: '/tools/sip-swp?mode=swp',
         permanent: true,
       },
+      {
+        source: '/top-funds',
+        destination: '/funds/market?mode=returns',
+        permanent: true,
+      },
+      {
+        source: '/top-funds/:path*',
+        destination: '/funds/market?mode=returns',
+        permanent: true,
+      },
+      {
+        source: '/risk-analysis',
+        destination: '/funds/market?mode=risk',
+        permanent: true,
+      },
+      {
+        source: '/risk-analysis/:path*',
+        destination: '/funds/market?mode=risk',
+        permanent: true,
+      },
     ];
   },
   env: {

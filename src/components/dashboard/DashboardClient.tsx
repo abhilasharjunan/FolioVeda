@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   TrendingUp, Wallet, PieChart, AlertCircle, ShieldAlert, ArrowRight,
-  Activity, Layers, Calculator, FileText, GitCompare, BarChart3,
+  Activity, Layers, Calculator, FileText, GitCompare, BarChart3, MessageSquare,
 } from 'lucide-react';
 import { ResponsiveContainer, PieChart as RePie, Pie, Cell, Tooltip } from 'recharts';
 import { FadeIn, StaggerChildren, StaggerItem } from '@/components/animations';
@@ -298,10 +298,11 @@ export default function DashboardClient({
               {[
                 { href: '/portfolio/risk', label: 'Risk X-Ray', icon: Activity },
                 { href: '/portfolio/overlap', label: 'Fund Overlap', icon: Layers },
-                { href: '/risk-analysis', label: 'Fund Ratings', icon: BarChart3 },
+                { href: '/funds/market?mode=risk', label: 'Market Funds', icon: BarChart3 },
                 { href: '/funds/compare', label: 'Compare', icon: GitCompare },
                 { href: '/portfolio/report', label: 'Report', icon: FileText },
                 { href: '/tools/sip-swp', label: 'SIP / SWP', icon: Calculator },
+                { href: '/feedback', label: 'Feedback', icon: MessageSquare },
               ].map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}

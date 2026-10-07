@@ -187,6 +187,14 @@ export default function AdminClient() {
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Product funnel and light ops. Passwords and holdings details are never shown.
           </p>
+          <div className="pt-2">
+            <Link
+              href="/admin/feedback"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-teal-700 dark:text-teal-300 hover:underline"
+            >
+              Triage user feedback →
+            </Link>
+          </div>
         </header>
       </FadeIn>
 

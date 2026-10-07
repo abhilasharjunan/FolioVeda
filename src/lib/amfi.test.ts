@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { parseAmfiNavAll, mapAmfiCategoryToFundCategory } from './amfi';
+import {
+  parseAmfiNavAll,
+  mapAmfiCategoryToFundCategory,
+  isMomentumIndexText,
+} from './amfi';
 
 // A trimmed but structurally faithful sample of AMFI's NAVAll.txt format:
 // header row, blank-line-separated sections, category headers, AMC name
@@ -96,5 +100,33 @@ describe('mapAmfiCategoryToFundCategory', () => {
   it('returns null for categories outside the app taxonomy', () => {
     expect(mapAmfiCategoryToFundCategory('Open Ended Schemes(Sectoral/Thematic)')).toBeNull();
     expect(mapAmfiCategoryToFundCategory('Close Ended Schemes(Fixed Term Plan)')).toBeNull();
+  });
+
+  it('maps momentum index products ahead of generic Index Funds', () => {
+    expect(
+      mapAmfiCategoryToFundCategory(
+        'Open Ended Schemes(Index Funds)',
+        'Motilal Oswal Nifty 200 Momentum 30 Index Fund - Direct Plan - Growth'
+      )
+    ).toBe('Momentum Index Funds');
+    expect(
+      mapAmfiCategoryToFundCategory(
+        'Open Ended Schemes(Index Funds)',
+        'UTI Nifty 50 Index Fund - Direct Plan - Growth'
+      )
+    ).toBe('Index Funds');
+  });
+
+  it('does not classify active momentum equity funds as Momentum Index Funds', () => {
+    expect(
+      mapAmfiCategoryToFundCategory(
+        'Open Ended Schemes(Sectoral/Thematic)',
+        'quant Momentum Fund - Direct Plan - Growth Option'
+      )
+    ).toBeNull();
+    expect(isMomentumIndexText('Samco Active Momentum Fund - Direct Plan - Growth')).toBe(false);
+    expect(
+      isMomentumIndexText('Edelweiss Nifty Midcap150 Momentum 50 Index Fund - Direct Plan - Growth')
+    ).toBe(true);
   });
 });

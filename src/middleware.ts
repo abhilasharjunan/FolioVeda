@@ -14,6 +14,7 @@ export default async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/risk-analysis") ||
     request.nextUrl.pathname.startsWith("/tools") ||
     request.nextUrl.pathname.startsWith("/about") ||
+    request.nextUrl.pathname.startsWith("/feedback") ||
     request.nextUrl.pathname.startsWith("/account") ||
     request.nextUrl.pathname.startsWith("/admin");
 
@@ -38,6 +39,8 @@ export const config = {
     "/tools/:path*",
     "/about",
     "/about/:path*",
+    "/feedback",
+    "/feedback/:path*",
     "/account/:path*",
     "/admin/:path*",
     "/auth/:path*",

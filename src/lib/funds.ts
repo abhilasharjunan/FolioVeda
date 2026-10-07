@@ -1,15 +1,30 @@
 import { fetchSchemeDetails } from "./mfapi";
 
-export type FundCategory = 
-  | "Large Cap" 
-  | "Mid Cap" 
-  | "Small Cap" 
-  | "Flexi Cap" 
-  | "ELSS" 
-  | "Debt" 
-  | "Hybrid" 
-  | "Index Funds" 
+export type FundCategory =
+  | "Large Cap"
+  | "Mid Cap"
+  | "Small Cap"
+  | "Flexi Cap"
+  | "ELSS"
+  | "Debt"
+  | "Hybrid"
+  | "Index Funds"
+  | "Momentum Index Funds"
   | "International Funds";
+
+/** Canonical category list for UI chips, sync batches, and filters. */
+export const FUND_CATEGORIES: FundCategory[] = [
+  "Large Cap",
+  "Mid Cap",
+  "Small Cap",
+  "Flexi Cap",
+  "ELSS",
+  "Debt",
+  "Hybrid",
+  "Index Funds",
+  "Momentum Index Funds",
+  "International Funds",
+];
 
 export interface BenchmarkScheme {
   schemeCode: string;
@@ -107,6 +122,17 @@ export const BENCHMARK_SCHEMES: BenchmarkScheme[] = [
   { schemeCode: "150754", schemeName: "Nippon India Nifty AAA PSU Bond Plus SDL Index Fund", category: "Index Funds" },
   { schemeCode: "148945", schemeName: "SBI Nifty Next 50 Index Fund", category: "Index Funds" },
   { schemeCode: "151157", schemeName: "HSBC Nifty 50 Index Fund", category: "Index Funds" },
+  // Momentum Index Funds (Direct Growth — curated + name-match elsewhere)
+  { schemeCode: "149800", schemeName: "Motilal Oswal Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "148703", schemeName: "UTI Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "150452", schemeName: "ICICI Prudential Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "150591", schemeName: "Bandhan Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "151781", schemeName: "Kotak Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152430", schemeName: "HDFC Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "153662", schemeName: "SBI Nifty 200 Momentum 30 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "150738", schemeName: "Tata Nifty Midcap 150 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "150902", schemeName: "Edelweiss Nifty Midcap 150 Momentum 50 Index Fund", category: "Momentum Index Funds" },
+  { schemeCode: "152875", schemeName: "Motilal Oswal Nifty 500 Momentum 50 Index Fund", category: "Momentum Index Funds" },
   // International Funds (10 - all Direct Growth)
   { schemeCode: "149170", schemeName: "Mirae Asset S&P 500 Top 50 ETF FOF", category: "International Funds" },
   { schemeCode: "140274", schemeName: "Edelweiss US Value Equity Offshore Fund", category: "International Funds" },

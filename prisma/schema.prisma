@@ -32,6 +32,9 @@ model User {
   accounts      Account[]
   sessions      Session[]
   adminAuditLogs AdminAuditLog[] @relation("AdminActor")
+  feedbacks      Feedback[]       @relation("FeedbackAuthor")
+  feedbackVotes  FeedbackVote[]
+  feedbackDecisions Feedback[]    @relation("FeedbackDecider")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -259,4 +262,62 @@ model Goal {
   portfolio   Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   @@index([portfolioId])
+}
+
+enum FeedbackCategory {
+  IDEA
+  BUG
+  UX
+  DATA
+  OTHER
+}
+
+enum FeedbackStatus {
+  NEW
+  UNDER_REVIEW
+  PLANNED
+  IN_PROGRESS
+  DONE
+  DECLINED
+}
+
+model Feedback {
+  id          String           @id @default(uuid())
+  userId      String
+  category    FeedbackCategory
+  title       String
+  body        String
+  /// 1–5: how much this affects the user
+  impact      Int              @default(3)
+  /// 1–5: mood about this area of the product
+  mood        Int              @default(3)
+  status      FeedbackStatus   @default(NEW)
+  adminNote   String?
+  decidedAt   DateTime?
+  decidedById String?
+  voteCount   Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  user      User           @relation("FeedbackAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  decidedBy User?          @relation("FeedbackDecider", fields: [decidedById], references: [id], onDelete: SetNull)
+  votes     FeedbackVote[]
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@index([category])
+  @@index([voteCount])
+}
+
+model FeedbackVote {
+  id         String   @id @default(uuid())
+  feedbackId String
+  userId     String
+  createdAt  DateTime @default(now())
+
+  feedback Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([feedbackId, userId])
+  @@index([userId])
 }

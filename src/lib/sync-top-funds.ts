@@ -1,21 +1,20 @@
 import { prisma } from "@/lib/prisma";
 import {
   BENCHMARK_SCHEMES,
+  FUND_CATEGORIES,
   FundCategory,
   calculateCAGR,
   computePeriodReturnsFromMfapi,
   getHistoricalNav,
 } from "@/lib/funds";
+import { isMomentumIndexText } from "@/lib/amfi";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
 import { isDirectGrowthScheme } from "@/lib/scheme-filters";
 import { refreshTopFundsRedisFromDb } from "@/lib/top-funds-cache";
 
-const CATEGORIES: FundCategory[] = [
-  "Large Cap", "Mid Cap", "Small Cap", "Flexi Cap",
-  "ELSS", "Debt", "Hybrid", "Index Funds", "International Funds"
-];
+const CATEGORIES: FundCategory[] = FUND_CATEGORIES;
 
-// A single run across all 9 categories does live mfapi.in calls per scheme
+// A single run across all categories does live mfapi.in calls per scheme
 // and can't reliably finish inside Vercel's per-invocation time limit (Hobby
 // caps at 60s). CATEGORY_BATCHES splits the work into smaller chunks (see
 // .github/workflows/scheduled-syncs.yml + the `batch` query param on the
@@ -23,7 +22,7 @@ const CATEGORIES: FundCategory[] = [
 export const CATEGORY_BATCHES: FundCategory[][] = [
   ["Large Cap", "Mid Cap", "Small Cap"],
   ["Flexi Cap", "ELSS", "Debt"],
-  ["Hybrid", "Index Funds", "International Funds"],
+  ["Hybrid", "Index Funds", "Momentum Index Funds", "International Funds"],
 ];
 
 const FULL_UNIVERSE_CANDIDATES_PER_CATEGORY = 200;
@@ -170,16 +169,36 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
  * history only. Direct Growth plans only — Regular / IDCW / Dividend excluded.
  */
 async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[]> {
-  const schemes = await prisma.schemeCatalog.findMany({
-    where: { category: cat },
-    select: { schemeCode: true, schemeName: true, fundHouse: true },
-    orderBy: { schemeName: "asc" },
-    take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
-  });
+  const schemes =
+    cat === "Momentum Index Funds"
+      ? await prisma.schemeCatalog.findMany({
+          where: {
+            OR: [
+              { category: "Momentum Index Funds" },
+              {
+                category: "Index Funds",
+                schemeName: { contains: "Momentum", mode: "insensitive" },
+              },
+            ],
+          },
+          select: { schemeCode: true, schemeName: true, fundHouse: true },
+          orderBy: { schemeName: "asc" },
+          take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
+        })
+      : await prisma.schemeCatalog.findMany({
+          where: { category: cat },
+          select: { schemeCode: true, schemeName: true, fundHouse: true },
+          orderBy: { schemeName: "asc" },
+          take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
+        });
   if (schemes.length === 0) return [];
 
   const directGrowth = schemes
-    .filter((s) => isDirectGrowthScheme(s.schemeName))
+    .filter((s) => {
+      if (!isDirectGrowthScheme(s.schemeName)) return false;
+      if (cat === "Momentum Index Funds") return isMomentumIndexText(s.schemeName);
+      return true;
+    })
     .slice(0, FULL_UNIVERSE_CANDIDATES_PER_CATEGORY);
   if (directGrowth.length === 0) return [];
 

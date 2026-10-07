@@ -14,13 +14,13 @@ test.describe('Critical User Paths', () => {
     await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
-  test('risk analysis page redirects unauthenticated users to sign in', async ({ page }) => {
-    await page.goto('/risk-analysis');
+  test('market funds page redirects unauthenticated users to sign in', async ({ page }) => {
+    await page.goto('/funds/market');
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/.*auth\/signin.*/);
   });
 
-  test('top funds page redirects unauthenticated users to sign in', async ({ page }) => {
+  test('legacy top funds URL still requires sign in', async ({ page }) => {
     await page.goto('/top-funds');
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/.*auth\/signin.*/);

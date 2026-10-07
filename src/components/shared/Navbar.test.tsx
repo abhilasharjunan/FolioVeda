@@ -70,7 +70,9 @@ describe('Navbar', () => {
     expect(within(container).getByText('Overlap')).toBeTruthy();
     expect(within(container).getByText('Report')).toBeTruthy();
     expect(within(container).getByText('Compare')).toBeTruthy();
-    expect(within(container).getByText('Top Funds')).toBeTruthy();
+    expect(within(container).getByRole('link', { name: 'Market Funds' }).getAttribute('href')).toBe(
+      '/funds/market'
+    );
   });
 
   it('highlights only the longest-matching portfolio sub-link', () => {
@@ -92,17 +94,21 @@ describe('Navbar', () => {
     expect(within(container).getByText('MF Academy')).toBeTruthy();
     expect(within(container).getByText('Sign in')).toBeTruthy();
     expect(within(container).queryByText('SIP / SWP')).toBeNull();
+    expect(within(container).queryByText('Feedback')).toBeNull();
     expect(within(container).queryByText('About')).toBeNull();
     expect(within(container).queryByText('Dashboard')).toBeNull();
     expect(within(container).queryByText('Logout')).toBeNull();
   });
 
-  it('shows SIP / SWP and About only when authenticated', () => {
+  it('shows SIP / SWP, Feedback, and About only when authenticated', () => {
     mockUsePathname.mockReturnValue('/dashboard');
     const { container } = render(<Navbar />);
     expect(within(container).getByText('SIP / SWP')).toBeTruthy();
     expect(within(container).getByRole('link', { name: 'SIP / SWP' }).getAttribute('href')).toBe(
       '/tools/sip-swp'
+    );
+    expect(within(container).getByRole('link', { name: 'Feedback' }).getAttribute('href')).toBe(
+      '/feedback'
     );
     expect(within(container).getByText('About')).toBeTruthy();
   });
