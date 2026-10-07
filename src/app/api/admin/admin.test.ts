@@ -30,6 +30,26 @@ vi.mock("@/lib/prisma", () => ({
       deleteMany: vi.fn(),
       create: vi.fn(),
     },
+    feedback: {
+      count: vi.fn(),
+      findMany: vi.fn(),
+    },
+    navSnapshot: {
+      findFirst: vi.fn(),
+    },
+    schemeCatalog: {
+      count: vi.fn(),
+      findFirst: vi.fn(),
+    },
+    schemeMaster: {
+      count: vi.fn(),
+    },
+    topFundsCache: {
+      findFirst: vi.fn(),
+    },
+    transaction: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
@@ -56,6 +76,85 @@ describe("admin APIs", () => {
     });
     const res = await getUsers(new Request("http://localhost/api/admin/users"));
     expect(res.status).toBe(403);
+  });
+
+  it("counts recent logins separately from signups", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: { id: "admin-1", email: "a@x.com", name: "A", role: "ADMIN" },
+    });
+    vi.mocked(prisma.user.count).mockImplementation(async (args?: { where?: Record<string, unknown> }) => {
+      const where = args?.where;
+      if (!where) return 10;
+      if ("createdAt" in where) return 2;
+      if (
+        where.lastLoginAt &&
+        typeof where.lastLoginAt === "object" &&
+        "gte" in (where.lastLoginAt as object)
+      ) {
+        return 4;
+      }
+      if (where.lastLoginAt === null) return 3;
+      if ("disabledAt" in where) return 1;
+      if ("portfolios" in where) return 2;
+      return 0;
+    });
+    vi.mocked(prisma.user.findMany).mockImplementation(async (args?: { select?: Record<string, unknown> }) => {
+      if (args?.select && "createdAt" in args.select && !("id" in args.select)) {
+        return [{ createdAt: new Date() }] as never;
+      }
+      return [{ id: "u1", portfolios: [{ _count: { holdings: 3 } }] }] as never;
+    });
+    vi.mocked(prisma.transaction.findMany).mockResolvedValue([
+      { holding: { portfolio: { userId: "u1" } } },
+      { holding: { portfolio: { userId: "u1" } } },
+    ] as never);
+    vi.mocked(prisma.navSnapshot.findFirst).mockResolvedValue({
+      date: new Date("2026-10-01T00:00:00.000Z"),
+    } as never);
+    vi.mocked(prisma.schemeCatalog.count).mockResolvedValue(120);
+    vi.mocked(prisma.schemeCatalog.findFirst).mockResolvedValue({ updatedAt: new Date() } as never);
+    vi.mocked(prisma.schemeMaster.count).mockImplementation(async (args?: { where?: unknown }) =>
+      args?.where ? 5 : 80
+    );
+    vi.mocked(prisma.topFundsCache.findFirst).mockResolvedValue({ updatedAt: new Date() } as never);
+    vi.mocked(prisma.feedback.count).mockResolvedValue(1);
+    vi.mocked(prisma.feedback.findMany).mockResolvedValue([]);
+    vi.mocked(prisma.adminAuditLog.findMany).mockResolvedValue([]);
+
+    const res = await getMetrics();
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(body.kpis.signups7d).toBe(2);
+    expect(body.kpis.signups30d).toBe(2);
+    expect(body.kpis.logins7d).toBe(4);
+    expect(body.kpis.logins30d).toBe(4);
+    expect(body.usage.activeTransactions7d).toBe(1);
+    expect(body.usage.holdingBands.twoToFive).toBe(1);
+    expect(body.signupsByDay).toHaveLength(14);
+    expect(body.signupsByDay.reduce((sum: number, day: { count: number }) => sum + day.count, 0)).toBe(1);
+    expect(body.dataHealth.schemeCatalogCount).toBe(120);
+    expect(body.dataHealth.schemesMissingRisk).toBe(5);
+    expect(body.inbox.newCount).toBe(1);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+  });
+
+  it("filters the user list to people who have never logged in", async () => {
+    vi.mocked(requireAdmin).mockResolvedValue({
+      ok: true,
+      user: { id: "admin-1", email: "a@x.com", name: "A", role: "ADMIN" },
+    });
+    vi.mocked(prisma.user.findMany).mockResolvedValue([] as never);
+
+    const res = await getUsers(
+      new Request("http://localhost/api/admin/users?filter=never_logged_in")
+    );
+    expect(res.status).toBe(200);
+    expect(prisma.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { AND: [{ lastLoginAt: null }] },
+      })
+    );
   });
 
   it("returns 403 for non-admin on metrics", async () => {

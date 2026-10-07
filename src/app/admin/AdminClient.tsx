@@ -16,13 +16,26 @@ import {
   KeyRound,
   LogOut,
   Trash2,
+  LogIn,
+  Database,
+  MessageSquare,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/animations";
+import { CATEGORY_META, type FeedbackCategory } from "@/lib/feedback";
 import { toast } from "sonner";
+
+const USER_FILTERS: { id: string; label: string }[] = [
+  { id: "", label: "All" },
+  { id: "never_logged_in", label: "Never logged in" },
+  { id: "empty_portfolio", label: "Empty portfolio" },
+  { id: "disabled", label: "Disabled" },
+  { id: "no_consent", label: "No consent" },
+  { id: "stale_portfolio", label: "Portfolio idle 30d" },
+];
 
 type AdminUser = {
   id: string;
@@ -44,6 +57,8 @@ type Metrics = {
     totalAccounts: number;
     signups7d: number;
     signups30d: number;
+    logins7d: number;
+    logins30d: number;
     disabledCount: number;
     withHoldings: number;
     emptyPortfolio: number;
@@ -54,7 +69,33 @@ type Metrics = {
     loggedInAtLeastOnce: number;
     hasHoldings: number;
   };
+  usage: {
+    withGoals: number;
+    activeTransactions7d: number;
+    holdingBands: { one: number; twoToFive: number; sixPlus: number };
+  };
   signupsByDay: { date: string; count: number }[];
+  dataHealth: {
+    latestNavDate: string | null;
+    schemeCatalogCount: number;
+    schemeCatalogUpdatedAt: string | null;
+    schemesMissingRisk: number;
+    schemeCount: number;
+    topFundsUpdatedAt: string | null;
+  };
+  inbox: {
+    newCount: number;
+    underReviewCount: number;
+    openBugs: number;
+    openData: number;
+    recent: Array<{
+      id: string;
+      title: string;
+      category: FeedbackCategory;
+      status: string;
+      createdAt: string;
+    }>;
+  };
   auditLog: Array<{
     id: string;
     action: string;
@@ -79,21 +120,41 @@ function fmtDate(iso: string | null | undefined) {
   }).format(new Date(iso));
 }
 
+function fmtDay(iso: string | null) {
+  if (!iso) return "No snapshots yet";
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date(iso));
+}
+
+function updatedAgo(iso: string | null) {
+  if (!iso) return "No data yet";
+  const hours = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 36e5));
+  if (hours < 1) return "Updated just now";
+  if (hours < 48) return `Updated ${hours}h ago`;
+  return `Updated ${Math.round(hours / 24)}d ago`;
+}
+
 export default function AdminClient() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [q, setQ] = useState("");
+  const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const load = useCallback(async (search = q) => {
+  const load = useCallback(async (search = q, nextFilter = filter) => {
     setLoading(true);
     setError(null);
     try {
       const [mRes, uRes] = await Promise.all([
-        fetch("/api/admin/metrics"),
-        fetch(`/api/admin/users?q=${encodeURIComponent(search)}`),
+        fetch("/api/admin/metrics", { cache: "no-store" }),
+        fetch(
+          `/api/admin/users?q=${encodeURIComponent(search)}&filter=${encodeURIComponent(nextFilter)}`,
+          { cache: "no-store" }
+        ),
       ]);
       if (mRes.status === 403 || uRes.status === 403) {
         setError("Admin access required.");
@@ -113,7 +174,7 @@ export default function AdminClient() {
     } finally {
       setLoading(false);
     }
-  }, [q]);
+  }, [q, filter]);
 
   useEffect(() => {
     load("");
@@ -141,7 +202,7 @@ export default function AdminClient() {
       } else if (data.user) {
         setUsers((prev) => prev.map((u) => (u.id === userId ? data.user : u)));
       }
-      const mRes = await fetch("/api/admin/metrics");
+      const mRes = await fetch("/api/admin/metrics", { cache: "no-store" });
       if (mRes.ok) setMetrics(await mRes.json());
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Action failed");
@@ -202,6 +263,9 @@ export default function AdminClient() {
         {[
           { label: "Accounts", value: k.totalAccounts, icon: Users },
           { label: "Signups 7d", value: k.signups7d, icon: UserPlus },
+          { label: "Signups 30d", value: k.signups30d, icon: UserPlus },
+          { label: "Logins 7d", value: k.logins7d, icon: LogIn },
+          { label: "Logins 30d", value: k.logins30d, icon: LogIn },
           { label: "Empty portfolio", value: k.emptyPortfolio, icon: Briefcase },
           { label: "Disabled", value: k.disabledCount, icon: UserX },
         ].map((card) => (
@@ -223,7 +287,7 @@ export default function AdminClient() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <CardTitle className="font-heading text-lg">Activation funnel</CardTitle>
@@ -237,6 +301,31 @@ export default function AdminClient() {
               { label: "Logged in at least once", value: metrics!.funnel.loggedInAtLeastOnce },
               { label: "Has holdings (count only)", value: metrics!.funnel.hasHoldings },
               { label: "Never logged in again / yet", value: k.neverLoggedIn },
+            ].map((row) => (
+              <div key={row.label} className="flex justify-between gap-4">
+                <span className="text-slate-500">{row.label}</span>
+                <span className="font-semibold tabular-nums text-slate-900 dark:text-slate-100">
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="surface-card border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg">Usage</CardTitle>
+            <CardDescription>
+              Counts only. Amounts and fund names stay off this page.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {[
+              { label: "Has a goal", value: metrics!.usage.withGoals },
+              { label: "Recorded a transaction in 7d", value: metrics!.usage.activeTransactions7d },
+              { label: "1 fund", value: metrics!.usage.holdingBands.one },
+              { label: "2–5 funds", value: metrics!.usage.holdingBands.twoToFive },
+              { label: "6+ funds", value: metrics!.usage.holdingBands.sixPlus },
             ].map((row) => (
               <div key={row.label} className="flex justify-between gap-4">
                 <span className="text-slate-500">{row.label}</span>
@@ -272,31 +361,144 @@ export default function AdminClient() {
       <Card className="surface-card border-none shadow-sm">
         <CardHeader>
           <CardTitle className="font-heading text-lg">Signups (14 days)</CardTitle>
+          <CardDescription>
+            New accounts by India calendar day. Logins are the cards above, not these bars.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-end gap-1 h-24">
+          <div className="flex items-end gap-1 h-36">
             {metrics!.signupsByDay.map((d) => (
-              <div key={d.date} className="flex-1 flex flex-col items-center gap-1 min-w-0">
+              <div key={d.date} className="flex-1 flex flex-col justify-end items-center gap-1 min-w-0 h-full">
+                <span className="text-[10px] tabular-nums text-slate-500">{d.count}</span>
                 <div
-                  className="w-full max-w-[14px] rounded-t bg-teal-600/80 dark:bg-teal-500/70"
-                  style={{ height: `${Math.max(4, (d.count / maxDay) * 100)}%` }}
-                  title={`${d.date}: ${d.count}`}
+                  className="w-full max-w-[18px] rounded-t bg-teal-600/80 dark:bg-teal-500/70"
+                  style={{
+                    height: `${d.count === 0 ? 2 : Math.max(8, (d.count / maxDay) * 72)}px`,
+                  }}
+                  title={`${d.date}: ${d.count} signup${d.count === 1 ? "" : "s"}`}
                 />
+                <span className="text-[9px] text-slate-400 tabular-nums">{d.date.slice(8)}</span>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-slate-400 mt-2">Hover bars in a full chart later — counts in tooltip via title.</p>
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="surface-card border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg flex items-center gap-2">
+              <Database size={18} className="text-teal-600 dark:text-teal-400" />
+              Data jobs
+            </CardTitle>
+            <CardDescription>
+              Freshness of the NAV, catalog, risk, and top-funds caches.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            {[
+              { label: "Latest NAV snapshot", value: fmtDay(metrics!.dataHealth.latestNavDate) },
+              {
+                label: "Scheme catalog",
+                value: `${metrics!.dataHealth.schemeCatalogCount.toLocaleString("en-IN")} · ${updatedAgo(metrics!.dataHealth.schemeCatalogUpdatedAt)}`,
+              },
+              {
+                label: "Schemes missing a risk score",
+                value: `${metrics!.dataHealth.schemesMissingRisk.toLocaleString("en-IN")} of ${metrics!.dataHealth.schemeCount.toLocaleString("en-IN")}`,
+              },
+              {
+                label: "Top funds cache",
+                value: updatedAgo(metrics!.dataHealth.topFundsUpdatedAt),
+              },
+            ].map((row) => (
+              <div key={row.label} className="flex justify-between gap-4">
+                <span className="text-slate-500">{row.label}</span>
+                <span className="font-semibold text-right text-slate-900 dark:text-slate-100">
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card className="surface-card border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="font-heading text-lg flex items-center gap-2">
+              <MessageSquare size={18} className="text-teal-600 dark:text-teal-400" />
+              Feedback inbox
+            </CardTitle>
+            <CardDescription>
+              <Link href="/admin/feedback" className="text-teal-700 dark:text-teal-300 hover:underline">
+                Open triage
+              </Link>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "New", value: metrics!.inbox.newCount },
+                { label: "In review", value: metrics!.inbox.underReviewCount },
+                { label: "Open bugs", value: metrics!.inbox.openBugs },
+                { label: "Open data issues", value: metrics!.inbox.openData },
+              ].map((row) => (
+                <div key={row.label} className="rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2">
+                  <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+                    {row.label}
+                  </p>
+                  <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-slate-50">
+                    {row.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {metrics!.inbox.recent.length === 0 ? (
+              <p className="text-sm text-slate-400">No open feedback.</p>
+            ) : (
+              <ul className="space-y-2">
+                {metrics!.inbox.recent.map((item) => (
+                  <li key={item.id} className="flex items-start justify-between gap-3 text-xs">
+                    <span className="text-slate-700 dark:text-slate-200 min-w-0">
+                      <span className="font-semibold text-slate-500 mr-2">
+                        {CATEGORY_META[item.category].label}
+                      </span>
+                      {item.title}
+                    </span>
+                    <span className="text-slate-400 whitespace-nowrap">{fmtDate(item.createdAt)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className="surface-card border-none shadow-sm">
         <CardHeader className="space-y-3">
           <CardTitle className="font-heading text-lg">Users</CardTitle>
+          <div className="flex flex-wrap gap-2">
+            {USER_FILTERS.map((item) => (
+              <button
+                key={item.id || "all"}
+                type="button"
+                onClick={() => {
+                  setFilter(item.id);
+                  load(q, item.id);
+                }}
+                className={`rounded-full px-3 py-1 text-xs font-semibold border transition-colors ${
+                  filter === item.id
+                    ? "border-teal-500 bg-teal-50 text-teal-800 dark:bg-teal-950/40 dark:text-teal-200"
+                    : "border-slate-200 text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
           <form
             className="flex gap-2"
             onSubmit={(e) => {
               e.preventDefault();
-              load(q);
+              load(q, filter);
             }}
           >
             <div className="relative flex-1">
@@ -314,13 +516,15 @@ export default function AdminClient() {
           </form>
         </CardHeader>
         <CardContent className="table-scroll overflow-x-auto">
-          <table className="w-full text-left text-sm min-w-[720px]">
+          <table className="w-full text-left text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500">
                 <th className="py-2 pr-3">User</th>
                 <th className="py-2 pr-3">Joined</th>
                 <th className="py-2 pr-3">Last login</th>
                 <th className="py-2 pr-3">Portfolio</th>
+                <th className="py-2 pr-3">Updated</th>
+                <th className="py-2 pr-3">Consent</th>
                 <th className="py-2 pr-3">Status</th>
                 <th className="py-2">Actions</th>
               </tr>
@@ -352,6 +556,16 @@ export default function AdminClient() {
                       </span>
                     ) : (
                       <span className="text-slate-400">Empty</span>
+                    )}
+                  </td>
+                  <td className="py-3 pr-3 text-xs text-slate-500 whitespace-nowrap">
+                    {fmtDate(u.portfolioUpdatedAt)}
+                  </td>
+                  <td className="py-3 pr-3 text-xs">
+                    {u.consentGiven ? (
+                      <span className="text-emerald-600 dark:text-emerald-400">Yes</span>
+                    ) : (
+                      <span className="text-slate-400">No</span>
                     )}
                   </td>
                   <td className="py-3 pr-3">
@@ -437,7 +651,7 @@ export default function AdminClient() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400 text-sm">
+                  <td colSpan={8} className="py-8 text-center text-slate-400 text-sm">
                     No users found
                   </td>
                 </tr>
