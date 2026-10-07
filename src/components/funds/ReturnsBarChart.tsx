@@ -20,7 +20,7 @@ const periodLabels: Record<string, string> = {
 
 const periodOrder = ['1Y', '3Y', '5Y'];
 
-const fundColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+const fundColors = ['#0d9488', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 function SingleFundChart({ returns }: { returns: Record<string, number | null> }) {
   const values = periodOrder.map((p) => returns[p]).filter((v): v is number => v !== null);

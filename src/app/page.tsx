@@ -267,7 +267,7 @@ export default function LandingPage() {
             <p className="text-slate-400 mt-1.5 sm:mt-2 text-xs sm:text-base max-w-xl mx-auto">
               A quick tour of what unlocks after you sign up — holdings, overlap, risk, compare, SIP, and reports.
             </p>
-            <p className="hidden sm:block text-[11px] text-slate-500 mt-3 max-w-lg mx-auto leading-relaxed">
+            <p className="hidden sm:block text-xs text-slate-500 mt-3 max-w-lg mx-auto leading-relaxed">
               {LANDING_TOUR_DISCLAIMER}
             </p>
           </div>

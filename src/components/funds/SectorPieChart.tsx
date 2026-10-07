@@ -52,7 +52,7 @@ export const SectorPieChart = ({ data }: SectorPieChartProps) => {
           <Tooltip
             formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Allocation']}
             contentStyle={{
-              borderRadius: '10px',
+              borderRadius: '8px',
               border: 'none',
               boxShadow: '0 8px 24px rgb(15 23 42 / 0.12)',
               background: 'hsl(var(--card))',

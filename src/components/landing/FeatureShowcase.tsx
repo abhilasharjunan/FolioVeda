@@ -129,7 +129,7 @@ export function FeatureShowcase() {
               <ChevronRight size={18} />
             </button>
           </div>
-          <p className="text-[10px] text-slate-600 text-center sm:text-left">
+          <p className="text-xs text-slate-600 text-center sm:text-left">
             Auto-advances every {SCENE_MS / 1000}s · hover to pause
           </p>
         </div>

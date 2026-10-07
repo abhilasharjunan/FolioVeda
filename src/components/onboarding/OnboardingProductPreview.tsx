@@ -20,7 +20,7 @@ export function OnboardingProductPreview() {
         headlineClassName="text-slate-900 dark:text-slate-50"
         taglineClassName="text-slate-600 dark:text-slate-400"
       />
-      <p className="text-[10px] text-center sm:text-left text-slate-500 dark:text-slate-500 leading-relaxed">
+      <p className="text-xs text-center sm:text-left text-slate-500 dark:text-slate-500 leading-relaxed">
         {LANDING_TOUR_DISCLAIMER}
       </p>
     </div>

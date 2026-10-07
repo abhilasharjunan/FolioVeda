@@ -17,7 +17,7 @@ import { FundNameLink } from '@/components/funds/FundNameLink';
 import { OnboardingDashboardTip } from '@/components/onboarding/OnboardingDashboardTip';
 import { markHoldingsOnboardingComplete } from '@/components/onboarding/OnboardingChecklist';
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#64748b'];
+const COLORS = ['#0d9488', '#10b981', '#f59e0b', '#ef4444', '#64748b'];
 
 interface DashboardClientProps {
   analysis: any;
@@ -177,7 +177,7 @@ export default function DashboardClient({
                       <Tooltip
                         formatter={(value) => [`${Number(value).toFixed(1)}%`, 'Share']}
                         contentStyle={{
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           border: 'none',
                           boxShadow: '0 8px 24px rgb(15 23 42 / 0.12)',
                           background: 'hsl(var(--card))',

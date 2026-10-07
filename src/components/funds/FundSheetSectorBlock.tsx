@@ -5,10 +5,10 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 const COLORS = [
   "#10b981",
-  "#6366f1",
+  "#0d9488",
   "#f59e0b",
   "#ef4444",
-  "#0ea5e9",
+  "#38bdf8",
   "#8b5cf6",
   "#64748b",
   "#14b8a6",

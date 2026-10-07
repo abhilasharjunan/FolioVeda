@@ -21,7 +21,7 @@ export async function sendPasswordResetEmail(email: string, resetUrl: string) {
         <h2 style="color: #1e3a5f;">FolioVeda</h2>
         <p>You requested a password reset for your account.</p>
         <a href="${resetUrl}" 
-           style="display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 8px; margin: 16px 0;">
+           style="display: inline-block; padding: 12px 24px; background: #0d9488; color: white; text-decoration: none; border-radius: 8px; margin: 16px 0;">
           Reset Password
         </a>
         <p style="color: #64748b; font-size: 14px;">

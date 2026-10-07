@@ -20,8 +20,8 @@ export const VolatilityChart = ({ data }: VolatilityChartProps) => {
         <AreaChart data={data}>
           <defs>
             <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35}/>
-              <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+              <stop offset="5%" stopColor="#0d9488" stopOpacity={0.35}/>
+              <stop offset="95%" stopColor="#0d9488" stopOpacity={0}/>
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
@@ -30,7 +30,7 @@ export const VolatilityChart = ({ data }: VolatilityChartProps) => {
           <Tooltip
              labelStyle={{ color: '#64748b' }}
              contentStyle={{
-               borderRadius: '10px',
+               borderRadius: '8px',
                border: 'none',
                boxShadow: '0 8px 24px rgb(15 23 42 / 0.12)',
                background: 'hsl(var(--card))',
@@ -39,7 +39,7 @@ export const VolatilityChart = ({ data }: VolatilityChartProps) => {
           <Area
             type="monotone"
             dataKey="value"
-            stroke="#2563eb"
+            stroke="#0d9488"
             fillOpacity={1}
             fill="url(#colorVol)"
             strokeWidth={2}

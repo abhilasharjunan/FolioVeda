@@ -25,8 +25,8 @@ export function formatAnimatedCurrency(n: number): string {
 }
 
 /** CVD-safe categorical palette for scenario charts (marks/swatches only). */
-export const SCENARIO_COLORS = ["#2563eb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
-export const SWP_SCENARIO_COLORS = ["#0d9488", "#2563eb", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
+export const SCENARIO_COLORS = ["#0d9488", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
+export const SWP_SCENARIO_COLORS = ["#0d9488", "#14b8a6", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 
 export type ChipAccent = "teal" | "indigo";
 

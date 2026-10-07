@@ -267,7 +267,7 @@ export function SwpPanel({ tab, onTabChange }: SwpPanelProps) {
                   format={(v) => (v === 0 ? "Flat" : `${v}%`)}
                   accent="teal"
                 />
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Step-up raises your SWP each year (e.g. to track inflation). Higher step-ups drain
                   corpus faster.
                 </p>
@@ -637,7 +637,7 @@ export function SwpPanel({ tab, onTabChange }: SwpPanelProps) {
               <div className="p-4">
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={scenarioChartData}>
-                    <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e1e0d9" />
+                    <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
                     <XAxis
                       dataKey="year"
                       tickFormatter={(y) => `Yr ${y}`}
@@ -657,7 +657,7 @@ export function SwpPanel({ tab, onTabChange }: SwpPanelProps) {
                     <Tooltip
                       labelFormatter={(y) => `Year ${y}`}
                       formatter={(value) => (typeof value === "number" ? fmtCurrency(value) : "")}
-                      contentStyle={{ borderRadius: 8, border: "1px solid #e1e0d9", fontSize: 12 }}
+                      contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12 }}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     {scenarioResults.map((r, i) => (

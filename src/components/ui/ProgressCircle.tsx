@@ -9,7 +9,7 @@ interface ProgressCircleProps {
   showLabel?: boolean;
 }
 
-export function ProgressCircle({ progress, size = 80, className = '', color = '#3b82f6', showLabel = true }: ProgressCircleProps) {
+export function ProgressCircle({ progress, size = 80, className = '', color = '#0d9488', showLabel = true }: ProgressCircleProps) {
   const [animatedProgress, setAnimatedProgress] = useState(0);
   const rafRef = useRef<number | null>(null);
   const animateRef = useRef<() => void>(() => {});

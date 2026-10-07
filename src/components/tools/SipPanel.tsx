@@ -242,7 +242,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                   format={(v) => (v === 0 ? "Flat" : `${v}%`)}
                   accent="teal"
                 />
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   Step-up raises your SIP each year — try 10% to see the compounding lift vs a flat SIP.
                 </p>
               </div>
@@ -346,8 +346,8 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                         <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.18} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#0d9488" stopOpacity={0.18} />
+                        <stop offset="95%" stopColor="#0d9488" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="0" vertical={false} stroke="#33415533" />
@@ -393,7 +393,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                       type="monotone"
                       dataKey="valueAtYearEnd"
                       name="Value"
-                      stroke="#6366f1"
+                      stroke="#0d9488"
                       fill="url(#colorValue)"
                       strokeWidth={2}
                       isAnimationActive={!reduceMotion}
@@ -602,7 +602,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
               <div className="p-4">
                 <ResponsiveContainer width="100%" height={280}>
                   <LineChart data={scenarioChartData}>
-                    <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e1e0d9" />
+                    <CartesianGrid strokeDasharray="0" vertical={false} stroke="#e2e8f0" />
                     <XAxis
                       dataKey="year"
                       tickFormatter={(y) => `Yr ${y}`}
@@ -622,7 +622,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                     <Tooltip
                       labelFormatter={(y) => `Year ${y}`}
                       formatter={(value) => (typeof value === "number" ? fmtCurrency(value) : "")}
-                      contentStyle={{ borderRadius: 8, border: "1px solid #e1e0d9", fontSize: 12 }}
+                      contentStyle={{ borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 12 }}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
                     {scenarioResults.map((r, i) => (

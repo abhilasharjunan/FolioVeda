@@ -247,7 +247,7 @@ export function FundDetailSheet({
                   <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
                     Returns vs Nifty 50
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                     Compared with {data.benchmark.schemeName}. Alpha = fund − index.
                   </p>
                   <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
@@ -329,7 +329,7 @@ export function FundDetailSheet({
                     <h3 className="text-sm font-semibold font-heading text-slate-900 dark:text-slate-50">
                       Top stock holdings
                     </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed space-y-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed space-y-1">
                       <span className="block">
                         {data.holdingsCount != null && data.holdingsCount > data.holdings.length
                           ? `Top ${data.holdings.length} of ${data.holdingsCount} names from the stored factsheet (monthly AMC disclosure).`

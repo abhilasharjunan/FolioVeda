@@ -154,7 +154,7 @@ export default function CsvUpload({ onSuccess }: { onSuccess?: () => void }) {
 
         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
           <p className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Required CSV Format</p>
-          <div className="bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 p-3 font-mono text-[11px] text-slate-500 dark:text-slate-300 leading-relaxed">
+          <div className="bg-white dark:bg-slate-900 rounded border border-slate-200 dark:border-slate-700 p-3 font-mono text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
             schemeName,schemeCode,units,investedAmount,date<br />
             "HDFC Index Fund",118531,100.0000,15000.00,2024-01-15<br />
             "SBI Bluechip Fund",118839,50.0000,10000.00,2024-02-01

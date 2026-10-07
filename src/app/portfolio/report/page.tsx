@@ -174,7 +174,7 @@ export default async function PortfolioReportPage() {
           </section>
         )}
 
-        <section className="print:break-inside-avoid pt-3 border-t border-slate-200 dark:border-slate-700 text-[9px] text-slate-400 dark:text-slate-400 leading-snug">
+        <section className="print:break-inside-avoid pt-3 border-t border-slate-200 dark:border-slate-700 text-xs text-slate-400 dark:text-slate-400 leading-snug">
           <p>
             Analytics only — not investment advice. Market risks apply. NAV may lag (AMFI/mfapi.in). Generated {generatedAt}.
           </p>

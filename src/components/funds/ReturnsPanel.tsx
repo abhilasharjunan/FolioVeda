@@ -256,7 +256,7 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
                     <div className="grid grid-cols-3 gap-2 mt-3 text-center">
                       {(["1Y", "3Y", "5Y"] as const).map((k) => (
                         <div key={k}>
-                          <p className="text-[9px] text-slate-400 uppercase font-bold">{k}</p>
+                          <p className="text-[10px] text-slate-400 uppercase font-bold">{k}</p>
                           <p className={`text-xs font-mono ${getReturnColor(fund.returns[k])}`}>
                             {formatReturn(fund.returns[k])}
                           </p>
