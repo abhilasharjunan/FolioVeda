@@ -16,7 +16,7 @@ const primaryLinks = [
   { href: "/tools/sip-calculator", label: "SIP Calculator" },
   { href: "/tools/swp-calculator", label: "SWP Calculator" },
   { href: "/academy", label: "MF Academy" },
-  { href: "/about", label: "What's New" },
+  { href: "/about", label: "About" },
 ];
 
 const adminLink = { href: "/admin", label: "Admin" };

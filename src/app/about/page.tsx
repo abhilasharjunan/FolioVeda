@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  ShieldCheck, Database, Cpu, Activity, Sparkles, Lock, Scale, LineChart,
+  ShieldCheck, Database, Cpu, Activity, Sparkles, Lock, Scale, LineChart, ChevronDown,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,11 +10,12 @@ import { getBuildInfo } from '@/lib/build-info';
 
 const CHANGELOG = [
   {
-    version: '1.7.0',
+    version: '1.8.1',
     date: 'Oct 2026',
     items: [
       'SWP Calculator: plan withdrawals, find a sustainable monthly SWP, and compare scenarios (sign-in required)',
       'Dashboard quick action and nav link for SWP Planner alongside SIP',
+      'About page: nav labeled About; Version History collapsed by default',
     ],
   },
   {
@@ -42,7 +43,7 @@ const CHANGELOG = [
     date: 'Oct 2026',
     items: [
       'Landing feature tour and first-run guide for new accounts (preview without a stored demo portfolio)',
-      'SIP Calculator and What’s New require sign-in; public nav keeps MF Academy',
+      'SIP Calculator and About require sign-in; public nav keeps MF Academy',
       'SIP Scenario Comparison layout stacks fields under each scenario instead of drifting right',
     ],
   },
@@ -94,7 +95,7 @@ export default function AboutPage() {
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <Badge
               variant="outline"
-              className="h-7 px-3 text-indigo-600 dark:text-indigo-300 border-indigo-300/60 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10"
+              className="h-7 px-3 text-teal-700 dark:text-teal-300 border-teal-300/60 dark:border-teal-500/30 bg-teal-50 dark:bg-teal-500/10"
             >
               <Sparkles className="w-3.5 h-3.5 mr-1" />
               Version {version}
@@ -106,7 +107,7 @@ export default function AboutPage() {
             )}
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 font-heading">
-            About Folio<span className="text-indigo-600 dark:text-indigo-400">Veda</span>
+            About Folio<span className="text-teal-600 dark:text-teal-400">Veda</span>
           </h1>
           <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
             Institutional-grade mutual fund analytics and portfolio intelligence for modern investors —
@@ -135,7 +136,7 @@ export default function AboutPage() {
         <StaggerItem>
           <Card className="surface-card border-none shadow-sm h-full">
             <CardHeader>
-              <Cpu className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mb-2" />
+              <Cpu className="w-6 h-6 text-teal-600 dark:text-teal-400 mb-2" />
               <CardTitle className="text-lg font-heading">Analytics Engine</CardTitle>
               <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
                 Calculation methodology
@@ -166,17 +167,29 @@ export default function AboutPage() {
       </StaggerChildren>
 
       <FadeIn delay={0.1}>
-        <Card className="surface-card border-none shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
-              <Activity className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-              What&apos;s New
-            </CardTitle>
-            <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
-              Current release v{version}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        <details className="group surface-card rounded-xl shadow-sm open:ring-1 open:ring-slate-200/80 dark:open:ring-slate-700/80">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 rounded-xl outline-none transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-800/40 focus-visible:ring-2 focus-visible:ring-teal-500/40 [&::-webkit-details-marker]:hidden">
+            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+              <Activity className="w-5 h-5 shrink-0 text-teal-600 dark:text-teal-400" aria-hidden />
+              <span className="text-base font-semibold font-heading text-slate-900 dark:text-slate-50">
+                Version History
+              </span>
+              <Badge variant="outline" className="font-mono text-[11px]">
+                v{version}
+              </Badge>
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                {CHANGELOG.length} releases
+              </span>
+            </div>
+            <ChevronDown
+              className="w-4 h-4 shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180"
+              aria-hidden
+            />
+          </summary>
+          <div className="border-t border-slate-100 dark:border-slate-800 px-5 py-5 space-y-6">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Product changelog for signed-in builds. Expand a release to skim what shipped.
+            </p>
             {CHANGELOG.map((release) => (
               <div key={release.version} className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -191,15 +204,17 @@ export default function AboutPage() {
                 <ul className="space-y-1.5 pl-1">
                   {release.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                      <span className="text-emerald-500 font-bold mt-0.5">•</span>
+                      <span className="text-emerald-500 font-bold mt-0.5" aria-hidden>
+                        •
+                      </span>
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </details>
       </FadeIn>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -225,7 +240,7 @@ export default function AboutPage() {
         <FadeIn delay={0.14}>
           <Card className="surface-card border-none shadow-sm h-full">
             <CardHeader>
-              <LineChart className="w-5 h-5 text-indigo-600 dark:text-indigo-400 mb-2" />
+              <LineChart className="w-5 h-5 text-teal-600 dark:text-teal-400 mb-2" />
               <CardTitle className="text-base font-heading">How returns are shown</CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
@@ -258,7 +273,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/portfolio"
-              className="shrink-0 inline-flex items-center justify-center rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 transition-colors"
+              className="shrink-0 inline-flex items-center justify-center rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold px-4 py-2 transition-colors"
             >
               Open Portfolio
             </Link>

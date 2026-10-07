@@ -93,18 +93,17 @@ describe('Navbar', () => {
     expect(within(container).getByText('Sign in')).toBeTruthy();
     expect(within(container).queryByText('SIP Calculator')).toBeNull();
     expect(within(container).queryByText('SWP Calculator')).toBeNull();
-    expect(within(container).queryByText("What's New")).toBeNull();
     expect(within(container).queryByText('About')).toBeNull();
     expect(within(container).queryByText('Dashboard')).toBeNull();
     expect(within(container).queryByText('Logout')).toBeNull();
   });
 
-  it('shows SIP Calculator and What\'s New only when authenticated', () => {
+  it('shows SIP Calculator and About only when authenticated', () => {
     mockUsePathname.mockReturnValue('/dashboard');
     const { container } = render(<Navbar />);
     expect(within(container).getByText('SIP Calculator')).toBeTruthy();
     expect(within(container).getByText('SWP Calculator')).toBeTruthy();
-    expect(within(container).getByText("What's New")).toBeTruthy();
+    expect(within(container).getByText('About')).toBeTruthy();
   });
 
   it('shows MF Academy in authenticated primary nav', () => {
