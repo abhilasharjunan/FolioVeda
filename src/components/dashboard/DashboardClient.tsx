@@ -301,8 +301,7 @@ export default function DashboardClient({
                 { href: '/risk-analysis', label: 'Fund Ratings', icon: BarChart3 },
                 { href: '/funds/compare', label: 'Compare', icon: GitCompare },
                 { href: '/portfolio/report', label: 'Report', icon: FileText },
-                { href: '/tools/sip-calculator', label: 'SIP Planner', icon: Calculator },
-                { href: '/tools/swp-calculator', label: 'SWP Planner', icon: Wallet },
+                { href: '/tools/sip-swp', label: 'SIP / SWP', icon: Calculator },
               ].map(({ href, label, icon: Icon }) => (
                 <Link
                   key={href}

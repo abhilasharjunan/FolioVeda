@@ -91,18 +91,19 @@ describe('Navbar', () => {
     const { container } = render(<Navbar />);
     expect(within(container).getByText('MF Academy')).toBeTruthy();
     expect(within(container).getByText('Sign in')).toBeTruthy();
-    expect(within(container).queryByText('SIP Calculator')).toBeNull();
-    expect(within(container).queryByText('SWP Calculator')).toBeNull();
+    expect(within(container).queryByText('SIP / SWP')).toBeNull();
     expect(within(container).queryByText('About')).toBeNull();
     expect(within(container).queryByText('Dashboard')).toBeNull();
     expect(within(container).queryByText('Logout')).toBeNull();
   });
 
-  it('shows SIP Calculator and About only when authenticated', () => {
+  it('shows SIP / SWP and About only when authenticated', () => {
     mockUsePathname.mockReturnValue('/dashboard');
     const { container } = render(<Navbar />);
-    expect(within(container).getByText('SIP Calculator')).toBeTruthy();
-    expect(within(container).getByText('SWP Calculator')).toBeTruthy();
+    expect(within(container).getByText('SIP / SWP')).toBeTruthy();
+    expect(within(container).getByRole('link', { name: 'SIP / SWP' }).getAttribute('href')).toBe(
+      '/tools/sip-swp'
+    );
     expect(within(container).getByText('About')).toBeTruthy();
   });
 

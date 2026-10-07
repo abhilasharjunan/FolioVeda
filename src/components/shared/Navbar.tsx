@@ -13,8 +13,7 @@ const primaryLinks = [
   { href: "/funds/compare", label: "Compare" },
   { href: "/top-funds", label: "Top Funds" },
   { href: "/risk-analysis", label: "Fund Ratings" },
-  { href: "/tools/sip-calculator", label: "SIP Calculator" },
-  { href: "/tools/swp-calculator", label: "SWP Calculator" },
+  { href: "/tools/sip-swp", label: "SIP / SWP" },
   { href: "/academy", label: "MF Academy" },
   { href: "/about", label: "About" },
 ];

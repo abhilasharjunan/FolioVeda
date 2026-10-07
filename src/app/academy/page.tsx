@@ -439,7 +439,7 @@ export default function AcademyPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/tools/sip-calculator"
+              href="/tools/sip-swp?mode=sip"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "bg-indigo-600 hover:bg-indigo-500 text-white font-semibold gap-2 inline-flex"
@@ -449,7 +449,7 @@ export default function AcademyPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/tools/swp-calculator"
+              href="/tools/sip-swp?mode=swp"
               className={cn(
                 buttonVariants({ size: "lg", variant: "outline" }),
                 "font-semibold gap-2 inline-flex"
