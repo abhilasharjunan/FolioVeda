@@ -27,17 +27,17 @@ export function OnboardingDashboardTip() {
   }
 
   return (
-    <div className="rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/80 dark:bg-indigo-950/30 overflow-hidden">
+    <div className="rounded-xl border border-teal-200 dark:border-teal-900/50 bg-teal-50/80 dark:bg-teal-950/30 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left text-sm font-semibold text-indigo-900 dark:text-indigo-100"
+        className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left text-sm font-semibold text-teal-900 dark:text-teal-100"
       >
         <span>{state.completed.holdings ? "Continue exploring tools" : "New here? Explore all tools"}</span>
         {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
       {open && (
-        <div className="px-4 pb-4 border-t border-indigo-100 dark:border-indigo-900/40 pt-3">
+        <div className="px-4 pb-4 border-t border-teal-100 dark:border-teal-900/40 pt-3">
           <OnboardingChecklist compact />
           <button
             type="button"

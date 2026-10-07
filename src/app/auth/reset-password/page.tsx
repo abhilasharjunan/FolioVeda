@@ -68,8 +68,9 @@ function ResetPasswordForm() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">New Password</label>
+                <label htmlFor="reset-password" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">New Password</label>
                 <Input
+                  id="reset-password"
                   type="password"
                   placeholder="At least 8 characters"
                   value={password}
@@ -80,8 +81,9 @@ function ResetPasswordForm() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">Confirm Password</label>
+                <label htmlFor="reset-confirm" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">Confirm Password</label>
                 <Input
+                  id="reset-confirm"
                   type="password"
                   placeholder="Repeat your password"
                   value={confirm}

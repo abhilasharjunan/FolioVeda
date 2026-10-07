@@ -113,7 +113,7 @@ export default async function PortfolioRiskPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-6 py-6">
-              <div className="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-full text-indigo-600">
+              <div className="p-4 bg-teal-50 dark:bg-teal-950/40 rounded-full text-teal-600">
                 <PieChart size={32} />
               </div>
               <div className="text-center">

@@ -60,7 +60,7 @@ function TopFundsPageInner() {
             title: "Top Performing Funds",
             subtitle:
               "Direct Growth plans only · updated daily. Ranked by 3Y CAGR across curated benchmarks and AMFI Direct Growth funds with enough NAV history — including Momentum Index Funds.",
-            gradient: "from-blue-600 via-indigo-600 to-slate-900",
+            gradient: "from-blue-600 via-teal-600 to-slate-900",
             muted: "text-blue-100",
             Icon: TrendingUp,
           }
@@ -119,7 +119,7 @@ function TopFundsPageInner() {
           className={cn(
             "inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
             mode === "returns"
-              ? "bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-sm"
+              ? "bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-sm"
               : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
           )}
         >

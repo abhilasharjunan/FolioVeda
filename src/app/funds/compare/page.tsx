@@ -203,7 +203,7 @@ export default function FundComparePage() {
                         ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-400 cursor-not-allowed' 
                         : isLoadingBatch
                           ? 'bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-400 cursor-wait'
-                          : 'hover:bg-blue-50 dark:hover:bg-teal-950/40 cursor-pointer text-slate-700 dark:text-slate-200'
+                          : 'cursor-pointer text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/60'
                     }`}
                   >
                     <span className="text-sm font-medium">{fund.schemeName}</span>
@@ -277,7 +277,7 @@ export default function FundComparePage() {
                 <CardHeader className="relative bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
                   <button 
                     onClick={() => removeFund(fund.schemeCode)}
-                    className="absolute right-4 top-4 p-1 text-slate-400 dark:text-slate-400 hover:text-rose-500 transition-colors rounded-full hover:bg-rose-50"
+                    className="absolute right-4 top-4 inline-flex items-center justify-center size-10 text-rose-600/70 hover:text-rose-700 dark:text-rose-400/70 dark:hover:text-rose-300 transition-colors rounded-full"
                   >
                     <X size={16} />
                   </button>

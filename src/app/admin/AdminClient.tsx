@@ -313,7 +313,7 @@ export default function AdminClient() {
             </Button>
           </form>
         </CardHeader>
-        <CardContent className="overflow-x-auto">
+        <CardContent className="table-scroll overflow-x-auto">
           <table className="w-full text-left text-sm min-w-[720px]">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500">

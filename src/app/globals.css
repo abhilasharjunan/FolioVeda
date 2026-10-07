@@ -11,8 +11,8 @@
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 239 84% 67%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 173 80% 36%;
+  --primary-foreground: 166 76% 97%;
   --secondary: 214 20% 92%;
   --secondary-foreground: 222 47% 11%;
   --muted: 214 20% 92%;
@@ -23,18 +23,18 @@
   --destructive-foreground: 0 0% 98%;
   --border: 214 20% 88%;
   --input: 214 20% 88%;
-  --ring: 239 84% 67%;
+  --ring: 173 80% 36%;
   --radius: 0.75rem;
   --success: 160 84% 39%;
   --danger: 0 72% 51%;
   --warning: 38 92% 50%;
   --chart-1: 160 84% 39%;
-  --chart-2: 239 84% 67%;
+  --chart-2: 173 80% 36%;
   --chart-3: 38 92% 50%;
   --chart-4: 0 72% 51%;
   --chart-5: 199 89% 48%;
   --page-gradient:
-    radial-gradient(ellipse 80% 50% at 90% -10%, rgb(99 102 241 / 0.08), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 90% -10%, rgb(13 148 136 / 0.08), transparent 55%),
     radial-gradient(ellipse 60% 40% at 0% 100%, rgb(16 185 129 / 0.06), transparent 50%),
     linear-gradient(180deg, #f1f5f9 0%, #eef2f7 100%);
   --page-grid: none;
@@ -49,8 +49,8 @@
   --card-foreground: 210 40% 98%;
   --popover: 222 47% 11%;
   --popover-foreground: 210 40% 98%;
-  --primary: 239 84% 67%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 172 66% 50%;
+  --primary-foreground: 222 47% 7%;
   --secondary: 217 33% 17%;
   --secondary-foreground: 210 40% 98%;
   --muted: 217 33% 17%;
@@ -61,17 +61,17 @@
   --destructive-foreground: 0 0% 98%;
   --border: 217 33% 20%;
   --input: 217 33% 20%;
-  --ring: 239 84% 67%;
+  --ring: 172 66% 50%;
   --success: 160 84% 39%;
   --danger: 0 72% 55%;
   --warning: 38 92% 50%;
   --chart-1: 160 84% 42%;
-  --chart-2: 239 84% 67%;
+  --chart-2: 172 66% 50%;
   --chart-3: 38 92% 50%;
   --chart-4: 0 72% 55%;
   --chart-5: 199 89% 55%;
   --page-gradient:
-    radial-gradient(ellipse 70% 45% at 92% -8%, rgb(99 102 241 / 0.12), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 92% -8%, rgb(13 148 136 / 0.12), transparent 55%),
     radial-gradient(ellipse 55% 35% at 0% 100%, rgb(16 185 129 / 0.08), transparent 50%),
     linear-gradient(180deg, #0f172a 0%, #121826 48%, #0f172a 100%);
   --page-grid: none;
@@ -176,19 +176,46 @@ body {
   animation: landing-ambient-drift 18s ease-in-out infinite;
 }
 
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background:
+    linear-gradient(to right, hsl(var(--background)), transparent) 0 0 / 1.25rem 100% local,
+    linear-gradient(to left, hsl(var(--background)), transparent) 100% 0 / 1.25rem 100% local;
+  background-repeat: no-repeat;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  html {
+    scroll-behavior: auto;
   }
 
+  .landing-ambient {
+    animation: none;
+  }
+
+  .hover-lift,
   .hover-lift:hover,
   .hover-lift:active {
+    transition: none;
     transform: none;
+  }
+
+  .page-loader,
+  .page-loader-letter {
+    animation: none !important;
   }
 }
 

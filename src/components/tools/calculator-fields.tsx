@@ -28,7 +28,7 @@ export function formatAnimatedCurrency(n: number): string {
 export const SCENARIO_COLORS = ["#2563eb", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 export const SWP_SCENARIO_COLORS = ["#0d9488", "#2563eb", "#f59e0b", "#ef4444", "#8b5cf6"] as const;
 
-export type ChipAccent = "indigo" | "teal";
+export type ChipAccent = "teal" | "indigo";
 
 export function NumberField({
   label,
@@ -37,6 +37,7 @@ export function NumberField({
   suffix,
   min = 0,
   step = 1,
+  id,
 }: {
   label: string;
   value: number;
@@ -44,12 +45,15 @@ export function NumberField({
   suffix?: string;
   min?: number;
   step?: number;
+  id?: string;
 }) {
+  const fieldId = id ?? `number-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   return (
     <div className="space-y-1">
-      <label className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
+      <label htmlFor={fieldId} className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
       <div className="relative">
         <Input
+          id={fieldId}
           type="number"
           value={Number.isFinite(value) ? value : 0}
           min={min}
@@ -76,6 +80,7 @@ export function SliderField({
   max,
   step = 1,
   formatValue,
+  id,
 }: {
   label: string;
   value: number;
@@ -85,17 +90,20 @@ export function SliderField({
   max: number;
   step?: number;
   formatValue?: (v: number) => string;
+  id?: string;
 }) {
+  const fieldId = id ?? `slider-field-${label.replace(/\s+/g, "-").toLowerCase()}`;
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
+        <label htmlFor={fieldId} className="text-xs font-medium text-slate-500 dark:text-slate-300">{label}</label>
         <span className="text-sm font-semibold text-slate-900 dark:text-slate-50 tabular-nums">
           {formatValue ? formatValue(value) : value}
           {suffix}
         </span>
       </div>
       <Slider
+        id={fieldId}
         value={[Number.isFinite(value) ? value : 0]}
         onValueChange={(v) => onChange(Array.isArray(v) ? v[0] : v)}
         min={min}
@@ -107,13 +115,13 @@ export function SliderField({
 }
 
 const chipActive: Record<ChipAccent, string> = {
-  indigo: "bg-indigo-600 border-indigo-600 text-white",
+  indigo: "bg-teal-600 border-teal-600 text-white",
   teal: "bg-teal-600 border-teal-600 text-white",
 };
 
 const chipIdle: Record<ChipAccent, string> = {
   indigo:
-    "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-indigo-300 hover:text-indigo-600",
+    "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-teal-300 hover:text-teal-600",
   teal:
     "border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:border-teal-300 hover:text-teal-600",
 };
@@ -123,7 +131,7 @@ export function PresetChips({
   value,
   onSelect,
   format,
-  accent = "indigo",
+  accent = "teal",
 }: {
   options: number[];
   value: number;

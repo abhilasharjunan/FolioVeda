@@ -386,8 +386,9 @@ export default function FeedbackPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-500">Title</label>
+                  <label htmlFor="feedback-title" className="text-xs font-medium text-slate-500">Title</label>
                   <Input
+                    id="feedback-title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value.slice(0, 120))}
                     placeholder="e.g. Export holdings as Excel"
@@ -399,8 +400,9 @@ export default function FeedbackPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-slate-500">Details</label>
+                  <label htmlFor="feedback-body" className="text-xs font-medium text-slate-500">Details</label>
                   <textarea
+                    id="feedback-body"
                     value={body}
                     onChange={(e) => setBody(e.target.value.slice(0, 4000))}
                     rows={6}

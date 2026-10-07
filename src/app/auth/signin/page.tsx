@@ -97,10 +97,11 @@ export default function AuthPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                  <label htmlFor="auth-name" className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                     <User size={14} /> Full Name
                   </label>
                   <Input
+                    id="auth-name"
                     placeholder="John Doe"
                     value={formData.name}
                     onChange={e => setFormData({...formData, name: e.target.value})}
@@ -110,10 +111,11 @@ export default function AuthPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                <label htmlFor="auth-email" className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Mail size={14} /> Email Address
                 </label>
                 <Input
+                  id="auth-email"
                   type="email"
                   placeholder="name@company.com"
                   value={formData.email}
@@ -123,10 +125,11 @@ export default function AuthPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                <label htmlFor="auth-password" className="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                   <Lock size={14} /> Password
                 </label>
                 <Input
+                  id="auth-password"
                   type="password"
                   placeholder="••••••••"
                   value={formData.password}

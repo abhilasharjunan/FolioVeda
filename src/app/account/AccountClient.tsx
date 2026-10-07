@@ -207,10 +207,11 @@ export default function AccountClient() {
         <CardContent>
           <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+              <label htmlFor="account-current-password" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                 Current password
               </label>
               <Input
+                id="account-current-password"
                 type="password"
                 autoComplete="current-password"
                 value={currentPassword}
@@ -219,10 +220,11 @@ export default function AccountClient() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+              <label htmlFor="account-new-password" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                 New password
               </label>
               <Input
+                id="account-new-password"
                 type="password"
                 autoComplete="new-password"
                 placeholder="At least 8 characters"
@@ -233,10 +235,11 @@ export default function AccountClient() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
+              <label htmlFor="account-confirm-password" className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 block">
                 Confirm new password
               </label>
               <Input
+                id="account-confirm-password"
                 type="password"
                 autoComplete="new-password"
                 value={confirmPassword}

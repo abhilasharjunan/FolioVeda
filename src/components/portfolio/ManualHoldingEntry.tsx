@@ -115,9 +115,10 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="relative" ref={dropdownRef}>
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Search Mutual Fund</label>
+            <label htmlFor="holding-fund-search" className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Search Mutual Fund</label>
             <div className="relative">
               <Input
+                id="holding-fund-search"
                 placeholder="e.g. HDFC Index Fund..."
                 value={query}
                 onChange={(e) => {
@@ -126,8 +127,8 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
                 }}
                 className="pl-10"
               />
-              <Search className="absolute left-3 top-2.5 text-slate-400 dark:text-slate-400" size={18} />
-              {isLoading && <Loader2 className="absolute right-3 top-2.5 text-slate-400 dark:text-slate-400 animate-spin" size={18} />}
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400" size={18} />
+              {isLoading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 animate-spin" size={18} />}
             </div>
 
             {suggestions.length > 0 && (
@@ -148,8 +149,9 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Units</label>
+              <label htmlFor="holding-units" className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Units</label>
               <Input
+                id="holding-units"
                 type="number"
                 step="any"
                 placeholder="0.00"
@@ -159,8 +161,9 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Amount (₹)</label>
+              <label htmlFor="holding-amount" className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Amount (₹)</label>
               <Input
+                id="holding-amount"
                 type="number"
                 step="any"
                 placeholder="0.00"
@@ -170,8 +173,9 @@ export default function ManualHoldingEntry({ onSuccess }: { onSuccess?: () => vo
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Date</label>
+              <label htmlFor="holding-date" className="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1 block">Date</label>
               <Input
+                id="holding-date"
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}

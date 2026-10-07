@@ -59,8 +59,8 @@ function SipSwpPlannerInner() {
             title: "SIP Calculator & Scenarios",
             subtitle:
               "Forward-looking projections based on assumed returns — not a promise of actual returns. Use these to plan, not predict.",
-            gradient: "from-indigo-600 via-indigo-600 to-indigo-900",
-            muted: "text-indigo-100",
+            gradient: "from-teal-600 via-teal-700 to-slate-900",
+            muted: "text-teal-100",
             Icon: Calculator,
           }
         : {
@@ -113,12 +113,15 @@ function SipSwpPlannerInner() {
         <button
           type="button"
           role="tab"
+          id="planner-tab-sip"
+          aria-controls="planner-panel-sip"
           aria-selected={mode === "sip"}
+          tabIndex={mode === "sip" ? 0 : -1}
           onClick={() => setMode("sip")}
           className={cn(
-            "inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+            "inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors min-h-10",
             mode === "sip"
-              ? "bg-white dark:bg-slate-900 text-indigo-700 dark:text-indigo-300 shadow-sm"
+              ? "bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-sm"
               : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
           )}
         >
@@ -128,10 +131,13 @@ function SipSwpPlannerInner() {
         <button
           type="button"
           role="tab"
+          id="planner-tab-swp"
+          aria-controls="planner-panel-swp"
           aria-selected={mode === "swp"}
+          tabIndex={mode === "swp" ? 0 : -1}
           onClick={() => setMode("swp")}
           className={cn(
-            "inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
+            "inline-flex flex-1 sm:flex-none items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors min-h-10",
             mode === "swp"
               ? "bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-sm"
               : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
@@ -145,6 +151,9 @@ function SipSwpPlannerInner() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={mode}
+          role="tabpanel"
+          id={mode === "sip" ? "planner-panel-sip" : "planner-panel-swp"}
+          aria-labelledby={mode === "sip" ? "planner-tab-sip" : "planner-tab-swp"}
           initial={reduceMotion ? false : { opacity: 0, x: mode === "sip" ? -10 : 10 }}
           animate={{ opacity: 1, x: 0 }}
           exit={reduceMotion ? undefined : { opacity: 0, x: mode === "sip" ? 10 : -10 }}

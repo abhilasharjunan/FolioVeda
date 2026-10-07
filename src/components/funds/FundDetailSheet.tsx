@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X, Loader2, TrendingUp, User, Building2, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { FundSheetSectorBlock } from "@/components/funds/FundSheetSectorBlock";
 import { formatCacheTimestamp, formatFactsheetAsOf } from "@/lib/format-holdings-date";
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 type FundDetail = {
   schemeCode: string;
@@ -60,6 +63,9 @@ export function FundDetailSheet({
   const [data, setData] = useState<FundDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!schemeCode) {
@@ -92,14 +98,38 @@ export function FundDetailSheet({
 
   useEffect(() => {
     if (!schemeCode) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
     document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => closeRef.current?.focus(), 0);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const nodes = Array.from(
+        panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)
+      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+      if (nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener("keydown", onKey);
     return () => {
+      window.clearTimeout(focusTimer);
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
+      previouslyFocused.current?.focus?.();
     };
   }, [schemeCode, onClose]);
 
@@ -109,22 +139,30 @@ export function FundDetailSheet({
   const hasHoldings = data && data.holdings?.length > 0;
   const hasManager = !!(data?.fundManager && (data.fundManager.history || data.fundManager.tenure || data.fundManager.name));
   const hasComparison = data && data.comparison?.length > 0;
+  const titleId = "fund-detail-sheet-title";
 
   return (
-    <div className="fixed inset-0 z-[80] flex justify-end" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[80] flex justify-end" role="dialog" aria-modal="true" aria-labelledby={titleId}>
       <button
         type="button"
         className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]"
         aria-label="Close fund details"
         onClick={onClose}
+        tabIndex={-1}
       />
-      <aside className="relative z-10 flex h-full w-full max-w-lg flex-col bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-200">
+      <aside
+        ref={panelRef}
+        className="relative z-10 flex h-full w-full max-w-lg flex-col bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 animate-in slide-in-from-right duration-200"
+      >
         <header className="flex items-start justify-between gap-3 border-b border-slate-200 dark:border-slate-800 px-4 py-3 shrink-0">
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-wider font-semibold text-teal-600 dark:text-teal-400 flex items-center gap-1">
               <TrendingUp size={12} /> Fund details
             </p>
-            <h2 className="text-base font-bold text-slate-900 dark:text-slate-50 font-heading leading-snug mt-0.5 line-clamp-2 pr-1">
+            <h2
+              id={titleId}
+              className="text-base font-bold text-slate-900 dark:text-slate-50 font-heading leading-snug mt-0.5 line-clamp-2 pr-1"
+            >
               {data?.schemeName || (loading ? "Loading…" : "Fund")}
             </h2>
             {data && (
@@ -141,9 +179,10 @@ export function FundDetailSheet({
             )}
           </div>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+            className="inline-flex items-center justify-center size-10 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
             aria-label="Close"
           >
             <X size={18} />

@@ -120,7 +120,7 @@ export function FeatureSceneVisual({ id }: { id: LandingFeatureSceneId }) {
                   <span className="text-slate-500 shrink-0">{r.level}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-slate-800">
-                  <div className="h-full rounded-full bg-indigo-500/80" style={{ width: `${r.w}%` }} />
+                  <div className="h-full rounded-full bg-teal-500/80" style={{ width: `${r.w}%` }} />
                 </div>
               </div>
             ))}

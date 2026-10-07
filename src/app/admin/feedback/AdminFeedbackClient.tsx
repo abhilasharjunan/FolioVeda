@@ -316,10 +316,14 @@ export default function AdminFeedbackClient() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] uppercase tracking-wide font-semibold text-slate-500">
+                    <label
+                      htmlFor={`admin-note-${item.id}`}
+                      className="text-[10px] uppercase tracking-wide font-semibold text-slate-500"
+                    >
                       Admin note
                     </label>
                     <textarea
+                      id={`admin-note-${item.id}`}
                       value={notes[item.id] ?? ""}
                       onChange={(e) =>
                         setNotes((prev) => ({ ...prev, [item.id]: e.target.value }))

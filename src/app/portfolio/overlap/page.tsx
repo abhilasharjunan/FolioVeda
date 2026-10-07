@@ -79,7 +79,7 @@ function MiniProgress({ value, max = 100 }: { value: number; max?: number }) {
   return (
     <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
       <div
-        className="h-full rounded-full bg-indigo-500 transition-all"
+        className="h-full rounded-full bg-teal-500 transition-all"
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -185,7 +185,7 @@ export default function PortfolioOverlapPage() {
         <header className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-sm uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-semibold text-sm uppercase tracking-wider">
                 <Layers size={16} />
                 <span>Portfolio Insights</span>
               </div>
@@ -216,7 +216,7 @@ export default function PortfolioOverlapPage() {
 
       {insightsAvailable < 2 && (
         <FadeIn delay={0.03}>
-          <Card className="surface-card border-none shadow-sm border-l-4 border-l-amber-500">
+          <Card className="surface-card border-none shadow-sm">
             <CardContent className="p-4 flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               <div className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -241,7 +241,7 @@ export default function PortfolioOverlapPage() {
             <Card className="surface-card border-none shadow-sm lg:col-span-2">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
-                  <PieChart className="w-5 h-5 text-indigo-500" />
+                  <PieChart className="w-5 h-5 text-teal-500" />
                   True Sector Allocation
                 </CardTitle>
                 <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
@@ -286,7 +286,7 @@ export default function PortfolioOverlapPage() {
 
       {concentratedTickers.length > 0 && (
         <FadeIn delay={0.04}>
-          <Card className="surface-card border-none shadow-sm border-l-4 border-l-amber-500">
+          <Card className="surface-card border-none shadow-sm">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -319,7 +319,7 @@ export default function PortfolioOverlapPage() {
         <Card className="surface-card border-none shadow-sm">
           <CardHeader className="pb-3">
             <CardTitle className="text-xl font-heading flex items-center gap-2 text-slate-900 dark:text-slate-50">
-              <Layers className="w-5 h-5 text-indigo-500" />
+              <Layers className="w-5 h-5 text-teal-500" />
               Pairwise Fund Overlap
             </CardTitle>
             <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
@@ -347,8 +347,8 @@ export default function PortfolioOverlapPage() {
                     onClick={() => setSelectedPair(pair)}
                     className={`text-left p-4 rounded-xl border space-y-3 transition-colors ${
                       active
-                        ? 'border-indigo-400 dark:border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/30'
-                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:border-indigo-300 dark:hover:border-indigo-600/50'
+                        ? 'border-teal-400 dark:border-teal-500 bg-teal-50/60 dark:bg-teal-950/30'
+                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 hover:border-teal-300 dark:hover:border-teal-600/50'
                     }`}
                   >
                     <div className="flex justify-between items-start gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
@@ -418,7 +418,7 @@ export default function PortfolioOverlapPage() {
                   No common stocks in their top disclosed holdings.
                 </p>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="table-scroll overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                       <tr>
@@ -465,7 +465,7 @@ export default function PortfolioOverlapPage() {
                 Look-through holdings unavailable until disclosed stock weights are fetched for your funds.
               </p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="table-scroll overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead className="border-b border-slate-200 dark:border-slate-800">
                     <tr>

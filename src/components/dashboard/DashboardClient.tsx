@@ -92,7 +92,7 @@ export default function DashboardClient({
             <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-700/80">
               <div className="p-5 sm:p-6">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                  <Wallet size={16} className="text-indigo-500" />
+                  <Wallet size={16} className="text-teal-500" />
                   <p className="text-xs font-semibold uppercase tracking-wide">Total Portfolio Value</p>
                 </div>
                 <p className="mt-2 text-2xl sm:text-3xl font-bold font-heading text-slate-900 dark:text-slate-50 tabular-nums">
@@ -114,7 +114,7 @@ export default function DashboardClient({
               </div>
               <div className="p-5 sm:p-6">
                 <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                  <PieChart size={16} className="text-indigo-500" />
+                  <PieChart size={16} className="text-teal-500" />
                   <p className="text-xs font-semibold uppercase tracking-wide">
                     {analysis.overallXirr != null ? 'Overall XIRR' : 'Overall return'}
                   </p>
@@ -221,7 +221,7 @@ export default function DashboardClient({
                     <StaggerItem key={fund.schemeCode || i}>
                       <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-950/60 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 bg-teal-100 dark:bg-teal-950/60 rounded-full flex items-center justify-center text-teal-600 dark:text-teal-300 font-bold text-xs shrink-0">
                             {i + 1}
                           </div>
                           <div className="min-w-0">
@@ -307,19 +307,19 @@ export default function DashboardClient({
                 <Link
                   key={href}
                   href={href}
-                  className="flex flex-col items-start gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/40 px-3 py-3 text-left hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 transition-colors"
+                  className="flex flex-col items-start gap-2 rounded-xl border border-slate-200 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/40 px-3 py-3 text-left hover:border-teal-300 dark:hover:border-teal-500/50 hover:bg-teal-50/50 dark:hover:bg-teal-950/30 transition-colors"
                 >
-                  <Icon size={16} className="text-indigo-500 dark:text-indigo-400" />
+                  <Icon size={16} className="text-teal-500 dark:text-teal-400" />
                   <span className="text-xs font-semibold text-slate-700 dark:text-slate-200 leading-tight">{label}</span>
                 </Link>
               ))}
             </CardContent>
           </Card>
 
-          <Card className="surface-card border-none shadow-sm bg-gradient-to-br from-indigo-600 to-indigo-800 text-white overflow-hidden relative">
+          <Card className="surface-card border-none shadow-sm bg-gradient-to-br from-teal-600 to-teal-800 text-white overflow-hidden relative">
             <Layers className="absolute -right-3 -bottom-3 text-white/10" size={88} strokeWidth={1} />
             <CardContent className="p-4 relative">
-              <p className="text-xs font-semibold uppercase tracking-wide text-indigo-100">Overlap Analyzer</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-teal-100">Overlap Analyzer</p>
               <p className="text-sm font-medium mt-1.5 leading-snug">
                 Check how much stock overlap sits across your funds.
               </p>
@@ -339,9 +339,9 @@ export default function DashboardClient({
       </FadeIn>
 
       <FadeIn delay={0.2}>
-        <div className="bg-indigo-50/80 dark:bg-indigo-950/30 p-4 rounded-xl border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-3">
-          <AlertCircle className="text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" size={18} />
-          <p className="text-xs text-indigo-800 dark:text-indigo-200/90 leading-relaxed">
+        <div className="bg-teal-50/80 dark:bg-teal-950/30 p-4 rounded-xl border border-teal-100 dark:border-teal-900/50 flex items-start gap-3">
+          <AlertCircle className="text-teal-600 dark:text-teal-400 mt-0.5 shrink-0" size={18} />
+          <p className="text-xs text-teal-800 dark:text-teal-200/90 leading-relaxed">
             <strong className="font-semibold">Compliance Note:</strong> Annualized XIRR is shown once a holding has about a year of history; shorter holdings show absolute (non-annualized) return.
             Past performance is not a guarantee of future returns.
           </p>

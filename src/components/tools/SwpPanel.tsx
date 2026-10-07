@@ -531,7 +531,7 @@ export function SwpPanel({ tab, onTabChange }: SwpPanelProps) {
                       type="button"
                       onClick={() => removeScenario(idx)}
                       disabled={scenarios.length <= 1}
-                      className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-40"
+                      className="size-10 shrink-0 flex items-center justify-center rounded-lg text-rose-600/80 hover:text-rose-700 dark:text-rose-400/80 dark:hover:text-rose-300 disabled:opacity-40"
                       aria-label={`Remove ${s.label}`}
                     >
                       <X size={16} />

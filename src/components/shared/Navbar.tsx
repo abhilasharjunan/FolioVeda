@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { TrendingUp, LogOut, Menu, X, UserRound } from "lucide-react";
@@ -31,6 +31,9 @@ const portfolioSubLinks = [
   { href: "/portfolio/report", label: "Report" },
 ];
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /** Longest-matching href wins so /portfolio and /portfolio/risk don't both highlight. */
 function getActiveHref(pathname: string, hrefs: string[]): string | null {
   let best: string | null = null;
@@ -57,6 +60,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -66,8 +71,39 @@ export default function Navbar() {
     if (!menuOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const roots = [menuButtonRef.current, drawerRef.current].filter(
+        Boolean
+      ) as HTMLElement[];
+      const nodes = roots.flatMap((root) =>
+        root === menuButtonRef.current
+          ? [root]
+          : Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE))
+      ).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+      if (nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
     };
   }, [menuOpen]);
 
@@ -146,7 +182,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 transition-colors"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-rose-700 dark:hover:text-rose-300 transition-colors"
               >
                 <LogOut size={14} />
                 <span>Logout</span>
@@ -167,9 +203,11 @@ export default function Navbar() {
         <div className="flex md:hidden items-center gap-1.5">
           <ThemeToggle />
           <button
+            ref={menuButtonRef}
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
+            aria-controls="mobile-nav-drawer"
             onClick={() => setMenuOpen((o) => !o)}
             className="inline-flex items-center justify-center size-10 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-200/70 dark:hover:bg-slate-800/80 transition-colors"
           >
@@ -201,7 +239,11 @@ export default function Navbar() {
 
       {/* Mobile drawer */}
       {menuOpen && (
-        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-[var(--nav-bg)] max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain">
+        <div
+          id="mobile-nav-drawer"
+          ref={drawerRef}
+          className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-[var(--nav-bg)] max-h-[calc(100dvh-3.5rem)] overflow-y-auto overscroll-contain"
+        >
           <div className="px-3 py-3 space-y-1">
             {links.map((link) => (
               <Link

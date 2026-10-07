@@ -169,7 +169,7 @@ export default function AcademyPage() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
+          <CardContent className="p-0 table-scroll overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead className="bg-slate-50 dark:bg-slate-900/50">
                 <tr className="border-b border-slate-200 dark:border-slate-800">
@@ -235,7 +235,7 @@ export default function AcademyPage() {
       <FadeIn delay={0.06}>
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <HelpCircle className="w-5 h-5 text-indigo-500" />
+            <HelpCircle className="w-5 h-5 text-teal-500" />
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">
               Mutual Fund Jargon Decoder
             </h2>
@@ -247,7 +247,7 @@ export default function AcademyPage() {
           <Card className="surface-card border-none shadow-sm p-4 sm:p-5">
             <Accordion>
               <AccordionItem value="nav" className="border-slate-200 dark:border-slate-800">
-                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-teal-600 dark:hover:text-teal-400">
                   NAV (Net Asset Value)
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-500 dark:text-slate-400">
@@ -258,7 +258,7 @@ export default function AcademyPage() {
               </AccordionItem>
 
               <AccordionItem value="sip" className="border-slate-200 dark:border-slate-800">
-                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-teal-600 dark:hover:text-teal-400">
                   SIP vs. Lumpsum
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-500 dark:text-slate-400">
@@ -271,7 +271,7 @@ export default function AcademyPage() {
               </AccordionItem>
 
               <AccordionItem value="xirr" className="border-slate-200 dark:border-slate-800">
-                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-teal-600 dark:hover:text-teal-400">
                   XIRR vs. CAGR
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-500 dark:text-slate-400">
@@ -284,7 +284,7 @@ export default function AcademyPage() {
               </AccordionItem>
 
               <AccordionItem value="direct" className="border-slate-200 dark:border-slate-800">
-                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-teal-600 dark:hover:text-teal-400">
                   Direct Plan vs. Regular Plan
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-500 dark:text-slate-400">
@@ -296,7 +296,7 @@ export default function AcademyPage() {
               </AccordionItem>
 
               <AccordionItem value="expense" className="border-slate-200 dark:border-slate-800">
-                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400">
+                <AccordionTrigger className="text-slate-900 dark:text-slate-100 hover:text-teal-600 dark:hover:text-teal-400">
                   Expense Ratio
                 </AccordionTrigger>
                 <AccordionContent className="text-slate-500 dark:text-slate-400">
@@ -313,7 +313,7 @@ export default function AcademyPage() {
       <FadeIn delay={0.08}>
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-indigo-500" />
+            <Target className="w-5 h-5 text-teal-500" />
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">
               Which Fund Type Fits Your Goal?
             </h2>
@@ -357,7 +357,7 @@ export default function AcademyPage() {
       <FadeIn delay={0.1}>
         <section className="space-y-4">
           <div className="flex items-center gap-2">
-            <PlayCircle className="w-5 h-5 text-indigo-500" />
+            <PlayCircle className="w-5 h-5 text-teal-500" />
             <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">
               Watch: Why the SIP Math Works
             </h2>
@@ -373,7 +373,7 @@ export default function AcademyPage() {
                 <CardHeader className="pb-2 space-y-1">
                   <Badge
                     variant="outline"
-                    className="w-fit text-[10px] border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/10"
+                    className="w-fit text-[10px] border-teal-500/30 text-teal-600 dark:text-teal-400 bg-teal-500/10"
                   >
                     {v.topic}
                   </Badge>
@@ -397,7 +397,7 @@ export default function AcademyPage() {
         <Card className="surface-card border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-xl flex items-center gap-2 text-slate-900 dark:text-slate-50 font-heading">
-              <BookOpen className="w-5 h-5 text-indigo-500" />
+              <BookOpen className="w-5 h-5 text-teal-500" />
               Recommended Indian Educational Resources
             </CardTitle>
             <CardDescription className="text-slate-500 dark:text-slate-400 text-xs">
@@ -412,9 +412,9 @@ export default function AcademyPage() {
                   href={r.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 hover:border-indigo-300 dark:hover:border-indigo-600/50 transition-colors group"
+                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/40 hover:border-teal-300 dark:hover:border-teal-600/50 transition-colors group"
                 >
-                  <h4 className="font-bold text-slate-900 dark:text-slate-50 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1.5 text-sm">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-50 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex items-center gap-1.5 text-sm">
                     {r.title}
                     <ExternalLink className="w-3.5 h-3.5 opacity-60 shrink-0" />
                   </h4>
@@ -429,7 +429,7 @@ export default function AcademyPage() {
       </FadeIn>
 
       <FadeIn delay={0.14}>
-        <div className="p-8 rounded-2xl bg-gradient-to-r from-indigo-100/80 via-slate-50 to-emerald-100/60 dark:from-indigo-950/40 dark:via-slate-900 dark:to-emerald-950/20 border border-slate-200 dark:border-slate-800 text-center space-y-4">
+        <div className="p-8 rounded-2xl bg-gradient-to-r from-teal-100/80 via-slate-50 to-emerald-100/60 dark:from-teal-950/40 dark:via-slate-900 dark:to-emerald-950/20 border border-slate-200 dark:border-slate-800 text-center space-y-4">
           <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-50 font-heading">
             Ready to test your wealth growth numbers?
           </h3>
@@ -442,7 +442,7 @@ export default function AcademyPage() {
               href="/tools/sip-swp?mode=sip"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "bg-indigo-600 hover:bg-indigo-500 text-white font-semibold gap-2 inline-flex"
+                "bg-teal-600 hover:bg-teal-500 text-white font-semibold gap-2 inline-flex"
               )}
             >
               Open SIP Calculator

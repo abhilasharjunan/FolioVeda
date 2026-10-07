@@ -72,7 +72,7 @@ const CHANGELOG = [
       'Dashboard KPI ribbon with Portfolio Health and Asset Allocation side by side',
       'XIRR shows absolute return when holding period is under ~1 year (no misleading annualized %)',
       'SIP Calculator: flat vs step-up comparison and balanced input/results layout',
-      'Refined deep-slate theme, indigo accents, and clearer typography hierarchy',
+      'Refined deep-slate theme, teal accents, and clearer typography hierarchy',
     ],
   },
   {

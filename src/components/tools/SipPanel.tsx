@@ -204,7 +204,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                   value={monthlyAmount}
                   onSelect={setMonthlyAmount}
                   format={(v) => `₹${v / 1000}k`}
-                  accent="indigo"
+                  accent="teal"
                 />
               </div>
               <SliderField
@@ -240,7 +240,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                   value={stepUp}
                   onSelect={setStepUp}
                   format={(v) => (v === 0 ? "Flat" : `${v}%`)}
-                  accent="indigo"
+                  accent="teal"
                 />
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
                   Step-up raises your SIP each year — try 10% to see the compounding lift vs a flat SIP.
@@ -252,12 +252,12 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
           <div className="lg:col-span-7 space-y-6">
             <ScaleIn>
               <Card
-                className={`border-none shadow-md bg-gradient-to-br from-indigo-600 to-indigo-800 text-white overflow-hidden relative ${
+                className={`border-none shadow-md bg-gradient-to-br from-teal-600 to-teal-800 text-white overflow-hidden relative ${
                   favorable ? "ring-2 ring-emerald-400/40" : ""
                 }`}
               >
                 <CardContent className="p-6">
-                  <p className="text-xs text-indigo-100 uppercase font-bold tracking-wide">
+                  <p className="text-xs text-teal-100 uppercase font-bold tracking-wide">
                     Future Value
                   </p>
                   <p className="text-4xl sm:text-5xl font-bold mt-1 tracking-tight font-heading">
@@ -269,7 +269,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                     />
                   </p>
                   {growthMultiple > 0 && (
-                    <p className="text-sm text-indigo-100 mt-2">
+                    <p className="text-sm text-teal-100 mt-2">
                       That&apos;s{" "}
                       <span className="font-semibold text-white">{growthMultiple.toFixed(1)}×</span>{" "}
                       your total contribution over {years} {years === 1 ? "year" : "years"}
@@ -320,11 +320,11 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                     {fmtCompact(stepped.futureValue)}
                   </p>
                 </div>
-                <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/30 p-3">
-                  <p className="text-[10px] uppercase font-bold tracking-wide text-indigo-700 dark:text-indigo-300">
+                <div className="rounded-xl bg-teal-50 dark:bg-teal-950/30 p-3">
+                  <p className="text-[10px] uppercase font-bold tracking-wide text-teal-700 dark:text-teal-300">
                     Extra corpus
                   </p>
-                  <p className="text-lg font-bold text-indigo-700 dark:text-indigo-300 mt-1 tabular-nums">
+                  <p className="text-lg font-bold text-teal-700 dark:text-teal-300 mt-1 tabular-nums">
                     +{fmtCompact(delta)}
                   </p>
                 </div>
@@ -429,7 +429,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                   value={targetAmount}
                   onSelect={setTargetAmount}
                   format={fmtCompact}
-                  accent="indigo"
+                  accent="teal"
                 />
               </div>
               <SliderField
@@ -453,7 +453,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
             </CardContent>
           </Card>
           <ScaleIn>
-            <Card className="border-none shadow-md bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center overflow-hidden relative h-full ring-2 ring-emerald-400/30">
+            <Card className="border-none shadow-md bg-gradient-to-br from-teal-600 to-teal-800 text-white flex items-center overflow-hidden relative h-full ring-2 ring-emerald-400/30">
               <Target className="absolute -right-4 -bottom-4 text-white/10" size={140} strokeWidth={1} />
               <CardContent className="p-6 text-center w-full relative">
                 <p className="text-sm text-blue-100 font-medium">Required Monthly SIP</p>
@@ -513,7 +513,7 @@ export function SipPanel({ tab, onTabChange }: SipPanelProps) {
                       type="button"
                       onClick={() => removeScenario(idx)}
                       disabled={scenarios.length <= 1}
-                      className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 disabled:opacity-40"
+                      className="size-10 shrink-0 flex items-center justify-center rounded-lg text-rose-600/80 hover:text-rose-700 dark:text-rose-400/80 dark:hover:text-rose-300 disabled:opacity-40"
                       aria-label={`Remove ${s.label}`}
                     >
                       <X size={16} />
