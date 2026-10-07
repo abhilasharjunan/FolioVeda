@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.9.7",
+    "date": "Oct 2026",
+    "items": [
+      "Land version and changelog bumps in the same commit"
+    ]
+  },
+  {
+    "version": "1.9.6",
+    "date": "Oct 2026",
+    "items": [
+      "Show Inside FolioVeda in the mobile first viewport",
+      "Auto-update Version History changelog on each commit"
+    ]
+  },
+  {
     "version": "1.9.5",
     "date": "Oct 2026",
     "items": [

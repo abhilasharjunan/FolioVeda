@@ -20,12 +20,12 @@ The version bumps automatically based on conventional commit prefixes:
 
 ## How It Works
 
-1. **Git Hook**: A `prepare-commit-msg` hook runs before each commit (install with `npm run prepare` / `node scripts/install-git-hooks.mjs`)
-2. **Message Parsing**: The hook reads your commit message
+1. **Git Hooks**: `prepare-commit-msg` + `post-commit` (install with `npm run prepare` / `node scripts/install-git-hooks.mjs`)
+2. **Message Parsing**: The prepare hook reads your commit message
 3. **Version Detection**: Based on the conventional commit prefix, the appropriate version increment is applied
 4. **Auto-Update**: `package.json` is updated with the new version
 5. **Version History**: A release note is prepended to [`src/lib/changelog-data.json`](../src/lib/changelog-data.json) (shown on `/about`) from the commit subject, skipping pure `chore:`/`docs:` version-bump commits
-6. **Auto-Staging**: `package.json` and `changelog-data.json` are staged for the same commit
+6. **Same commit**: `post-commit` amends once (guarded) so the bump files are included in the commit that just finished
 
 ## Examples
 

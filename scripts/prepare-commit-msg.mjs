@@ -3,20 +3,27 @@
  * prepare-commit-msg hook body (tracked in-repo).
  * Bumps package.json and prepends a Version History entry for user-visible commits.
  *
- * Install / refresh the local git hook with:
+ * Files are written here; `post-commit` amends once so they land in the same commit
+ * (plain `git add` during prepare-commit-msg is too late for the commit index).
+ *
+ * Install / refresh local hooks:
  *   node scripts/install-git-hooks.mjs
  */
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
+const pendingPath = path.join(root, ".git", "FOLIOVEDA_VERSION_PENDING");
+
+// Skip when post-commit is amending to attach the bump.
+if (process.env.FOLIOVEDA_AMENDING === "1") {
+  process.exit(0);
+}
 
 const commitMsgFile = process.argv[2];
 if (!commitMsgFile) {
-  console.error("prepare-commit-msg: missing commit message file path");
   process.exit(0);
 }
 
@@ -64,7 +71,7 @@ function shouldSkipChangelog(msg) {
 
 function humanizeCommit(msg) {
   const stripped = msg
-    .replace(/^(BREAKING CHANGE:\s*|[a-z]+(\([^)]*\))?!:?\s*)/i, "")
+    .replace(/^(BREAKING CHANGE:\s*|[a-z]+(\([^)]*\))?!?:\s*)/i, "")
     .trim();
   if (!stripped) return msg;
   return stripped.charAt(0).toUpperCase() + stripped.slice(1);
@@ -74,6 +81,7 @@ function changelogDate(d = new Date()) {
   return d.toLocaleString("en-US", { month: "short", year: "numeric" });
 }
 
+let changelogUpdated = false;
 if (!shouldSkipChangelog(commitMsg) && fs.existsSync(changelogPath)) {
   const changelog = JSON.parse(fs.readFileSync(changelogPath, "utf8"));
   const item = humanizeCommit(commitMsg);
@@ -82,6 +90,7 @@ if (!shouldSkipChangelog(commitMsg) && fs.existsSync(changelogPath)) {
     if (changelog[0]?.version === newVersion) {
       if (!changelog[0].items.includes(item)) {
         changelog[0].items.unshift(item);
+        changelogUpdated = true;
       }
     } else {
       changelog.unshift({
@@ -89,19 +98,22 @@ if (!shouldSkipChangelog(commitMsg) && fs.existsSync(changelogPath)) {
         date: changelogDate(),
         items: [item],
       });
+      changelogUpdated = true;
     }
-    fs.writeFileSync(changelogPath, JSON.stringify(changelog, null, 2) + "\n");
+    if (changelogUpdated) {
+      fs.writeFileSync(changelogPath, JSON.stringify(changelog, null, 2) + "\n");
+    }
   }
 }
 
-try {
-  execSync("git add package.json src/lib/changelog-data.json", {
-    cwd: root,
-    stdio: "pipe",
-  });
-  console.log(`✓ Version bumped: ${currentVersion} → ${newVersion}`);
-} catch {
-  // Ignore staging failures (rebase / empty index edge cases).
-}
+fs.writeFileSync(
+  pendingPath,
+  JSON.stringify({
+    from: currentVersion,
+    to: newVersion,
+    files: ["package.json", ...(changelogUpdated ? ["src/lib/changelog-data.json"] : [])],
+  }) + "\n"
+);
 
+console.log(`✓ Version bumped: ${currentVersion} → ${newVersion}`);
 process.exit(0);
