@@ -48,9 +48,9 @@ function mergeReturns(
   return out;
 }
 
-/** Local NavSnapshot history is often only weeks old — treat as complete only when 1Y/3Y exists. */
+/** Local NavSnapshot history is often only weeks old — treat as complete only when 1Y (or 3Y) exists. */
 function hasLongHorizonReturns(returns: Record<string, number | null>): boolean {
-  return returns["3Y"] != null || returns["1Y"] != null;
+  return returns["1Y"] != null || returns["3Y"] != null;
 }
 
 async function enrichReturnsFromMfapi(fund: RankedFund): Promise<RankedFund> {
@@ -279,7 +279,7 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     const sortedThin = eligible
       .sort((a, b) => {
         const score = (f: RankedFund) =>
-          f.returns["3Y"] ?? f.returns["1Y"] ?? f.returns["1M"] ?? -Infinity;
+          f.returns["1Y"] ?? f.returns["3Y"] ?? f.returns["1M"] ?? -Infinity;
         return score(b) - score(a);
       })
       .slice(0, TARGET_PER_CATEGORY);
@@ -289,7 +289,7 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     for (const fund of sortedThin) {
       sorted.push(await enrichReturnsFromMfapi(fund));
     }
-    sorted.sort((a, b) => (b.returns["3Y"] ?? -Infinity) - (a.returns["3Y"] ?? -Infinity));
+    sorted.sort((a, b) => (b.returns["1Y"] ?? -Infinity) - (a.returns["1Y"] ?? -Infinity));
 
     if (sorted.length < TARGET_PER_CATEGORY) {
       console.warn(

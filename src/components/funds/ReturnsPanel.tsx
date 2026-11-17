@@ -43,7 +43,7 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({
-      key: "3Y",
+      key: "1Y",
       direction: "desc",
     });
 
@@ -192,12 +192,12 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
                 </Badge>
               </div>
               <div className="mt-8">
-                <p className="text-blue-100 text-sm font-medium">Leading category (3Y)</p>
+                <p className="text-blue-100 text-sm font-medium">Leading category (1Y)</p>
                 <h3 className="text-2xl font-bold font-heading">
                   {Object.entries(fundsData).sort(
                     (a, b) =>
-                      (b[1][0]?.returns?.["3Y"] ?? -Infinity) -
-                      (a[1][0]?.returns?.["3Y"] ?? -Infinity)
+                      (b[1][0]?.returns?.["1Y"] ?? -Infinity) -
+                      (a[1][0]?.returns?.["1Y"] ?? -Infinity)
                   )[0]?.[0] ?? "—"}
                 </h3>
               </div>

@@ -59,7 +59,7 @@ function TopFundsPageInner() {
             eyebrow: "Returns",
             title: "Top Performing Funds",
             subtitle:
-              "Direct Growth plans only · updated daily. Ranked by 3Y CAGR across curated benchmarks and AMFI Direct Growth funds with enough NAV history — including Momentum Index Funds.",
+              "Direct Growth plans only · updated daily. Ranked by 1Y returns across curated benchmarks and AMFI Direct Growth funds with enough NAV history — including Momentum Index Funds.",
             gradient: "from-blue-600 via-teal-600 to-slate-900",
             muted: "text-blue-100",
             Icon: TrendingUp,
