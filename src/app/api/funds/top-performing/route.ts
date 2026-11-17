@@ -18,8 +18,14 @@ const TARGET_PER_CATEGORY = 10;
 export const maxDuration = 60;
 export const revalidate = 3600;
 
-function categoryNeedsRefill(funds: TopFundsPayload[string] | undefined): boolean {
-  if (!funds || funds.length < TARGET_PER_CATEGORY) return true;
+function categoryNeedsRefill(
+  cat: FundCategory,
+  funds: TopFundsPayload[string] | undefined
+): boolean {
+  if (!funds || funds.length === 0) return true;
+  // SIFs are often <1Y old — treat a non-empty Direct Growth list as healthy.
+  if (cat === "SIF Funds") return funds.length < 3;
+  if (funds.length < TARGET_PER_CATEGORY) return true;
   // Snapshot-only syncs leave 3Y/1Y null while 1M is filled — force refill.
   const withLongHorizon = funds.filter(
     (f) => f.returns?.["3Y"] != null || f.returns?.["1Y"] != null
@@ -29,7 +35,7 @@ function categoryNeedsRefill(funds: TopFundsPayload[string] | undefined): boolea
 
 function thinCategories(payload: TopFundsPayload | null): FundCategory[] {
   if (!payload) return [...EXPECTED_CATEGORIES];
-  return EXPECTED_CATEGORIES.filter((cat) => categoryNeedsRefill(payload[cat]));
+  return EXPECTED_CATEGORIES.filter((cat) => categoryNeedsRefill(cat, payload[cat]));
 }
 
 export async function GET() {
@@ -56,7 +62,11 @@ export async function GET() {
     if (thin.length > 0) {
       try {
         // Cap on-demand work under Vercel 60s — remaining thin cats refill on later GETs / cron.
-        await syncTopFundsCache(thin.slice(0, 3));
+        // Prefer SIF Funds when empty: it needs an AMFI SIF pull and is often last in the list.
+        const refillOrder = thin.includes("SIF Funds")
+          ? (["SIF Funds", ...thin.filter((c) => c !== "SIF Funds")] as FundCategory[])
+          : thin;
+        await syncTopFundsCache(refillOrder.slice(0, 3));
         results = await loadTopFundsPayloadFromDb();
       } catch (syncErr) {
         console.warn("On-demand top-funds refill failed:", syncErr);

@@ -125,6 +125,20 @@ export interface AmfiSyncResult {
  *
  * See FolioVeda_Audit_and_Roadmap.md follow-up: full-universe NAV sync via AMFI.
  */
+/**
+ * Pull only the AMFI SIF_NAVAll.txt universe into SchemeCatalog + NavSnapshot.
+ * Used by daily sync-nav and by Top Funds when ranking the SIF Funds category
+ * (mfapi.in does not cover SIF-* scheme codes).
+ */
+export async function syncAmfiSifUniverse(): Promise<number> {
+  const records = await fetchAmfiSifNavAll();
+  if (records.length === 0) return 0;
+  await bulkUpsertSchemeCatalog(records);
+  await bulkUpdateSchemeMaster(records);
+  await bulkUpsertNavSnapshots(records);
+  return records.length;
+}
+
 export async function syncAmfiUniverse(): Promise<AmfiSyncResult> {
   const mfRecords = await fetchAmfiNavAll();
   if (mfRecords.length < 1000) {
@@ -135,23 +149,21 @@ export async function syncAmfiUniverse(): Promise<AmfiSyncResult> {
 
   // SIF strategies live on a separate AMFI file; soft-fail so a SIF outage
   // does not block the main mutual-fund NAV sync.
-  let sifRecords: AmfiSchemeRecord[] = [];
+  let sifCount = 0;
   try {
-    sifRecords = await fetchAmfiSifNavAll();
+    sifCount = await syncAmfiSifUniverse();
   } catch (err) {
     console.warn("AMFI SIF_NAVAll.txt sync skipped:", err);
   }
 
-  const records = [...mfRecords, ...sifRecords];
-
-  const catalogUpserted = await bulkUpsertSchemeCatalog(records);
-  const schemeMasterUpdated = await bulkUpdateSchemeMaster(records);
-  const navSnapshotsUpserted = await bulkUpsertNavSnapshots(records);
+  const catalogUpserted = await bulkUpsertSchemeCatalog(mfRecords);
+  const schemeMasterUpdated = await bulkUpdateSchemeMaster(mfRecords);
+  const navSnapshotsUpserted = await bulkUpsertNavSnapshots(mfRecords);
 
   return {
-    totalSchemesInFile: records.length,
-    catalogUpserted,
+    totalSchemesInFile: mfRecords.length + sifCount,
+    catalogUpserted: catalogUpserted + sifCount,
     schemeMasterUpdated,
-    navSnapshotsUpserted,
+    navSnapshotsUpserted: navSnapshotsUpserted + sifCount,
   };
 }

@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.9.13",
+    "date": "Nov 2026",
+    "items": [
+      "Fix empty SIF Funds ranking by syncing AMFI SIF NAVs without mfapi."
+    ]
+  },
+  {
     "version": "1.9.12",
     "date": "Nov 2026",
     "items": [

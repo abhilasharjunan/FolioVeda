@@ -8,9 +8,14 @@ import {
   getHistoricalNav,
 } from "@/lib/funds";
 import { isMomentumIndexText, isSifFundText } from "@/lib/amfi";
+import { syncAmfiSifUniverse } from "@/lib/sync-amfi";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
 import { isDirectGrowthScheme } from "@/lib/scheme-filters";
 import { refreshTopFundsRedisFromDb } from "@/lib/top-funds-cache";
+
+function isSifSchemeCode(schemeCode: string): boolean {
+  return /^SIF-\d+$/i.test(schemeCode);
+}
 
 const CATEGORIES: FundCategory[] = FUND_CATEGORIES;
 
@@ -37,6 +42,19 @@ interface RankedFund {
   sinceInception: number | null;
 }
 
+/** Prefer 1Y, then fall back through shorter windows — SIFs are often <1Y old. */
+function rankScore(f: RankedFund): number {
+  return (
+    f.returns["1Y"] ??
+    f.returns["3Y"] ??
+    f.returns["6M"] ??
+    f.returns["3M"] ??
+    f.returns["1M"] ??
+    f.sinceInception ??
+    -Infinity
+  );
+}
+
 function mergeReturns(
   primary: Record<string, number | null>,
   fallback: Record<string, number | null>
@@ -54,6 +72,8 @@ function hasLongHorizonReturns(returns: Record<string, number | null>): boolean 
 }
 
 async function enrichReturnsFromMfapi(fund: RankedFund): Promise<RankedFund> {
+  // mfapi.in has no SIF-* coverage — skip the timed-out external call.
+  if (isSifSchemeCode(fund.schemeCode)) return fund;
   if (hasLongHorizonReturns(fund.returns) && fund.sinceInception != null) {
     return fund;
   }
@@ -70,6 +90,22 @@ async function enrichReturnsFromMfapi(fund: RankedFund): Promise<RankedFund> {
     console.warn(`mfapi return backfill failed for ${fund.schemeCode}:`, e);
     return fund;
   }
+}
+
+function rankedFromLocal(
+  scheme: { schemeCode: string; schemeName: string },
+  nav: number,
+  local: Awaited<ReturnType<typeof computeReturnsFromSnapshots>>,
+  fundHouse: string | null = "Mutual Fund"
+): RankedFund {
+  return {
+    schemeCode: scheme.schemeCode,
+    schemeName: scheme.schemeName,
+    fundHouse,
+    nav,
+    returns: local.returns,
+    sinceInception: local.sinceInception,
+  };
 }
 
 /**
@@ -96,61 +132,60 @@ async function getCuratedCandidates(cat: FundCategory): Promise<RankedFund[]> {
         if (recent) {
           const local = await computeReturnsFromSnapshots(scheme.schemeCode, Number(recent.nav));
           if (hasMinimumHistory(local.earliestSnapshotDate) && hasLongHorizonReturns(local.returns)) {
-            return {
-              schemeCode: scheme.schemeCode,
-              schemeName: scheme.schemeName,
-              fundHouse: "Mutual Fund",
-              nav: Number(recent.nav),
-              returns: local.returns,
-              sinceInception: local.sinceInception,
-            };
+            return rankedFromLocal(scheme, Number(recent.nav), local);
           }
 
           // Thin local history (e.g. only 1M) — keep local shorts, fill longer windows from mfapi.
-          if (hasMinimumHistory(local.earliestSnapshotDate)) {
+          if (hasMinimumHistory(local.earliestSnapshotDate) && !isSifSchemeCode(scheme.schemeCode)) {
             const mf = await computePeriodReturnsFromMfapi(scheme.schemeCode);
             if (mf) {
               return {
-                schemeCode: scheme.schemeCode,
-                schemeName: scheme.schemeName,
-                fundHouse: "Mutual Fund",
-                nav: Number(recent.nav),
+                ...rankedFromLocal(scheme, Number(recent.nav), local),
                 returns: mergeReturns(local.returns, mf.returns),
                 sinceInception: local.sinceInception ?? mf.sinceInception,
               };
             }
           }
+
+          // SIF / brand-new schemes: mfapi has no history — still rank on local NAV.
+          if (isSifSchemeCode(scheme.schemeCode) || cat === "SIF Funds") {
+            return rankedFromLocal(scheme, Number(recent.nav), local);
+          }
         }
 
-        const mf = await computePeriodReturnsFromMfapi(scheme.schemeCode);
-        if (mf) {
+        if (!isSifSchemeCode(scheme.schemeCode)) {
+          const mf = await computePeriodReturnsFromMfapi(scheme.schemeCode);
+          if (mf) {
+            return {
+              schemeCode: scheme.schemeCode,
+              schemeName: scheme.schemeName,
+              fundHouse: "Mutual Fund",
+              nav: mf.nav,
+              returns: mf.returns,
+              sinceInception: mf.sinceInception,
+            };
+          }
+
+          const currentNav = await getHistoricalNav(scheme.schemeCode, 0);
+          if (!currentNav) return null;
+
+          const returns: Record<string, number | null> = {};
+          for (const [label, days] of Object.entries(RETURN_WINDOWS)) {
+            const pastNav = await getHistoricalNav(scheme.schemeCode, days);
+            returns[label] = pastNav ? calculateCAGR(currentNav, pastNav, days) : null;
+          }
+
           return {
             schemeCode: scheme.schemeCode,
             schemeName: scheme.schemeName,
             fundHouse: "Mutual Fund",
-            nav: mf.nav,
-            returns: mf.returns,
-            sinceInception: mf.sinceInception,
+            nav: currentNav,
+            returns,
+            sinceInception: returns["10Y"],
           };
         }
 
-        const currentNav = await getHistoricalNav(scheme.schemeCode, 0);
-        if (!currentNav) return null;
-
-        const returns: Record<string, number | null> = {};
-        for (const [label, days] of Object.entries(RETURN_WINDOWS)) {
-          const pastNav = await getHistoricalNav(scheme.schemeCode, days);
-          returns[label] = pastNav ? calculateCAGR(currentNav, pastNav, days) : null;
-        }
-
-        return {
-          schemeCode: scheme.schemeCode,
-          schemeName: scheme.schemeName,
-          fundHouse: "Mutual Fund",
-          nav: currentNav,
-          returns,
-          sinceInception: returns["10Y"],
-        };
+        return null;
       } catch (e) {
         console.error(`Error fetching ${scheme.schemeCode}:`, e);
         return null;
@@ -238,7 +273,8 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
     if (!latest) continue;
 
     const local = await computeReturnsFromSnapshots(scheme.schemeCode, latest.nav);
-    if (!hasMinimumHistory(local.earliestSnapshotDate)) continue;
+    // SIFs launched recently — don't wait for the usual 25-day snapshot floor.
+    if (cat !== "SIF Funds" && !hasMinimumHistory(local.earliestSnapshotDate)) continue;
 
     results.push({
       schemeCode: scheme.schemeCode,
@@ -255,6 +291,17 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
 
 export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES) {
   const results: Record<string, RankedFund[]> = {};
+
+  // SIF-* codes are absent from mfapi.in; hydrate catalog + today's snapshots
+  // from AMFI before ranking so the category is not empty on first deploy.
+  if (categories.includes("SIF Funds")) {
+    try {
+      const n = await syncAmfiSifUniverse();
+      console.log(`Top funds sync: refreshed ${n} SIF schemes from AMFI`);
+    } catch (err) {
+      console.warn("Top funds sync: SIF AMFI refresh failed:", err);
+    }
+  }
 
   for (const cat of categories) {
     const [curated, fullUniverse] = await Promise.all([
@@ -292,11 +339,7 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
 
     const TARGET_PER_CATEGORY = 10;
     const sortedThin = eligible
-      .sort((a, b) => {
-        const score = (f: RankedFund) =>
-          f.returns["1Y"] ?? f.returns["3Y"] ?? f.returns["1M"] ?? -Infinity;
-        return score(b) - score(a);
-      })
+      .sort((a, b) => rankScore(b) - rankScore(a))
       .slice(0, TARGET_PER_CATEGORY);
 
     // Backfill mfapi for finalists still missing long-horizon returns.
@@ -304,7 +347,7 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     for (const fund of sortedThin) {
       sorted.push(await enrichReturnsFromMfapi(fund));
     }
-    sorted.sort((a, b) => (b.returns["1Y"] ?? -Infinity) - (a.returns["1Y"] ?? -Infinity));
+    sorted.sort((a, b) => rankScore(b) - rankScore(a));
 
     if (sorted.length < TARGET_PER_CATEGORY) {
       console.warn(
