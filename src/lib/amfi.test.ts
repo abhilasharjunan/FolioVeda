@@ -3,6 +3,7 @@ import {
   parseAmfiNavAll,
   mapAmfiCategoryToFundCategory,
   isMomentumIndexText,
+  isSifFundText,
 } from './amfi';
 
 // A trimmed but structurally faithful sample of AMFI's NAVAll.txt format:
@@ -164,4 +165,47 @@ describe('mapAmfiCategoryToFundCategory', () => {
       isMomentumIndexText('Edelweiss Nifty Midcap150 Momentum 50 Index Fund - Direct Plan - Growth')
     ).toBe(true);
   });
+
+  it('maps SIF / long-short investment strategies to SIF Funds', () => {
+    expect(
+      mapAmfiCategoryToFundCategory(
+        'Open Ended Schemes(Equity Oriented Investment Strategies - Equity Long-Short Fund)',
+        'qsif Equity Long-Short Fund - Direct Plan - Growth Option'
+      )
+    ).toBe('SIF Funds');
+    expect(
+      mapAmfiCategoryToFundCategory(
+        'Interval Fund Schemes(Hybrid Investment Strategies - Hybrid Long-Short Fund)',
+        'Altiva Hybrid Long-Short Fund - Direct Plan - Growth'
+      )
+    ).toBe('SIF Funds');
+    expect(isSifFundText('SIF-23')).toBe(true);
+  });
 });
+
+describe('parseAmfiNavAll SIF codes', () => {
+  it('accepts SIF-* scheme codes and Interval Fund Schemes headers', () => {
+    const raw = `
+Scheme Code;ISIN Div Payout/ ISIN Growth;ISIN Div Reinvestment;Scheme Name;Plan;Option;Net Asset Value;Date
+
+Open Ended Schemes(Equity Oriented Investment Strategies - Equity Ex-Top 100 Long-Short Fund)
+
+qsif SIF
+
+SIF-23;INF966L30159;-;qsif Equity Ex-Top 100 Long-Short Fund;Direct Plan;Growth Option;11.7508;16-Nov-2026
+
+Interval Fund Schemes(Hybrid Investment Strategies - Hybrid Long-Short Fund)
+
+Altiva SIF
+
+SIF-9;INF754K30011;-;Altiva Hybrid Long-Short Fund;Direct Plan;Growth;11.1261;16-Nov-2026
+`;
+    const records = parseAmfiNavAll(raw);
+    expect(records).toHaveLength(2);
+    expect(records[0].schemeCode).toBe('SIF-23');
+    expect(records[0].category).toBe('SIF Funds');
+    expect(records[1].schemeCode).toBe('SIF-9');
+    expect(records[1].category).toBe('SIF Funds');
+  });
+});
+

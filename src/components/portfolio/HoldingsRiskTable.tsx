@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
+import React, { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
+import { SortableTh } from "@/components/ui/SortableTh";
 import { FundNameLink } from "@/components/funds/FundNameLink";
+import { useTableSort } from "@/hooks/useTableSort";
+import { compareSortValues } from "@/lib/table-sort";
 
 export interface HoldingRisk {
   schemeName: string;
@@ -16,14 +18,13 @@ export interface HoldingRisk {
 }
 
 type SortKey = "fund" | "weight" | "value" | "volatility" | "score";
-type SortDir = "asc" | "desc";
 
-const COLUMNS: { key: SortKey; label: string; numeric: boolean }[] = [
-  { key: "fund", label: "Fund", numeric: false },
-  { key: "weight", label: "Weight", numeric: true },
-  { key: "value", label: "Value", numeric: true },
-  { key: "volatility", label: "Volatility", numeric: true },
-  { key: "score", label: "Score", numeric: true },
+const COLUMNS: { key: SortKey; label: string; text?: boolean }[] = [
+  { key: "fund", label: "Fund", text: true },
+  { key: "weight", label: "Weight" },
+  { key: "value", label: "Value" },
+  { key: "volatility", label: "Volatility" },
+  { key: "score", label: "Score" },
 ];
 
 export function HoldingsRiskTable({
@@ -33,25 +34,13 @@ export function HoldingsRiskTable({
   holdings: HoldingRisk[];
   totalValue: number;
 }) {
-  // Default: largest position first — the same order the page rendered before.
-  const [sortKey, setSortKey] = useState<SortKey>("value");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-
-  function toggle(key: SortKey) {
-    if (key === sortKey) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      // Names read best A→Z, numbers most-interesting-first.
-      setSortDir(key === "fund" ? "asc" : "desc");
-    }
-  }
+  const { sortKey, sortDir, toggle } = useTableSort<SortKey>("value", "desc");
 
   const sorted = useMemo(() => {
-    const value = (h: HoldingRisk): number | string => {
+    const valueOf = (h: HoldingRisk) => {
       switch (sortKey) {
         case "fund":
-          return h.schemeName.toLowerCase();
+          return h.schemeName;
         case "weight":
         case "value":
           return h.currentValue;
@@ -61,17 +50,7 @@ export function HoldingsRiskTable({
           return h.riskScore;
       }
     };
-    return [...holdings].sort((a, b) => {
-      const av = value(a);
-      const bv = value(b);
-      let cmp: number;
-      if (typeof av === "string" && typeof bv === "string") {
-        cmp = av.localeCompare(bv);
-      } else {
-        cmp = (av as number) - (bv as number);
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
+    return [...holdings].sort((a, b) => compareSortValues(valueOf(a), valueOf(b), sortDir));
   }, [holdings, sortKey, sortDir]);
 
   return (
@@ -79,35 +58,15 @@ export function HoldingsRiskTable({
       <table className="w-full text-left border-collapse">
         <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
           <tr>
-            {COLUMNS.map((col) => {
-              const active = col.key === sortKey;
-              return (
-                <th
-                  key={col.key}
-                  aria-sort={active ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
-                  className="p-0 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider"
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggle(col.key)}
-                    className={`flex w-full items-center gap-1.5 p-4 transition-colors hover:text-slate-800 dark:hover:text-slate-100 ${
-                      col.numeric ? "justify-start" : ""
-                    } ${active ? "text-slate-800 dark:text-slate-100" : ""}`}
-                  >
-                    {col.label}
-                    {active ? (
-                      sortDir === "asc" ? (
-                        <ArrowUp size={12} />
-                      ) : (
-                        <ArrowDown size={12} />
-                      )
-                    ) : (
-                      <ChevronsUpDown size={12} className="opacity-40" />
-                    )}
-                  </button>
-                </th>
-              );
-            })}
+            {COLUMNS.map((col) => (
+              <SortableTh
+                key={col.key}
+                label={col.label}
+                active={col.key === sortKey}
+                direction={sortDir}
+                onClick={() => toggle(col.key, { text: col.text })}
+              />
+            ))}
           </tr>
         </thead>
         <tbody>
@@ -121,7 +80,9 @@ export function HoldingsRiskTable({
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     <FundNameLink schemeCode={h.schemeCode}>{h.schemeName}</FundNameLink>
                   </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase">{h.category}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-400 uppercase">
+                    {h.category}
+                  </span>
                 </div>
               </td>
               <td className="p-4 text-sm font-mono text-slate-600 dark:text-slate-300">

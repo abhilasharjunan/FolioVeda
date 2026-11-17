@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -25,8 +25,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/animations";
+import { SortableTh } from "@/components/ui/SortableTh";
 import { CATEGORY_META, type FeedbackCategory } from "@/lib/feedback";
+import { useTableSort } from "@/hooks/useTableSort";
+import { compareSortValues } from "@/lib/table-sort";
 import { toast } from "sonner";
+
+type UserSortKey =
+  | "name"
+  | "createdAt"
+  | "lastLoginAt"
+  | "holdingCount"
+  | "portfolioUpdatedAt"
+  | "consentGiven"
+  | "status";
 
 const USER_FILTERS: { id: string; label: string }[] = [
   { id: "", label: "All" },
@@ -144,6 +156,29 @@ export default function AdminClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const { sortKey, sortDir, toggle } = useTableSort<UserSortKey>("createdAt", "desc");
+
+  const sortedUsers = useMemo(() => {
+    const valueOf = (u: AdminUser) => {
+      switch (sortKey) {
+        case "name":
+          return u.name || u.email;
+        case "createdAt":
+          return new Date(u.createdAt).getTime();
+        case "lastLoginAt":
+          return u.lastLoginAt ? new Date(u.lastLoginAt).getTime() : null;
+        case "holdingCount":
+          return u.holdingCount;
+        case "portfolioUpdatedAt":
+          return u.portfolioUpdatedAt ? new Date(u.portfolioUpdatedAt).getTime() : null;
+        case "consentGiven":
+          return u.consentGiven ? 1 : 0;
+        case "status":
+          return u.disabledAt ? 1 : 0;
+      }
+    };
+    return [...users].sort((a, b) => compareSortValues(valueOf(a), valueOf(b), sortDir));
+  }, [users, sortKey, sortDir]);
 
   const load = useCallback(async (search = q, nextFilter = filter) => {
     setLoading(true);
@@ -519,18 +554,53 @@ export default function AdminClient() {
           <table className="w-full text-left text-sm min-w-[960px]">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-xs uppercase tracking-wider text-slate-500">
-                <th className="py-2 pr-3">User</th>
-                <th className="py-2 pr-3">Joined</th>
-                <th className="py-2 pr-3">Last login</th>
-                <th className="py-2 pr-3">Portfolio</th>
-                <th className="py-2 pr-3">Updated</th>
-                <th className="py-2 pr-3">Consent</th>
-                <th className="py-2 pr-3">Status</th>
-                <th className="py-2">Actions</th>
+                <SortableTh
+                  label="User"
+                  active={sortKey === "name"}
+                  direction={sortDir}
+                  onClick={() => toggle("name", { text: true })}
+                />
+                <SortableTh
+                  label="Joined"
+                  active={sortKey === "createdAt"}
+                  direction={sortDir}
+                  onClick={() => toggle("createdAt")}
+                />
+                <SortableTh
+                  label="Last login"
+                  active={sortKey === "lastLoginAt"}
+                  direction={sortDir}
+                  onClick={() => toggle("lastLoginAt")}
+                />
+                <SortableTh
+                  label="Portfolio"
+                  active={sortKey === "holdingCount"}
+                  direction={sortDir}
+                  onClick={() => toggle("holdingCount")}
+                />
+                <SortableTh
+                  label="Updated"
+                  active={sortKey === "portfolioUpdatedAt"}
+                  direction={sortDir}
+                  onClick={() => toggle("portfolioUpdatedAt")}
+                />
+                <SortableTh
+                  label="Consent"
+                  active={sortKey === "consentGiven"}
+                  direction={sortDir}
+                  onClick={() => toggle("consentGiven")}
+                />
+                <SortableTh
+                  label="Status"
+                  active={sortKey === "status"}
+                  direction={sortDir}
+                  onClick={() => toggle("status")}
+                />
+                <th className="py-2 px-4">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {sortedUsers.map((u) => (
                 <tr key={u.id} className="border-b border-slate-100 dark:border-slate-800/80">
                   <td className="py-3 pr-3">
                     <div className="font-medium text-slate-900 dark:text-slate-100">

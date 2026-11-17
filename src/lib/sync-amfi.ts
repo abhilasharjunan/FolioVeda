@@ -1,5 +1,5 @@
 import { prisma } from "./prisma";
-import { fetchAmfiNavAll, AmfiSchemeRecord } from "./amfi";
+import { fetchAmfiNavAll, fetchAmfiSifNavAll, AmfiSchemeRecord } from "./amfi";
 import { randomUUID } from "crypto";
 
 // Bulk set-based upserts (one round trip per chunk via unnest + ON CONFLICT)
@@ -126,12 +126,23 @@ export interface AmfiSyncResult {
  * See FolioVeda_Audit_and_Roadmap.md follow-up: full-universe NAV sync via AMFI.
  */
 export async function syncAmfiUniverse(): Promise<AmfiSyncResult> {
-  const records = await fetchAmfiNavAll();
-  if (records.length < 1000) {
+  const mfRecords = await fetchAmfiNavAll();
+  if (mfRecords.length < 1000) {
     // A healthy NAVAll.txt has ~9,000-12,000 rows. Something's wrong with the
     // fetch/parse if we got far fewer — don't let a bad pull nuke good data.
-    throw new Error(`AMFI sync aborted: only parsed ${records.length} scheme records (expected 1000+)`);
+    throw new Error(`AMFI sync aborted: only parsed ${mfRecords.length} scheme records (expected 1000+)`);
   }
+
+  // SIF strategies live on a separate AMFI file; soft-fail so a SIF outage
+  // does not block the main mutual-fund NAV sync.
+  let sifRecords: AmfiSchemeRecord[] = [];
+  try {
+    sifRecords = await fetchAmfiSifNavAll();
+  } catch (err) {
+    console.warn("AMFI SIF_NAVAll.txt sync skipped:", err);
+  }
+
+  const records = [...mfRecords, ...sifRecords];
 
   const catalogUpserted = await bulkUpsertSchemeCatalog(records);
   const schemeMasterUpdated = await bulkUpdateSchemeMaster(records);

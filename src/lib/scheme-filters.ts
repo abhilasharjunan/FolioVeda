@@ -4,13 +4,21 @@
  * matching is intentionally substring-based and case-insensitive.
  */
 
-export function isDirectGrowthScheme(name: string): boolean {
+import { SIF_EMPTY_PLAN_DIRECT_CODES } from "@/lib/amfi";
+
+export function isDirectGrowthScheme(name: string, schemeCode?: string | null): boolean {
   const n = name.toLowerCase();
   if (n.includes("regular")) return false;
   if (/\bidcw\b|dividend|payout|reinvestment/.test(n)) return false;
   // Index funds often use "Cumulative" instead of "Growth" for the accumulation option.
   const isGrowthLike = n.includes("growth") || n.includes("cumulative");
-  return n.includes("direct") && isGrowthLike;
+  if (n.includes("direct") && isGrowthLike) return true;
+
+  // iSIF rows in SIF_NAVAll.txt often omit Plan/Option; accept known Direct codes.
+  if (schemeCode && SIF_EMPTY_PLAN_DIRECT_CODES.has(schemeCode.toUpperCase())) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -22,6 +30,7 @@ export function normalizeSchemeCategory(raw: string | null | undefined): string 
   const n = raw.toLowerCase().replace(/[_/]+/g, " ").replace(/\s+/g, " ").trim();
 
   if (/\belss\b|tax.?saver|equity linked/.test(n)) return "ELSS";
+  if (/\bsif\b|long[\s-]*short/.test(n)) return "SIF Funds";
   if (/small.?cap/.test(n)) return "Small Cap";
   if (/mid.?cap/.test(n)) return "Mid Cap";
   if (/large.?cap|blue.?chip/.test(n)) return "Large Cap";

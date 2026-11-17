@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.9.12",
+    "date": "Nov 2026",
+    "items": [
+      "Add SIF Funds to Top Funds and sortable columns across data tables."
+    ]
+  },
+  {
     "version": "1.9.11",
     "date": "Nov 2026",
     "items": [

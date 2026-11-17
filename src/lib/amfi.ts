@@ -22,7 +22,17 @@ import { FundCategory } from "./funds";
  */
 
 const AMFI_NAV_ALL_URL = "https://www.amfiindia.com/spages/NAVAll.txt";
+/** SEBI Specialized Investment Funds publish on a separate AMFI bulk file. */
+const AMFI_SIF_NAV_ALL_URL = "https://portal.amfiindia.com/spages/SIF_NAVAll.txt";
 const FETCH_TIMEOUT_MS = 20000;
+
+/** iSIF rows often omit Plan/Option; these AMFI codes are the Direct Growth plans. */
+export const SIF_EMPTY_PLAN_DIRECT_CODES = new Set([
+  "SIF-33", // iSIF Equity Ex-Top 100 Long-Short
+  "SIF-127", // iSIF Equity Long-Short
+  "SIF-125", // iSIF Active Asset Allocator Long-Short
+  "SIF-36", // iSIF Hybrid Long-Short
+]);
 
 export interface AmfiSchemeRecord {
   schemeCode: string;
@@ -36,7 +46,12 @@ export interface AmfiSchemeRecord {
   category: FundCategory | null; // best-effort mapping to the app's taxonomy
 }
 
-const CATEGORY_HEADER_RE = /^(Open|Close|Interval)\s+Ended\s+Schemes?\s*\(/i;
+// Matches "Open Ended Schemes(...)", "Close Ended Schemes(...)", and SIF's
+// "Interval Fund Schemes(...)" headers.
+const CATEGORY_HEADER_RE =
+  /^(Open|Close|Interval)\s+(Ended\s+)?(Fund\s+)?Schemes?\s*\(/i;
+
+const SCHEME_CODE_RE = /^(?:\d+|SIF-\d+)$/i;
 
 /**
  * Momentum index / ETF schemes are not a clean AMFI header — detect from
@@ -55,6 +70,21 @@ export function isMomentumIndexText(...parts: Array<string | null | undefined>):
   );
 }
 
+/** Detect SEBI Specialized Investment Fund strategies from AMFI headers / names. */
+export function isSifFundText(...parts: Array<string | null | undefined>): boolean {
+  const t = parts.filter(Boolean).join(" ").toLowerCase();
+  if (!t) return false;
+  if (/\bsif-\d+\b/.test(t)) return true;
+  if (t.includes("equity oriented investment strategies")) return true;
+  if (t.includes("hybrid investment strategies")) return true;
+  if (t.includes("debt oriented investment strategies")) return true;
+  if (/\blong[\s-]*short\b/.test(t) && (t.includes("sif") || t.includes("investment strateg"))) {
+    return true;
+  }
+  // AMC brand names often embed SIF (iSIF, qsif, DynaSIF, Magnum SIF, …).
+  return /\bsif\b/.test(t) && /\blong[\s-]*short\b/.test(t);
+}
+
 /**
  * Best-effort mapping from AMFI's granular scheme categories (dozens of them)
  * down to the app's taxonomy. Ordered by specificity — first match wins.
@@ -67,6 +97,7 @@ export function mapAmfiCategoryToFundCategory(
 ): FundCategory | null {
   const c = amfiCategory.toLowerCase();
 
+  if (isSifFundText(amfiCategory, schemeName)) return "SIF Funds";
   if (isMomentumIndexText(amfiCategory, schemeName)) return "Momentum Index Funds";
 
   if (c.includes("elss")) return "ELSS";
@@ -135,7 +166,7 @@ function parseAmfiLine(line: string): { schemeCode: string; isinGrowth: string |
   }
 
   const schemeCode = schemeCodeRaw.trim();
-  if (!schemeCode || !/^\d+$/.test(schemeCode)) return null;
+  if (!schemeCode || !SCHEME_CODE_RE.test(schemeCode)) return null;
 
   const nav = parseFloat(navRaw.trim());
   if (!isFinite(nav)) return null;
@@ -189,29 +220,41 @@ export function parseAmfiNavAll(raw: string): AmfiSchemeRecord[] {
   return records;
 }
 
-/** Fetches and parses the AMFI bulk NAV file. Throws on network/timeout failure. */
-export async function fetchAmfiNavAll(): Promise<AmfiSchemeRecord[]> {
+async function fetchAmfiText(url: string, label: string): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    const response = await fetch(AMFI_NAV_ALL_URL, {
+    const response = await fetch(url, {
       signal: controller.signal,
       headers: {
         // AMFI's endpoint is known to be picky about requests with no UA.
         "User-Agent": "Mozilla/5.0 (compatible; FolioVeda/1.0; +https://foliveda.example)",
       },
     });
-    if (!response.ok) throw new Error(`AMFI NAVAll.txt returned ${response.status}`);
+    if (!response.ok) throw new Error(`${label} returned ${response.status}`);
     const text = await response.text();
-    if (!text || text.length < 1000) throw new Error("AMFI NAVAll.txt response looked truncated or empty");
-    return parseAmfiNavAll(text);
+    if (!text || text.length < 200) throw new Error(`${label} response looked truncated or empty`);
+    return text;
   } catch (err: unknown) {
     if (err instanceof Error && err.name === "AbortError") {
-      throw new Error("AMFI NAVAll.txt request timed out");
+      throw new Error(`${label} request timed out`);
     }
     throw err;
   } finally {
     clearTimeout(timer);
   }
+}
+
+/** Fetches and parses the AMFI bulk NAV file. Throws on network/timeout failure. */
+export async function fetchAmfiNavAll(): Promise<AmfiSchemeRecord[]> {
+  const text = await fetchAmfiText(AMFI_NAV_ALL_URL, "AMFI NAVAll.txt");
+  if (text.length < 1000) throw new Error("AMFI NAVAll.txt response looked truncated or empty");
+  return parseAmfiNavAll(text);
+}
+
+/** Fetches SEBI SIF strategies from AMFI's separate SIF_NAVAll.txt. */
+export async function fetchAmfiSifNavAll(): Promise<AmfiSchemeRecord[]> {
+  const text = await fetchAmfiText(AMFI_SIF_NAV_ALL_URL, "AMFI SIF_NAVAll.txt");
+  return parseAmfiNavAll(text);
 }

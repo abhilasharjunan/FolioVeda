@@ -22,11 +22,17 @@ describe('isDirectGrowthScheme', () => {
     expect(isDirectGrowthScheme('Some Fund Growth Option')).toBe(false);
   });
 
+  it('accepts known iSIF empty-plan Direct codes', () => {
+    expect(isDirectGrowthScheme('iSIF Equity Ex-Top 100 Long-Short Fund', 'SIF-33')).toBe(true);
+    expect(isDirectGrowthScheme('iSIF Equity Ex-Top 100 Long-Short Fund', 'SIF-34')).toBe(false);
+  });
+
   it('rejects empty and whitespace-only names', () => {
     expect(isDirectGrowthScheme('')).toBe(false);
     expect(isDirectGrowthScheme('   ')).toBe(false);
   });
 });
+
 
 describe('normalizeSchemeCategory', () => {
   it('collapses AMFI-style long labels into short buckets', () => {
@@ -35,6 +41,9 @@ describe('normalizeSchemeCategory', () => {
     expect(normalizeSchemeCategory('Equity Scheme - Mid Cap Fund')).toBe('Mid Cap');
     expect(normalizeSchemeCategory('Other Scheme - Index Funds')).toBe('Index');
     expect(normalizeSchemeCategory('Index Funds - Equity Funds')).toBe('Index');
+    expect(normalizeSchemeCategory('Equity Oriented Investment Strategies - Equity Long-Short Fund')).toBe(
+      'SIF Funds'
+    );
   });
 
   it('keeps short SEBI-style labels', () => {

@@ -7,7 +7,7 @@ import {
   computePeriodReturnsFromMfapi,
   getHistoricalNav,
 } from "@/lib/funds";
-import { isMomentumIndexText } from "@/lib/amfi";
+import { isMomentumIndexText, isSifFundText } from "@/lib/amfi";
 import { computeReturnsFromSnapshots, hasMinimumHistory, RETURN_WINDOWS } from "@/lib/nav-snapshots";
 import { isDirectGrowthScheme } from "@/lib/scheme-filters";
 import { refreshTopFundsRedisFromDb } from "@/lib/top-funds-cache";
@@ -22,7 +22,7 @@ const CATEGORIES: FundCategory[] = FUND_CATEGORIES;
 export const CATEGORY_BATCHES: FundCategory[][] = [
   ["Large Cap", "Mid Cap", "Small Cap"],
   ["Flexi Cap", "ELSS", "Debt"],
-  ["Hybrid", "Index Funds", "Momentum Index Funds", "International Funds"],
+  ["Hybrid", "Index Funds", "Momentum Index Funds", "International Funds", "SIF Funds"],
 ];
 
 const FULL_UNIVERSE_CANDIDATES_PER_CATEGORY = 200;
@@ -184,6 +184,20 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
           orderBy: { schemeName: "asc" },
           take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
         })
+      : cat === "SIF Funds"
+        ? await prisma.schemeCatalog.findMany({
+            where: {
+              OR: [
+                { category: "SIF Funds" },
+                { schemeCode: { startsWith: "SIF-" } },
+                { schemeName: { contains: "Long-Short", mode: "insensitive" } },
+                { schemeName: { contains: "Long - Short", mode: "insensitive" } },
+              ],
+            },
+            select: { schemeCode: true, schemeName: true, fundHouse: true },
+            orderBy: { schemeName: "asc" },
+            take: FULL_UNIVERSE_CANDIDATES_PER_CATEGORY * 3,
+          })
       : await prisma.schemeCatalog.findMany({
           where: { category: cat },
           select: { schemeCode: true, schemeName: true, fundHouse: true },
@@ -194,8 +208,9 @@ async function getFullUniverseCandidates(cat: FundCategory): Promise<RankedFund[
 
   const directGrowth = schemes
     .filter((s) => {
-      if (!isDirectGrowthScheme(s.schemeName)) return false;
+      if (!isDirectGrowthScheme(s.schemeName, s.schemeCode)) return false;
       if (cat === "Momentum Index Funds") return isMomentumIndexText(s.schemeName);
+      if (cat === "SIF Funds") return isSifFundText(s.schemeName, s.schemeCode);
       return true;
     })
     .slice(0, FULL_UNIVERSE_CANDIDATES_PER_CATEGORY);
@@ -272,7 +287,7 @@ export async function syncTopFundsCache(categories: FundCategory[] = CATEGORIES)
     const eligible = Array.from(merged.values()).filter((f) => {
       if (curatedCodeSet.has(f.schemeCode)) return true;
       const catalogName = catalogNameByCode.get(f.schemeCode);
-      return isDirectGrowthScheme(catalogName || f.schemeName);
+      return isDirectGrowthScheme(catalogName || f.schemeName, f.schemeCode);
     });
 
     const TARGET_PER_CATEGORY = 10;

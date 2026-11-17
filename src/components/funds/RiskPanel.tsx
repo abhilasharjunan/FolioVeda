@@ -7,26 +7,31 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import {
-  TrendingUp,
-  ChevronUp,
-  ChevronDown,
-  ShieldAlert,
-  Activity,
-  Zap,
-} from "lucide-react";
+import { TrendingUp, ShieldAlert, Activity, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FadeIn } from "@/components/animations";
 import { RiskOMeterInline } from "@/components/funds/RiskOMeterInline";
 import { SectorPieChart } from "@/components/funds/SectorPieChart";
 import { VolatilityChart } from "@/components/funds/VolatilityChart";
 import { SkeletonCard, SkeletonChart } from "@/components/ui/skeletons";
+import { SortableTh } from "@/components/ui/SortableTh";
 import { downloadCSV } from "@/lib/export";
 import { MetricLabel, METRIC_EXPLANATIONS } from "@/components/ui/InfoTooltip";
 import { FundNameLink } from "@/components/funds/FundNameLink";
 import { useOpenFundDetail } from "@/components/funds/FundDetailContext";
+import { useTableSort } from "@/hooks/useTableSort";
+import { compareSortValues } from "@/lib/table-sort";
 import type { FundCategory } from "@/lib/funds";
 import type { TopFundsPanelHandle } from "@/components/funds/ReturnsPanel";
+
+type RiskSortKey =
+  | "schemeName"
+  | "compositeScore"
+  | "volatility"
+  | "sharpeRatio"
+  | "sortinoRatio"
+  | "maxDrawdown"
+  | "maxDrawdownDuration";
 
 interface RiskMetrics {
   volatility: number;
@@ -62,13 +67,7 @@ export const RiskPanel = forwardRef<TopFundsPanelHandle, RiskPanelProps>(
     const openFund = useOpenFundDetail();
     const [data, setData] = useState<Record<string, FundRiskData[]> | null>(null);
     const [loading, setLoading] = useState(true);
-    const [sortConfig, setSortConfig] = useState<{
-      key: string;
-      direction: "asc" | "desc";
-    }>({
-      key: "compositeScore",
-      direction: "desc",
-    });
+    const { sortKey, sortDir, toggle } = useTableSort<RiskSortKey>("compositeScore", "desc");
     const [selectedFund, setSelectedFund] = useState<FundRiskData | null>(null);
 
     useEffect(() => {
@@ -105,12 +104,12 @@ export const RiskPanel = forwardRef<TopFundsPanelHandle, RiskPanelProps>(
           }
         });
       });
-      return list.sort((a, b) => {
-        const aVal = a.metrics[sortConfig.key as keyof RiskMetrics] || 0;
-        const bVal = b.metrics[sortConfig.key as keyof RiskMetrics] || 0;
-        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
-      });
-    }, [data, activeCategory, searchQuery, sortConfig]);
+      const valueOf = (f: FundRiskData) => {
+        if (sortKey === "schemeName") return f.schemeName;
+        return f.metrics[sortKey];
+      };
+      return [...list].sort((a, b) => compareSortValues(valueOf(a), valueOf(b), sortDir));
+    }, [data, activeCategory, searchQuery, sortKey, sortDir]);
 
     useImperativeHandle(ref, () => ({
       exportCsv: () => {
@@ -226,54 +225,70 @@ export const RiskPanel = forwardRef<TopFundsPanelHandle, RiskPanelProps>(
               <table className="w-full text-left border-collapse">
                 <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <tr>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      Fund
-                    </th>
-                    <th
-                      className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-rose-600"
-                      onClick={() =>
-                        setSortConfig({
-                          key: "compositeScore",
-                          direction:
-                            sortConfig.direction === "asc" ? "desc" : "asc",
-                        })
+                    <SortableTh
+                      label="Fund"
+                      active={sortKey === "schemeName"}
+                      direction={sortDir}
+                      onClick={() => toggle("schemeName", { text: true })}
+                    />
+                    <SortableTh
+                      label={
+                        <MetricLabel
+                          label="Risk Score"
+                          tooltip={METRIC_EXPLANATIONS.compositeScore}
+                        />
                       }
-                    >
-                      <MetricLabel
-                        label="Risk Score"
-                        tooltip={METRIC_EXPLANATIONS.compositeScore}
-                      />
-                      {sortConfig.key === "compositeScore" &&
-                        (sortConfig.direction === "asc" ? (
-                          <ChevronUp size={12} className="inline ml-1" />
-                        ) : (
-                          <ChevronDown size={12} className="inline ml-1" />
-                        ))}
-                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      <MetricLabel
-                        label="Volatility"
-                        tooltip={METRIC_EXPLANATIONS.volatility}
-                      />
-                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      <MetricLabel label="Sharpe" tooltip={METRIC_EXPLANATIONS.sharpeRatio} />
-                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      <MetricLabel
-                        label="Sortino"
-                        tooltip={METRIC_EXPLANATIONS.sortinoRatio}
-                      />
-                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      <MetricLabel
-                        label="Max DD"
-                        tooltip={METRIC_EXPLANATIONS.maxDrawdown}
-                      />
-                    </th>
-                    <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                      DD Duration
-                    </th>
+                      active={sortKey === "compositeScore"}
+                      direction={sortDir}
+                      onClick={() => toggle("compositeScore")}
+                    />
+                    <SortableTh
+                      label={
+                        <MetricLabel
+                          label="Volatility"
+                          tooltip={METRIC_EXPLANATIONS.volatility}
+                        />
+                      }
+                      active={sortKey === "volatility"}
+                      direction={sortDir}
+                      onClick={() => toggle("volatility")}
+                    />
+                    <SortableTh
+                      label={
+                        <MetricLabel label="Sharpe" tooltip={METRIC_EXPLANATIONS.sharpeRatio} />
+                      }
+                      active={sortKey === "sharpeRatio"}
+                      direction={sortDir}
+                      onClick={() => toggle("sharpeRatio")}
+                    />
+                    <SortableTh
+                      label={
+                        <MetricLabel
+                          label="Sortino"
+                          tooltip={METRIC_EXPLANATIONS.sortinoRatio}
+                        />
+                      }
+                      active={sortKey === "sortinoRatio"}
+                      direction={sortDir}
+                      onClick={() => toggle("sortinoRatio")}
+                    />
+                    <SortableTh
+                      label={
+                        <MetricLabel
+                          label="Max DD"
+                          tooltip={METRIC_EXPLANATIONS.maxDrawdown}
+                        />
+                      }
+                      active={sortKey === "maxDrawdown"}
+                      direction={sortDir}
+                      onClick={() => toggle("maxDrawdown")}
+                    />
+                    <SortableTh
+                      label="DD Duration"
+                      active={sortKey === "maxDrawdownDuration"}
+                      direction={sortDir}
+                      onClick={() => toggle("maxDrawdownDuration")}
+                    />
                     <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
                       Risk Bar
                     </th>

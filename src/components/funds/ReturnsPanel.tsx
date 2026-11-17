@@ -7,15 +7,31 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { TrendingUp, ChevronUp, ChevronDown, Award, Sparkles } from "lucide-react";
+import { TrendingUp, Award, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StaggerChildren, StaggerItem } from "@/components/animations";
 import { PageLoader } from "@/components/ui/PageLoader";
+import { SortableTh } from "@/components/ui/SortableTh";
 import { downloadCSV } from "@/lib/export";
 import { useOpenFundDetail } from "@/components/funds/FundDetailContext";
 import { FundNameLink } from "@/components/funds/FundNameLink";
+import { useTableSort } from "@/hooks/useTableSort";
+import { compareSortValues } from "@/lib/table-sort";
 import type { FundCategory } from "@/lib/funds";
+
+type ReturnsSortKey =
+  | "rank"
+  | "schemeName"
+  | "nav"
+  | "1M"
+  | "3M"
+  | "6M"
+  | "1Y"
+  | "3Y"
+  | "5Y"
+  | "10Y"
+  | "sinceInception";
 
 interface FundData {
   schemeCode: string;
@@ -42,10 +58,7 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
     const [fundsData, setFundsData] = useState<Record<string, FundData[]>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" }>({
-      key: "1Y",
-      direction: "desc",
-    });
+    const { sortKey, sortDir, toggle } = useTableSort<ReturnsSortKey>("1Y", "desc");
 
     const currentFunds = useMemo(() => {
       const list: Array<FundData & { category: string }> = [];
@@ -59,18 +72,22 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
           }
         });
       });
-      return list.sort((a, b) => {
-        const aVal =
-          sortConfig.key === "sinceInception"
-            ? a.sinceInception || 0
-            : a.returns[sortConfig.key] || 0;
-        const bVal =
-          sortConfig.key === "sinceInception"
-            ? b.sinceInception || 0
-            : b.returns[sortConfig.key] || 0;
-        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
-      });
-    }, [fundsData, activeCategory, searchQuery, sortConfig]);
+      const valueOf = (f: FundData & { category: string }) => {
+        switch (sortKey) {
+          case "rank":
+            return f.rank;
+          case "schemeName":
+            return f.schemeName;
+          case "nav":
+            return f.nav;
+          case "sinceInception":
+            return f.sinceInception;
+          default:
+            return f.returns[sortKey];
+        }
+      };
+      return [...list].sort((a, b) => compareSortValues(valueOf(a), valueOf(b), sortDir));
+    }, [fundsData, activeCategory, searchQuery, sortKey, sortDir]);
 
     const fetchFunds = async () => {
       setLoading(true);
@@ -112,13 +129,6 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
         downloadCSV(csvData, "top-performing-funds");
       },
     }));
-
-    const handleSort = (key: string) => {
-      setSortConfig((prev) => ({
-        key,
-        direction: prev.key === key ? (prev.direction === "asc" ? "desc" : "asc") : "desc",
-      }));
-    };
 
     const getReturnColor = (val: number | null) => {
       if (val === null) return "text-slate-400 dark:text-slate-400";
@@ -275,15 +285,25 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider sticky left-0 bg-slate-50 dark:bg-slate-800/50 z-10">
-                    Rank
-                  </th>
-                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                    Fund Name
-                  </th>
-                  <th className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider">
-                    NAV
-                  </th>
+                  <SortableTh
+                    label="Rank"
+                    active={sortKey === "rank"}
+                    direction={sortDir}
+                    onClick={() => toggle("rank")}
+                    sticky
+                  />
+                  <SortableTh
+                    label="Fund Name"
+                    active={sortKey === "schemeName"}
+                    direction={sortDir}
+                    onClick={() => toggle("schemeName", { text: true })}
+                  />
+                  <SortableTh
+                    label="NAV"
+                    active={sortKey === "nav"}
+                    direction={sortDir}
+                    onClick={() => toggle("nav")}
+                  />
                   {(
                     [
                       ["1M", "1M"],
@@ -296,19 +316,13 @@ export const ReturnsPanel = forwardRef<TopFundsPanelHandle, ReturnsPanelProps>(
                       ["sinceInception", "Inception"],
                     ] as const
                   ).map(([key, label]) => (
-                    <th
+                    <SortableTh
                       key={key}
-                      className="p-4 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider cursor-pointer hover:text-blue-600 dark:hover:text-teal-400 transition-colors"
-                      onClick={() => handleSort(key)}
-                    >
-                      {label}{" "}
-                      {sortConfig.key === key &&
-                        (sortConfig.direction === "asc" ? (
-                          <ChevronUp size={12} className="inline ml-1" />
-                        ) : (
-                          <ChevronDown size={12} className="inline ml-1" />
-                        ))}
-                    </th>
+                      label={label}
+                      active={sortKey === key}
+                      direction={sortDir}
+                      onClick={() => toggle(key)}
+                    />
                   ))}
                 </tr>
               </thead>

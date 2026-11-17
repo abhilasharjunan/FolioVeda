@@ -10,7 +10,8 @@ export type FundCategory =
   | "Hybrid"
   | "Index Funds"
   | "Momentum Index Funds"
-  | "International Funds";
+  | "International Funds"
+  | "SIF Funds";
 
 /** Canonical category list for UI chips, sync batches, and filters. */
 export const FUND_CATEGORIES: FundCategory[] = [
@@ -24,6 +25,7 @@ export const FUND_CATEGORIES: FundCategory[] = [
   "Index Funds",
   "Momentum Index Funds",
   "International Funds",
+  "SIF Funds",
 ];
 
 export interface BenchmarkScheme {
@@ -164,6 +166,19 @@ export const BENCHMARK_SCHEMES: BenchmarkScheme[] = [
   { schemeCode: "152140", schemeName: "Aditya Birla Sun Life US Treasury 1-3Y Bond ETFs FOF", category: "International Funds" },
   { schemeCode: "148646", schemeName: "Kotak International REIT Overseas Equity FOF", category: "International Funds" },
   { schemeCode: "149830", schemeName: "Navi US Total Stock Market Passive FOF", category: "International Funds" },
+  // SIF Funds — SEBI Specialized Investment Funds (Direct Growth). Codes are
+  // AMFI SIF-* scheme ids from SIF_NAVAll.txt (not the numeric MF NAVAll set).
+  { schemeCode: "SIF-23", schemeName: "qsif Equity Ex-Top 100 Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-120", schemeName: "Altiva Equity Ex- Top 100 Long - Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-140", schemeName: "DynaSIF Equity Ex-Top 100 Long - Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-33", schemeName: "iSIF Equity Ex-Top 100 Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-1", schemeName: "qsif Equity Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-57", schemeName: "DynaSIF Equity Long - Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-163", schemeName: "Altiva Equity Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-5", schemeName: "qsif Hybrid Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-9", schemeName: "Altiva Hybrid Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-90", schemeName: "qsif Active Asset Allocator Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
+  { schemeCode: "SIF-116", schemeName: "qsif Sector Rotation Long-Short Fund - Direct Plan - Growth", category: "SIF Funds" },
 ];
 
 export function calculateCAGR(currentNav: number, pastNav: number, days: number) {

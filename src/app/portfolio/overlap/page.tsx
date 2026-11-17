@@ -6,9 +6,15 @@ import { Badge } from '@/components/ui/badge';
 import { FadeIn } from '@/components/animations';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { MetricLabel, METRIC_EXPLANATIONS } from '@/components/ui/InfoTooltip';
+import { SortableTh } from '@/components/ui/SortableTh';
 import { SectorPieChart } from '@/components/funds/SectorPieChart';
 import { Layers, AlertTriangle, ShieldCheck, PieChart } from 'lucide-react';
 import { FundNameLink } from '@/components/funds/FundNameLink';
+import { useTableSort } from '@/hooks/useTableSort';
+import { compareSortValues } from '@/lib/table-sort';
+
+type CommonSortKey = 'stockName' | 'weightA' | 'weightB' | 'minWeight';
+type LookThroughSortKey = 'stockName' | 'effectiveWeight' | 'fundCount';
 
 interface FundEntry {
   schemeCode: string;
@@ -97,6 +103,8 @@ export default function PortfolioOverlapPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPair, setSelectedPair] = useState<OverlapPair | null>(null);
+  const commonSort = useTableSort<CommonSortKey>('minWeight', 'desc');
+  const lookThroughSort = useTableSort<LookThroughSortKey>('effectiveWeight', 'desc');
 
   useEffect(() => {
     let cancelled = false;
@@ -148,6 +156,41 @@ export default function PortfolioOverlapPage() {
     () => Object.fromEntries(sectors.map((s) => [s.sector, s.weight])),
     [sectors]
   );
+
+  const sortedCommonStocks = useMemo(() => {
+    if (!selectedPair) return [];
+    const valueOf = (s: CommonStock) => {
+      switch (commonSort.sortKey) {
+        case 'stockName':
+          return s.stockName;
+        case 'weightA':
+          return s.weightA;
+        case 'weightB':
+          return s.weightB;
+        case 'minWeight':
+          return s.minWeight;
+      }
+    };
+    return [...selectedPair.commonStocks].sort((a, b) =>
+      compareSortValues(valueOf(a), valueOf(b), commonSort.sortDir)
+    );
+  }, [selectedPair, commonSort.sortKey, commonSort.sortDir]);
+
+  const sortedLookThrough = useMemo(() => {
+    const valueOf = (s: LookThroughHolding) => {
+      switch (lookThroughSort.sortKey) {
+        case 'stockName':
+          return s.stockName;
+        case 'effectiveWeight':
+          return s.effectiveWeight;
+        case 'fundCount':
+          return s.heldInFunds.length;
+      }
+    };
+    return [...lookThrough].sort((a, b) =>
+      compareSortValues(valueOf(a), valueOf(b), lookThroughSort.sortDir)
+    );
+  }, [lookThrough, lookThroughSort.sortKey, lookThroughSort.sortDir]);
 
   if (loading) {
     return (
@@ -422,14 +465,37 @@ export default function PortfolioOverlapPage() {
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                       <tr>
-                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Stock</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Weight in A</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Weight in B</th>
-                        <th className="p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Overlap (min)</th>
+                        <SortableTh
+                          label="Stock"
+                          active={commonSort.sortKey === 'stockName'}
+                          direction={commonSort.sortDir}
+                          onClick={() => commonSort.toggle('stockName', { text: true })}
+                        />
+                        <SortableTh
+                          label="Weight in A"
+                          active={commonSort.sortKey === 'weightA'}
+                          direction={commonSort.sortDir}
+                          onClick={() => commonSort.toggle('weightA')}
+                          align="right"
+                        />
+                        <SortableTh
+                          label="Weight in B"
+                          active={commonSort.sortKey === 'weightB'}
+                          direction={commonSort.sortDir}
+                          onClick={() => commonSort.toggle('weightB')}
+                          align="right"
+                        />
+                        <SortableTh
+                          label="Overlap (min)"
+                          active={commonSort.sortKey === 'minWeight'}
+                          direction={commonSort.sortDir}
+                          onClick={() => commonSort.toggle('minWeight')}
+                          align="right"
+                        />
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedPair.commonStocks.map((s) => (
+                      {sortedCommonStocks.map((s) => (
                         <tr key={s.stockName} className="border-b border-slate-50 dark:border-slate-800/80">
                           <td className="p-3 text-sm font-medium text-slate-800 dark:text-slate-100">
                             {s.stockName}
@@ -469,21 +535,36 @@ export default function PortfolioOverlapPage() {
                 <table className="w-full text-left border-collapse">
                   <thead className="border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                      <th className="pb-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Company / Stock</th>
-                      <th className="pb-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Effective Weight</th>
-                      <th className="pb-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Held Across Schemes</th>
+                      <SortableTh
+                        label="Company / Stock"
+                        active={lookThroughSort.sortKey === 'stockName'}
+                        direction={lookThroughSort.sortDir}
+                        onClick={() => lookThroughSort.toggle('stockName', { text: true })}
+                      />
+                      <SortableTh
+                        label="Effective Weight"
+                        active={lookThroughSort.sortKey === 'effectiveWeight'}
+                        direction={lookThroughSort.sortDir}
+                        onClick={() => lookThroughSort.toggle('effectiveWeight')}
+                      />
+                      <SortableTh
+                        label="Held Across Schemes"
+                        active={lookThroughSort.sortKey === 'fundCount'}
+                        direction={lookThroughSort.sortDir}
+                        onClick={() => lookThroughSort.toggle('fundCount')}
+                      />
                     </tr>
                   </thead>
                   <tbody>
-                    {lookThrough.map((stock) => (
+                    {sortedLookThrough.map((stock) => (
                       <tr key={stock.stockName} className="border-b border-slate-100 dark:border-slate-800/70">
-                        <td className="py-3 pr-3">
+                        <td className="py-3 pr-3 px-4">
                           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{stock.stockName}</p>
                           {stock.sector && stock.sector !== 'Other' && (
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{stock.sector}</p>
                           )}
                         </td>
-                        <td className="py-3 pr-3 min-w-[160px]">
+                        <td className="py-3 pr-3 px-4 min-w-[160px]">
                           <div className="flex items-center gap-3">
                             <span className={`text-sm font-bold tabular-nums w-14 ${
                               stock.effectiveWeight >= 10
@@ -493,11 +574,14 @@ export default function PortfolioOverlapPage() {
                               {stock.effectiveWeight.toFixed(1)}%
                             </span>
                             <div className="flex-1 max-w-[120px]">
-                              <MiniProgress value={stock.effectiveWeight} max={Math.max(lookThrough[0]?.effectiveWeight || 10, 10)} />
+                              <MiniProgress
+                                value={stock.effectiveWeight}
+                                max={Math.max(sortedLookThrough[0]?.effectiveWeight || 10, 10)}
+                              />
                             </div>
                           </div>
                         </td>
-                        <td className="py-3">
+                        <td className="py-3 px-4">
                           <div className="flex gap-1.5 flex-wrap">
                             {stock.heldInFunds.map((f) => (
                               <Badge

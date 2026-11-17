@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,10 @@ import { AnimatedNumber, StaggerChildren, StaggerItem } from '@/components/anima
 import { EmptyState } from '@/components/ui/EmptyState';
 import { toast } from 'sonner';
 import { FundNameLink } from '@/components/funds/FundNameLink';
+import { useTableSort } from '@/hooks/useTableSort';
+import { compareSortValues } from '@/lib/table-sort';
+
+type HoldingsSortKey = 'name' | 'units' | 'invested' | 'value';
 
 interface Transaction {
   id: string;
@@ -109,10 +113,33 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
     }
   };
 
+  const { sortKey, sortDir, toggle } = useTableSort<HoldingsSortKey>('value', 'desc');
+
   const totalValue = holdings.reduce((sum, h) => sum + h.units * (schemeMeta[h.schemeCode]?.nav || 0), 0);
   const totalInvested = holdings.reduce((sum, h) =>
     sum + h.transactions.reduce((s, t) => s + (t.type === 'BUY' ? t.amount : -t.amount), 0), 0);
   const gain = totalValue - totalInvested;
+
+  const sortedHoldings = useMemo(() => {
+    const valueOf = (h: Holding) => {
+      const invested = h.transactions.reduce(
+        (s, t) => s + (t.type === 'BUY' ? t.amount : -t.amount),
+        0
+      );
+      const value = h.units * (schemeMeta[h.schemeCode]?.nav || 0);
+      switch (sortKey) {
+        case 'name':
+          return schemeMeta[h.schemeCode]?.name || h.schemeCode;
+        case 'units':
+          return h.units;
+        case 'invested':
+          return invested;
+        case 'value':
+          return value;
+      }
+    };
+    return [...holdings].sort((a, b) => compareSortValues(valueOf(a), valueOf(b), sortDir));
+  }, [holdings, schemeMeta, sortKey, sortDir]);
 
   if (loading) {
     return (
@@ -165,8 +192,36 @@ export default function HoldingsList({ onRequestAdd }: { onRequestAdd?: () => vo
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-500 dark:text-slate-400 font-medium">Sort</span>
+          {(
+            [
+              ['name', 'Name', true],
+              ['units', 'Units', false],
+              ['invested', 'Invested', false],
+              ['value', 'Value', false],
+            ] as const
+          ).map(([key, label, text]) => {
+            const active = sortKey === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => toggle(key, { text })}
+                className={`rounded-full border px-2.5 py-1 font-semibold transition-colors ${
+                  active
+                    ? 'border-teal-500 bg-teal-50 text-teal-800 dark:bg-teal-950/40 dark:text-teal-200'
+                    : 'border-slate-200 text-slate-500 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300'
+                }`}
+              >
+                {label}
+                {active ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
+              </button>
+            );
+          })}
+        </div>
         <StaggerChildren className="space-y-3" stagger={0.05}>
-          {holdings.map((h) => {
+          {sortedHoldings.map((h) => {
             const meta = schemeMeta[h.schemeCode] || { name: 'Unknown Fund', nav: 0 };
             const invested = h.transactions.reduce((s, t) => s + (t.type === 'BUY' ? t.amount : -t.amount), 0);
             const isOpen = expanded === h.id;

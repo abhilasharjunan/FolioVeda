@@ -2,7 +2,7 @@ import { getPortfolioAnalysis } from "@/lib/analysis";
 import { getPortfolioDiversification } from "@/lib/diversification";
 import { getPortfolioRiskAnalysis } from "@/lib/portfolio-risk";
 import { PrintReportButton } from "@/components/portfolio/PrintReportButton";
-import { ReportFundCell } from "@/components/portfolio/ReportFundCell";
+import { ReportHoldingsTable } from "@/components/portfolio/ReportHoldingsTable";
 import { TrendingUp } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -124,34 +124,7 @@ export default async function PortfolioReportPage() {
 
         <section className="print:break-inside-avoid">
           <h2 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-3">Holdings</h2>
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-700">
-                <th className="text-left py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Fund</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Invested</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Current Value</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">Gain</th>
-                <th className="text-right py-2 text-xs font-semibold text-slate-500 dark:text-slate-300 uppercase">XIRR</th>
-              </tr>
-            </thead>
-            <tbody>
-              {analysis.holdings.map((h: any, i: number) => (
-                <tr key={i} className="border-b border-slate-100 dark:border-slate-800">
-                  <td className="py-2 text-slate-800 dark:text-slate-100">
-                    <ReportFundCell schemeCode={h.schemeCode} schemeName={h.schemeName} />
-                  </td>
-                  <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.invested)}</td>
-                  <td className="py-2 text-right font-mono text-slate-700 dark:text-slate-200">{fmtCurrency(h.currentVal)}</td>
-                  <td className={`py-2 text-right font-mono ${h.gain >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'}`}>{fmtCurrency(h.gain)}</td>
-                  <td className={`py-2 text-right font-mono font-bold ${
-                    h.xirr == null ? 'text-slate-400 dark:text-slate-400' : h.xirr >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400'
-                  }`}>
-                    {h.xirr != null ? `${h.xirr.toFixed(2)}%` : 'N/A'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ReportHoldingsTable holdings={analysis.holdings} />
         </section>
 
         {riskAnalysis && (
